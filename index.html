@@ -111,6 +111,7 @@
     .badge-red    { background: #fee2e2; color: #991b1b; }
     .badge-amber  { background: #fef3c7; color: #92400e; }
     .badge-blue   { background: #dbeafe; color: #1e40af; }
+    .badge-gray   { background: #f3f4f6; color: #374151; }
 
     .empty {
       padding: 40px 20px;
@@ -143,7 +144,7 @@
       margin-top: 4px;
     }
 
-    /* === Analyze tab specific === */
+    /* Analyze tab */
     .analyze-form {
       padding: 18px;
       background: #fff;
@@ -191,10 +192,9 @@
       margin-top: 4px;
     }
 
-    .analysis-content {
-      padding: 18px;
-    }
-    .analysis-content .price-card {
+    .analysis-content { padding: 18px; }
+
+    .price-card {
       background: #f9fafb;
       border-radius: 8px;
       padding: 14px;
@@ -203,9 +203,7 @@
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 10px;
     }
-    .price-card .metric {
-      font-size: 13px;
-    }
+    .price-card .metric { font-size: 13px; }
     .price-card .metric-label {
       color: #6b7280;
       font-size: 11px;
@@ -218,10 +216,95 @@
       font-size: 15px;
     }
 
-    .analysis-text {
-      line-height: 1.7;
-      font-size: 14px;
+    /* Analyst card */
+    .analyst-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 16px;
     }
+    .analyst-card-header {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .analyst-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .analyst-metric {
+      background: #f9fafb;
+      padding: 10px 12px;
+      border-radius: 6px;
+    }
+    .analyst-metric-label {
+      color: #6b7280;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .analyst-metric-value {
+      font-weight: 600;
+      font-size: 15px;
+    }
+    .rating-bars {
+      display: grid;
+      grid-template-columns: 110px 1fr 40px;
+      gap: 6px 12px;
+      align-items: center;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .rating-bar-track {
+      background: #f3f4f6;
+      border-radius: 99px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .rating-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+    }
+    .rating-bar-fill.strong-buy  { background: #15803d; }
+    .rating-bar-fill.buy         { background: #16a34a; }
+    .rating-bar-fill.hold        { background: #ca8a04; }
+    .rating-bar-fill.sell        { background: #dc2626; }
+    .rating-bar-fill.strong-sell { background: #991b1b; }
+    .rating-label { color: #374151; font-weight: 500; }
+    .rating-count { text-align: right; color: #6b7280; font-variant-numeric: tabular-nums; }
+
+    .actions-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    .actions-table th {
+      padding: 8px 10px;
+      font-size: 11px;
+      background: #f9fafb;
+    }
+    .actions-table td {
+      padding: 8px 10px;
+      font-size: 13px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .action-up   { color: #16a34a; font-weight: 600; }
+    .action-down { color: #dc2626; font-weight: 600; }
+    .action-init { color: #1d4ed8; font-weight: 600; }
+    .action-main { color: #6b7280; font-weight: 500; }
+
+    /* Analysis text */
+    .analysis-text { line-height: 1.7; font-size: 14px; }
     .analysis-text h2 {
       font-size: 16px;
       margin-top: 18px;
@@ -237,21 +320,14 @@
     .analysis-text p { margin: 8px 0; }
     .analysis-text em { color: #6b7280; font-size: 13px; }
 
-    .news-list {
-      list-style: none;
-      padding: 0;
-      margin-top: 12px;
-    }
+    .news-list { list-style: none; padding: 0; margin-top: 12px; }
     .news-list li {
       padding: 10px 0;
       border-bottom: 1px solid #f3f4f6;
       font-size: 14px;
     }
     .news-list li:last-child { border-bottom: none; }
-    .news-list a {
-      color: #1d4ed8;
-      text-decoration: none;
-    }
+    .news-list a { color: #1d4ed8; text-decoration: none; }
     .news-list a:hover { text-decoration: underline; }
     .news-list .news-meta {
       color: #9ca3af;
@@ -282,6 +358,7 @@
       header h1 { font-size: 18px; }
       th, td { padding: 8px 10px; font-size: 13px; }
       .tab { padding: 8px 12px; font-size: 13px; }
+      .rating-bars { grid-template-columns: 90px 1fr 32px; }
     }
   </style>
 </head>
@@ -321,12 +398,10 @@
   </div>
 
   <script>
-    // ===== Configuration =====
     const API_URL = "https://nse-dashboard-api.onrender.com/api/snapshot";
     const ANALYZE_URL = "https://nse-dashboard-api.onrender.com/api/analyze";
     const REFRESH_MS = 60_000;
 
-    // ===== Helpers =====
     const $ = (id) => document.getElementById(id);
     const fmt = (n, places = 2) =>
       n.toLocaleString("en-IN", { minimumFractionDigits: places, maximumFractionDigits: places });
@@ -351,8 +426,6 @@
       return `${Math.floor(sec / 86400)}d ago`;
     }
 
-    // ===== Simple Markdown → HTML for analysis output =====
-    // Handles: ##, ###, **bold**, *italic*, - bullets, line breaks.
     function mdToHtml(md) {
       const lines = md.split("\n");
       let html = "";
@@ -381,7 +454,6 @@
       return html;
     }
     function inlineMd(text) {
-      // Escape first, then apply inline markdown
       let t = escapeHtml(text);
       t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
       t = t.replace(/\*([^*]+)\*/g,    "<em>$1</em>");
@@ -391,7 +463,7 @@
       return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // ===== Renderers — existing tabs =====
+    // ===== Existing tab renderers (intraday/reversal/momentum) =====
     function renderIntraday(data) {
       const panel = $("panel-intraday");
       const items = (data && data.items) || [];
@@ -545,18 +617,18 @@
       `;
     }
 
-    // ===== Analyze panel renderer =====
+    // ===== Analyze panel =====
     function renderAnalyzePanel() {
       const panel = $("panel-analyze");
       panel.innerHTML = `
         <div class="panel-header">
           🤖 AI Technical Analysis
-          <div class="freshness">Enter an NSE symbol for full technical breakdown + recommendation</div>
+          <div class="freshness">Enter an NSE symbol for full technical breakdown + analyst ratings + recommendation</div>
         </div>
         <div class="analyze-form">
           <input type="text" id="analyze-input" placeholder="e.g. RELIANCE, TCS, HDFCBANK" autocomplete="off">
           <button id="analyze-button" type="button">Analyze</button>
-          <div class="hint">Uses Claude to interpret 10+ technical indicators + latest news. ~5-30 seconds per analysis.</div>
+          <div class="hint">Uses Claude to interpret technical indicators + analyst ratings + latest news. ~5-30 seconds per analysis.</div>
         </div>
         <div id="analyze-result" class="analysis-content"></div>
       `;
@@ -583,7 +655,7 @@
       result.innerHTML = `
         <div class="loading-spinner">
           Analyzing ${symbol}…<br>
-          <span style="font-size:13px;">Fetching data → running indicators → AI interpretation</span><br>
+          <span style="font-size:13px;">Fetching data → analyst ratings → news → AI interpretation</span><br>
           <span style="font-size:12px;color:#9ca3af;">(First request after idle may take ~30s while server wakes)</span>
         </div>
       `;
@@ -614,12 +686,162 @@
       }
     }
 
+    // ===== Render analyst ratings card =====
+    function renderAnalystCard(ratings, currentPrice) {
+      if (!ratings || ratings.data_source === "unavailable" ||
+          (!ratings.summary && !ratings.price_target &&
+           (!ratings.recent_actions || ratings.recent_actions.length === 0))) {
+        return `
+          <div class="analyst-card">
+            <div class="analyst-card-header">📊 Analyst Ratings</div>
+            <div style="color:#6b7280;font-size:13px;font-style:italic;">
+              No analyst data available for this stock from Yahoo Finance.
+            </div>
+          </div>
+        `;
+      }
+
+      // Consensus + key metrics row
+      const metrics = [];
+      if (ratings.consensus) {
+        const consensusClass = /buy/i.test(ratings.consensus) ? "gain" :
+                               /sell/i.test(ratings.consensus) ? "loss" : "";
+        metrics.push(`
+          <div class="analyst-metric">
+            <div class="analyst-metric-label">Consensus</div>
+            <div class="analyst-metric-value ${consensusClass}">${escapeHtml(ratings.consensus)}</div>
+          </div>
+        `);
+      }
+      if (ratings.price_target && ratings.price_target.mean) {
+        const pt = ratings.price_target;
+        const upside = ((pt.mean - currentPrice) / currentPrice) * 100;
+        const upsideClass = upside >= 0 ? "gain" : "loss";
+        metrics.push(`
+          <div class="analyst-metric">
+            <div class="analyst-metric-label">Target (Mean)</div>
+            <div class="analyst-metric-value">₹${fmt(pt.mean)}</div>
+            <div style="font-size:11px;" class="${upsideClass}">${sign(upside)}${fmt(upside)}% upside</div>
+          </div>
+        `);
+        if (pt.high && pt.low) {
+          metrics.push(`
+            <div class="analyst-metric">
+              <div class="analyst-metric-label">Target Range</div>
+              <div class="analyst-metric-value" style="font-size:13px;">
+                ₹${fmt(pt.low)} – ₹${fmt(pt.high)}
+              </div>
+            </div>
+          `);
+        }
+        if (pt.count) {
+          metrics.push(`
+            <div class="analyst-metric">
+              <div class="analyst-metric-label">Analysts</div>
+              <div class="analyst-metric-value">${pt.count}</div>
+            </div>
+          `);
+        }
+      }
+
+      // Rating bars
+      let ratingBars = "";
+      if (ratings.summary && ratings.summary.total > 0) {
+        const s = ratings.summary;
+        const total = s.total;
+        const bar = (label, count, klass) => {
+          if (total === 0) return "";
+          const pct = (count / total) * 100;
+          return `
+            <div class="rating-label">${label}</div>
+            <div class="rating-bar-track">
+              <div class="rating-bar-fill ${klass}" style="width:${pct}%;"></div>
+            </div>
+            <div class="rating-count">${count}</div>
+          `;
+        };
+        const anyBreakdown = s.strong_buy + s.buy + s.hold + s.sell + s.strong_sell > 0;
+        if (anyBreakdown) {
+          ratingBars = `
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f3f4f6;">
+              <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;">
+                Rating Distribution (${total} analysts)
+              </div>
+              <div class="rating-bars">
+                ${bar("Strong Buy",  s.strong_buy,  "strong-buy")}
+                ${bar("Buy",         s.buy,         "buy")}
+                ${bar("Hold",        s.hold,        "hold")}
+                ${bar("Sell",        s.sell,        "sell")}
+                ${bar("Strong Sell", s.strong_sell, "strong-sell")}
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      // Recent broker actions table
+      let actionsTable = "";
+      if (ratings.recent_actions && ratings.recent_actions.length > 0) {
+        const rows = ratings.recent_actions.map(a => {
+          const actionLower = (a.action || "").toLowerCase();
+          let actionClass = "action-main";
+          let actionIcon  = "·";
+          if (actionLower.includes("up")) {
+            actionClass = "action-up";
+            actionIcon  = "↑";
+          } else if (actionLower.includes("down")) {
+            actionClass = "action-down";
+            actionIcon  = "↓";
+          } else if (actionLower.includes("init")) {
+            actionClass = "action-init";
+            actionIcon  = "★";
+          }
+          const transition = (a.from_grade && a.to_grade && a.from_grade !== a.to_grade)
+            ? `${escapeHtml(a.from_grade)} → ${escapeHtml(a.to_grade)}`
+            : escapeHtml(a.to_grade || "");
+          return `
+            <tr>
+              <td style="white-space:nowrap;">${escapeHtml(a.date)}</td>
+              <td>${escapeHtml(a.firm)}</td>
+              <td class="${actionClass}">${actionIcon} ${escapeHtml(a.action || "")}</td>
+              <td>${transition}</td>
+            </tr>
+          `;
+        }).join("");
+
+        actionsTable = `
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f3f4f6;">
+            <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;">
+              Recent Broker Actions
+            </div>
+            <table class="actions-table">
+              <thead>
+                <tr><th>Date</th><th>Firm</th><th>Action</th><th>Rating</th></tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="analyst-card">
+          <div class="analyst-card-header">
+            📊 Analyst Ratings
+            <span class="badge badge-gray">via Yahoo Finance</span>
+          </div>
+          <div class="analyst-summary">${metrics.join("")}</div>
+          ${ratingBars}
+          ${actionsTable}
+        </div>
+      `;
+    }
+
     function renderAnalysisResult(data) {
       const result = $("analyze-result");
       const p = data.price_data;
       const change1d = p.pct_change_1d;
 
-      // Price summary card
       const priceCard = `
         <div class="price-card">
           <div class="metric">
@@ -654,7 +876,8 @@
         </div>
       `;
 
-      // News block
+      const analystCard = renderAnalystCard(data.ratings, p.current_price);
+
       let newsBlock = "";
       if (data.news && data.news.length > 0) {
         const newsItems = data.news.map(n => {
@@ -667,12 +890,13 @@
           `;
         }).join("");
         newsBlock = `
-          <h2>📰 Latest News (last 7 days)</h2>
+          <h2 style="font-size:16px;margin-top:18px;padding-bottom:6px;border-bottom:1px solid #e5e7eb;">
+            📰 Latest News (last 7 days)
+          </h2>
           <ul class="news-list">${newsItems}</ul>
         `;
       }
 
-      // Chart links
       const chartLinks = `
         <div style="margin-top:18px; padding-top:14px; border-top:1px solid #e5e7eb;">
           ${tvLink(data.symbol)} · ${nseLink(data.symbol)} ·
@@ -682,10 +906,10 @@
         </div>
       `;
 
-      // Combine everything
       result.innerHTML = `
         <h1 style="font-size:20px; margin-bottom:6px;">${data.symbol}</h1>
         ${priceCard}
+        ${analystCard}
         <div class="analysis-text">${mdToHtml(data.analysis)}</div>
         ${newsBlock}
         ${chartLinks}
@@ -700,33 +924,28 @@
         document.querySelectorAll('[id^="panel-"]').forEach((p) => {
           p.style.display = p.id === `panel-${tab}` ? "block" : "none";
         });
-        // Initialize analyze panel on first open
         if (tab === "analyze" && !$("panel-analyze").innerHTML.trim()) {
           renderAnalyzePanel();
         }
       });
     });
 
-    // Delegate clicks on symbol links from any table → jump to analyze tab
     document.addEventListener("click", (e) => {
       const link = e.target.closest(".analyze-link");
       if (!link) return;
       e.preventDefault();
       const symbol = link.dataset.symbol;
 
-      // Switch to analyze tab
       document.querySelectorAll(".tab").forEach(b =>
         b.classList.toggle("active", b.dataset.tab === "analyze"));
       document.querySelectorAll('[id^="panel-"]').forEach(p =>
         p.style.display = p.id === "panel-analyze" ? "block" : "none");
 
-      // Initialize and run
       if (!$("panel-analyze").innerHTML.trim()) renderAnalyzePanel();
       $("analyze-input").value = symbol;
       runAnalysis(symbol);
     });
 
-    // ===== Snapshot fetcher =====
     async function refresh() {
       const status = $("status");
       try {
