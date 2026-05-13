@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NSE Stock Dashboard</title>
+  <style>
+    /* Reset + base */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f9fafb;
+      color: #111827;
+      padding: 20px;
+      line-height: 1.4;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* Header */
+    header {
+      background: #1f2937;
+      color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    header h1 { font-size: 22px; font-weight: 700; }
+    header .meta { font-size: 13px; opacity: 0.8; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 10px 18px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .tab:hover { background: #f3f4f6; }
+    .tab.active {
+      background: #1d4ed8;
+      color: #fff;
+      border-color: #1d4ed8;
+    }
+    .tab .count {
+      display: inline-block;
+      background: rgba(0,0,0,0.1);
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      margin-left: 6px;
+    }
+    .tab.active .count { background: rgba(255,255,255,0.25); }
+
+    /* Tables */
+    .panel {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 14px 18px;
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+      font-weight: 600;
+      font-size: 14px;
+      color: #374151;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    td {
+      padding: 12px 14px;
+      font-size: 14px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafbfc; }
+
+    .symbol { font-weight: 600; font-family: ui-monospace, monospace; }
+    .gain { color: #16a34a; font-weight: 600; }
+    .loss { color: #dc2626; font-weight: 600; }
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+    .badge-green  { background: #d1fae5; color: #065f46; }
+    .badge-red    { background: #fee2e2; color: #991b1b; }
+    .badge-amber  { background: #fef3c7; color: #92400e; }
+    .badge-blue   { background: #dbeafe; color: #1e40af; }
+
+    .empty {
+      padding: 40px 20px;
+      text-align: center;
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .ext-link {
+      color: #1d4ed8;
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .ext-link:hover { text-decoration: underline; }
+
+    /* Loading + error states */
+    .status {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+    .status.loading { background: #dbeafe; color: #1e40af; }
+    .status.error   { background: #fee2e2; color: #991b1b; }
+    .status.ok      { background: #d1fae5; color: #065f46; }
+
+    .freshness {
+      font-size: 11px;
+      color: #9ca3af;
+      font-style: italic;
+      margin-top: 4px;
+    }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      body { padding: 10px; }
+      header { padding: 14px; }
+      header h1 { font-size: 18px; }
+      th, td { padding: 8px 10px; font-size: 13px; }
+      .tab { padding: 8px 12px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>📊 NSE Stock Dashboard</h1>
+        <div class="meta">Auto-refresh every 60s · Data from Yahoo Finance + Google News</div>
+      </div>
+      <div>
+        <div id="last-refresh" class="meta">Loading…</div>
+      </div>
+    </header>
+
+    <div id="status" class="status loading">Fetching latest data…</div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="intraday">
+        ⚡ Intraday Alerts <span class="count" id="count-intraday">—</span>
+      </button>
+      <button class="tab" data-tab="reversal">
+        🔄 Trend Reversals <span class="count" id="count-reversal">—</span>
+      </button>
+      <button class="tab" data-tab="momentum">
+        📈 30-Day Momentum <span class="count" id="count-momentum">—</span>
+      </button>
+    </div>
+
+    <div id="panel-intraday" class="panel"></div>
+    <div id="panel-reversal" class="panel" style="display:none;"></div>
+    <div id="panel-momentum" class="panel" style="display:none;"></div>
+  </div>
+
+  <script>
+    // ===== Configuration =====
+    // CHANGE THIS to your Render API URL after Part 2 is deployed:
+    const API_URL = "https://nse-dashboard-api.onrender.com/api/snapshot";
+    const REFRESH_MS = 60_000;   // refresh every 60 seconds
+
+    // ===== Helpers =====
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n, places = 2) =>
+      n.toLocaleString("en-IN", { minimumFractionDigits: places, maximumFractionDigits: places });
+    const cls = (val) => (val >= 0 ? "gain" : "loss");
+    const sign = (val) => (val >= 0 ? "+" : "");
+
+    function tvLink(symbol) {
+      return `<a class="ext-link" target="_blank" href="https://in.tradingview.com/chart/?symbol=NSE:${symbol}">📈 TV</a>`;
+    }
+    function nseLink(symbol) {
+      return `<a class="ext-link" target="_blank" href="https://www.nseindia.com/get-quotes/equity?symbol=${symbol}">NSE</a>`;
+    }
+
+    function timeAgo(isoString) {
+      if (!isoString) return "never";
+      const then = new Date(isoString).getTime();
+      const now  = Date.now();
+      const sec  = Math.floor((now - then) / 1000);
+      if (sec < 60)    return `${sec}s ago`;
+      if (sec < 3600)  return `${Math.floor(sec / 60)}m ago`;
+      if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
+      return `${Math.floor(sec / 86400)}d ago`;
+    }
+
+    // ===== Renderers =====
+    function renderIntraday(data) {
+      const panel = $("panel-intraday");
+      const items = (data && data.items) || [];
+      $("count-intraday").textContent = items.length;
+
+      if (items.length === 0) {
+        panel.innerHTML = `
+          <div class="panel-header">Intraday Alerts</div>
+          <div class="empty">No active alerts. Updated ${timeAgo(data?.updated_at)}.</div>
+        `;
+        return;
+      }
+
+      const rows = items.map((s) => {
+        const badges = [];
+        if (s.is_new_52w_high) badges.push('<span class="badge badge-green">🏆 NEW 52W HIGH</span>');
+        if (s.is_new_52w_low)  badges.push('<span class="badge badge-red">⚠️ NEW 52W LOW</span>');
+        if (s.is_gap_up)       badges.push('<span class="badge badge-green">GAP UP</span>');
+        if (s.is_gap_down)     badges.push('<span class="badge badge-red">GAP DOWN</span>');
+        if (s.volume_ratio > 2) badges.push(`<span class="badge badge-amber">VOL ${fmt(s.volume_ratio, 1)}x</span>`);
+        return `
+          <tr>
+            <td class="symbol">${s.symbol}</td>
+            <td>${badges.join("")}</td>
+            <td style="text-align:right;">₹${fmt(s.price)}</td>
+            <td style="text-align:right;" class="${cls(s.pct_change)}">${sign(s.pct_change)}${fmt(s.pct_change)}%</td>
+            <td style="text-align:right;">${sign(s.gap_pct)}${fmt(s.gap_pct)}%</td>
+            <td style="text-align:right;">${fmt(s.volume_ratio, 1)}x</td>
+            <td>${tvLink(s.symbol)} · ${nseLink(s.symbol)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      panel.innerHTML = `
+        <div class="panel-header">
+          Intraday Alerts (${items.length})
+          <div class="freshness">Updated ${timeAgo(data.updated_at)}</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Signals</th>
+              <th style="text-align:right;">Price</th>
+              <th style="text-align:right;">% Change</th>
+              <th style="text-align:right;">Gap %</th>
+              <th style="text-align:right;">Vol</th>
+              <th>Chart</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderReversal(data) {
+      const panel = $("panel-reversal");
+      const items = (data && data.items) || [];
+      $("count-reversal").textContent = items.length;
+
+      if (items.length === 0) {
+        panel.innerHTML = `
+          <div class="panel-header">Trend Reversals</div>
+          <div class="empty">No active reversal candidates. Updated ${timeAgo(data?.updated_at)}.</div>
+        `;
+        return;
+      }
+
+      // Sort: bullish first, then by signal_count desc
+      const sorted = [...items].sort((a, b) =>
+        a.direction === b.direction
+          ? b.signal_count - a.signal_count
+          : (a.direction === "bullish" ? -1 : 1)
+      );
+
+      const rows = sorted.map((s) => {
+        const dirBadge = s.direction === "bullish"
+          ? '<span class="badge badge-green">🚀 BULL</span>'
+          : '<span class="badge badge-red">📉 BEAR</span>';
+        const confirmations = (s.confirmations || []).join(" · ");
+        return `
+          <tr>
+            <td class="symbol">${s.symbol}</td>
+            <td>${s.name || ""}</td>
+            <td>${dirBadge}</td>
+            <td style="text-align:center;"><strong>${s.signal_count}/5</strong></td>
+            <td style="text-align:right;">₹${fmt(s.price)}</td>
+            <td style="text-align:right;" class="${cls(s.pct_change_1d)}">${sign(s.pct_change_1d)}${fmt(s.pct_change_1d)}%</td>
+            <td style="font-size:12px; color:#6b7280;">${confirmations}</td>
+            <td>${tvLink(s.symbol)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      panel.innerHTML = `
+        <div class="panel-header">
+          Trend Reversal Candidates (${items.length})
+          <div class="freshness">Updated ${timeAgo(data.updated_at)}</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Name</th>
+              <th>Direction</th>
+              <th>Signals</th>
+              <th style="text-align:right;">Price</th>
+              <th style="text-align:right;">1D %</th>
+              <th>Confirmations</th>
+              <th>Chart</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function renderMomentum(data) {
+      const panel = $("panel-momentum");
+      const items = (data && data.items) || [];
+      $("count-momentum").textContent = items.length;
+
+      if (items.length === 0) {
+        panel.innerHTML = `
+          <div class="panel-header">30-Day Momentum</div>
+          <div class="empty">No data yet. Updated ${timeAgo(data?.updated_at)}.</div>
+        `;
+        return;
+      }
+
+      // Gainers first (sorted desc), then losers (sorted asc)
+      const sorted = [...items].sort((a, b) => b.pct_change - a.pct_change);
+
+      const rows = sorted.map((s) => `
+        <tr>
+          <td class="symbol">${s.symbol}</td>
+          <td>${s.name || ""}</td>
+          <td style="text-align:right;">₹${fmt(s.start_price)}</td>
+          <td style="text-align:right;">₹${fmt(s.end_price)}</td>
+          <td style="text-align:right;" class="${cls(s.pct_change)}">${sign(s.pct_change)}${fmt(s.pct_change)}%</td>
+          <td>${tvLink(s.symbol)}</td>
+        </tr>
+      `).join("");
+
+      panel.innerHTML = `
+        <div class="panel-header">
+          30-Day Momentum (${items.length})
+          <div class="freshness">Updated ${timeAgo(data.updated_at)}</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Name</th>
+              <th style="text-align:right;">Start</th>
+              <th style="text-align:right;">Now</th>
+              <th style="text-align:right;">30D %</th>
+              <th>Chart</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    // ===== Tab switching =====
+    document.querySelectorAll(".tab").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b === btn));
+        document.querySelectorAll('[id^="panel-"]').forEach((p) => {
+          p.style.display = p.id === `panel-${tab}` ? "block" : "none";
+        });
+      });
+    });
+
+    // ===== Data fetcher =====
+    async function refresh() {
+      const status = $("status");
+      try {
+        const res = await fetch(API_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        renderIntraday(data.intraday);
+        renderReversal(data.reversal);
+        renderMomentum(data.momentum);
+
+        $("last-refresh").textContent = `Last refresh: ${new Date().toLocaleTimeString()}`;
+        status.className = "status ok";
+        status.textContent = "✓ Live · Auto-refresh every 60s";
+      } catch (err) {
+        console.error(err);
+        status.className = "status error";
+        status.textContent = `⚠️ Failed to load data: ${err.message}. Retrying in 60s.`;
+      }
+    }
+
+    refresh();                              // initial load
+    setInterval(refresh, REFRESH_MS);       // periodic refresh
+  </script>
+</body>
+</html>
