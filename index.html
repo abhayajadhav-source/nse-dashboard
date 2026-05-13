@@ -191,8 +191,7 @@
 
   <script>
     // ===== Configuration =====
-    // CHANGE THIS to your Render API URL after Part 2 is deployed:
-    const API_URL = "https://nse-dashboard-api.onrender.com";
+    const API_URL = "https://nse-dashboard-api.onrender.com/api/snapshot";
     const REFRESH_MS = 60_000;   // refresh every 60 seconds
 
     // ===== Helpers =====
@@ -240,6 +239,8 @@
         if (s.is_new_52w_low)  badges.push('<span class="badge badge-red">⚠️ NEW 52W LOW</span>');
         if (s.is_gap_up)       badges.push('<span class="badge badge-green">GAP UP</span>');
         if (s.is_gap_down)     badges.push('<span class="badge badge-red">GAP DOWN</span>');
+        if (s.is_breakout_up)  badges.push('<span class="badge badge-green">BREAKOUT UP</span>');
+        if (s.is_breakout_down)badges.push('<span class="badge badge-red">BREAKOUT DOWN</span>');
         if (s.volume_ratio > 2) badges.push(`<span class="badge badge-amber">VOL ${fmt(s.volume_ratio, 1)}x</span>`);
         return `
           <tr>
@@ -351,7 +352,7 @@
         return;
       }
 
-      // Gainers first (sorted desc), then losers (sorted asc)
+      // Sort by largest move (gainers first, then losers)
       const sorted = [...items].sort((a, b) => b.pct_change - a.pct_change);
 
       const rows = sorted.map((s) => `
