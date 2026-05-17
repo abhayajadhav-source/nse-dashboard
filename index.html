@@ -30,69 +30,32 @@
     header h1 { font-size: 22px; font-weight: 700; }
     header .meta { font-size: 13px; opacity: 0.8; }
 
-    .tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
+    .tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
     .tab {
-      padding: 10px 18px;
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.15s;
+      padding: 10px 18px; background: #fff; border: 1px solid #e5e7eb;
+      border-radius: 8px; cursor: pointer; font-size: 14px;
+      font-weight: 500; transition: all 0.15s;
     }
     .tab:hover { background: #f3f4f6; }
-    .tab.active {
-      background: #1d4ed8;
-      color: #fff;
-      border-color: #1d4ed8;
-    }
+    .tab.active { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
     .tab .count {
-      display: inline-block;
-      background: rgba(0,0,0,0.1);
-      padding: 2px 8px;
-      border-radius: 99px;
-      font-size: 11px;
-      margin-left: 6px;
+      display: inline-block; background: rgba(0,0,0,0.1);
+      padding: 2px 8px; border-radius: 99px; font-size: 11px; margin-left: 6px;
     }
     .tab.active .count { background: rgba(255,255,255,0.25); }
 
-    .panel {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      overflow: hidden;
-    }
+    .panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
     .panel-header {
-      padding: 14px 18px;
-      background: #f9fafb;
-      border-bottom: 1px solid #e5e7eb;
-      font-weight: 600;
-      font-size: 14px;
-      color: #374151;
+      padding: 14px 18px; background: #f9fafb; border-bottom: 1px solid #e5e7eb;
+      font-weight: 600; font-size: 14px; color: #374151;
     }
     table { width: 100%; border-collapse: collapse; }
     th {
-      padding: 10px 14px;
-      text-align: left;
-      font-size: 12px;
-      font-weight: 600;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: #f9fafb;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 600;
+      color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;
+      background: #f9fafb; border-bottom: 1px solid #e5e7eb;
     }
-    td {
-      padding: 12px 14px;
-      font-size: 14px;
-      border-bottom: 1px solid #f3f4f6;
-    }
+    td { padding: 12px 14px; font-size: 14px; border-bottom: 1px solid #f3f4f6; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #fafbfc; }
 
@@ -100,12 +63,8 @@
     .gain { color: #16a34a; font-weight: 600; }
     .loss { color: #dc2626; font-weight: 600; }
     .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 600;
-      margin-right: 4px;
+      display: inline-block; padding: 3px 8px; border-radius: 4px;
+      font-size: 11px; font-weight: 600; margin-right: 4px;
     }
     .badge-green  { background: #d1fae5; color: #065f46; }
     .badge-red    { background: #fee2e2; color: #991b1b; }
@@ -113,205 +72,112 @@
     .badge-blue   { background: #dbeafe; color: #1e40af; }
     .badge-gray   { background: #f3f4f6; color: #374151; }
 
-    .empty {
-      padding: 40px 20px;
-      text-align: center;
-      color: #9ca3af;
-      font-style: italic;
-    }
-
-    .ext-link {
-      color: #1d4ed8;
-      text-decoration: none;
-      font-size: 13px;
-    }
+    .empty { padding: 40px 20px; text-align: center; color: #9ca3af; font-style: italic; }
+    .ext-link { color: #1d4ed8; text-decoration: none; font-size: 13px; }
     .ext-link:hover { text-decoration: underline; }
 
-    .status {
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      margin-bottom: 16px;
-    }
+    .status { padding: 8px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 16px; }
     .status.loading { background: #dbeafe; color: #1e40af; }
     .status.error   { background: #fee2e2; color: #991b1b; }
     .status.ok      { background: #d1fae5; color: #065f46; }
 
-    .freshness {
-      font-size: 11px;
-      color: #9ca3af;
-      font-style: italic;
-      margin-top: 4px;
-    }
+    .freshness { font-size: 11px; color: #9ca3af; font-style: italic; margin-top: 4px; }
 
-    /* Analyze tab */
     .analyze-form {
-      padding: 18px;
-      background: #fff;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
+      padding: 18px; background: #fff; border-bottom: 1px solid #e5e7eb;
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
     }
     .analyze-form input[type="text"] {
-      flex: 1;
-      min-width: 200px;
-      padding: 10px 14px;
-      font-size: 15px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      font-family: ui-monospace, monospace;
-      text-transform: uppercase;
+      flex: 1; min-width: 200px; padding: 10px 14px; font-size: 15px;
+      border: 1px solid #d1d5db; border-radius: 6px;
+      font-family: ui-monospace, monospace; text-transform: uppercase;
     }
     .analyze-form input[type="text"]:focus {
-      outline: none;
-      border-color: #1d4ed8;
+      outline: none; border-color: #1d4ed8;
       box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
     }
     .analyze-form button {
-      padding: 10px 20px;
-      background: #1d4ed8;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      transition: background 0.15s;
+      padding: 10px 20px; background: #1d4ed8; color: #fff; border: none;
+      border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;
     }
     .analyze-form button:hover { background: #1e3a8a; }
-    .analyze-form button:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
-    }
-    .analyze-form .hint {
-      font-size: 12px;
-      color: #6b7280;
-      flex-basis: 100%;
-      margin-top: 4px;
-    }
+    .analyze-form button:disabled { background: #9ca3af; cursor: not-allowed; }
+    .analyze-form .hint { font-size: 12px; color: #6b7280; flex-basis: 100%; margin-top: 4px; }
 
     .analysis-content { padding: 18px; }
 
     .price-card {
-      background: #f9fafb;
-      border-radius: 8px;
-      padding: 14px;
-      margin-bottom: 16px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
+      background: #f9fafb; border-radius: 8px; padding: 14px; margin-bottom: 16px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;
     }
     .price-card .metric { font-size: 13px; }
     .price-card .metric-label {
-      color: #6b7280;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 2px;
+      color: #6b7280; font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.5px; margin-bottom: 2px;
     }
-    .price-card .metric-value {
-      font-weight: 600;
-      font-size: 15px;
-    }
+    .price-card .metric-value { font-weight: 600; font-size: 15px; }
 
-    /* Analyst card */
-    .analyst-card {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 14px;
-      margin-bottom: 16px;
+    .analyst-card, .options-card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+      padding: 14px; margin-bottom: 16px;
     }
-    .analyst-card-header {
-      font-size: 14px;
-      font-weight: 600;
-      color: #111827;
+    .analyst-card-header, .options-card-header {
+      font-size: 14px; font-weight: 600; color: #111827; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .analyst-summary, .options-summary {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px; margin-bottom: 14px;
+    }
+    .analyst-metric, .options-metric {
+      background: #f9fafb; padding: 10px 12px; border-radius: 6px;
+    }
+    .analyst-metric-label, .options-metric-label {
+      color: #6b7280; font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.5px; margin-bottom: 2px;
+    }
+    .analyst-metric-value, .options-metric-value { font-weight: 600; font-size: 15px; }
+
+    /* Composite signal big badge */
+    .composite-signal {
+      display: inline-block; padding: 8px 14px; border-radius: 8px;
+      font-size: 15px; font-weight: 700; letter-spacing: 0.3px;
       margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
     }
-    .analyst-summary {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-    .analyst-metric {
-      background: #f9fafb;
-      padding: 10px 12px;
-      border-radius: 6px;
-    }
-    .analyst-metric-label {
-      color: #6b7280;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 2px;
-    }
-    .analyst-metric-value {
-      font-weight: 600;
-      font-size: 15px;
-    }
-    .rating-bars {
-      display: grid;
-      grid-template-columns: 110px 1fr 40px;
-      gap: 6px 12px;
-      align-items: center;
-      font-size: 12px;
-      margin-top: 8px;
-    }
-    .rating-bar-track {
-      background: #f3f4f6;
-      border-radius: 99px;
-      height: 8px;
-      overflow: hidden;
-    }
-    .rating-bar-fill {
-      height: 100%;
-      border-radius: 99px;
-    }
-    .rating-bar-fill.strong-buy  { background: #15803d; }
-    .rating-bar-fill.buy         { background: #16a34a; }
-    .rating-bar-fill.hold        { background: #ca8a04; }
-    .rating-bar-fill.sell        { background: #dc2626; }
-    .rating-bar-fill.strong-sell { background: #991b1b; }
-    .rating-label { color: #374151; font-weight: 500; }
-    .rating-count { text-align: right; color: #6b7280; font-variant-numeric: tabular-nums; }
+    .signal-strong-bullish    { background: #15803d; color: #fff; }
+    .signal-bullish           { background: #16a34a; color: #fff; }
+    .signal-slightly-bullish  { background: #d1fae5; color: #065f46; }
+    .signal-neutral           { background: #f3f4f6; color: #374151; }
+    .signal-slightly-bearish  { background: #fed7aa; color: #9a3412; }
+    .signal-bearish           { background: #dc2626; color: #fff; }
+    .signal-strong-bearish    { background: #991b1b; color: #fff; }
 
-    .actions-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      margin-top: 8px;
+    .confirmations-list {
+      margin-top: 8px; padding-left: 18px; font-size: 13px; color: #374151;
     }
-    .actions-table th {
-      padding: 8px 10px;
-      font-size: 11px;
-      background: #f9fafb;
-    }
-    .actions-table td {
-      padding: 8px 10px;
-      font-size: 13px;
-      border-bottom: 1px solid #f3f4f6;
-    }
-    .action-up   { color: #16a34a; font-weight: 600; }
-    .action-down { color: #dc2626; font-weight: 600; }
-    .action-init { color: #1d4ed8; font-weight: 600; }
-    .action-main { color: #6b7280; font-weight: 500; }
+    .confirmations-list li { margin: 4px 0; }
 
-    /* Analysis text */
+    .strikes-table {
+      width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px;
+    }
+    .strikes-table th {
+      padding: 8px 10px; background: #f9fafb; font-size: 11px;
+    }
+    .strikes-table td {
+      padding: 8px 10px; font-size: 13px; border-bottom: 1px solid #f3f4f6;
+    }
+    .strikes-table .strike-row-atm {
+      background: #fefce8; font-weight: 600;
+    }
+    .strikes-table .strike-row-resistance { color: #991b1b; }
+    .strikes-table .strike-row-support    { color: #065f46; }
+    .oi-change-pos { color: #16a34a; }
+    .oi-change-neg { color: #dc2626; }
+
     .analysis-text { line-height: 1.7; font-size: 14px; }
     .analysis-text h2 {
-      font-size: 16px;
-      margin-top: 18px;
-      margin-bottom: 8px;
-      color: #111827;
-      padding-bottom: 6px;
-      border-bottom: 1px solid #e5e7eb;
+      font-size: 16px; margin-top: 18px; margin-bottom: 8px; color: #111827;
+      padding-bottom: 6px; border-bottom: 1px solid #e5e7eb;
     }
     .analysis-text h2:first-child { margin-top: 0; }
     .analysis-text ul { margin: 8px 0 8px 22px; }
@@ -321,36 +187,42 @@
     .analysis-text em { color: #6b7280; font-size: 13px; }
 
     .news-list { list-style: none; padding: 0; margin-top: 12px; }
-    .news-list li {
-      padding: 10px 0;
-      border-bottom: 1px solid #f3f4f6;
-      font-size: 14px;
-    }
+    .news-list li { padding: 10px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
     .news-list li:last-child { border-bottom: none; }
     .news-list a { color: #1d4ed8; text-decoration: none; }
     .news-list a:hover { text-decoration: underline; }
-    .news-list .news-meta {
-      color: #9ca3af;
-      font-size: 12px;
-      margin-left: 6px;
-    }
+    .news-list .news-meta { color: #9ca3af; font-size: 12px; margin-left: 6px; }
 
-    .loading-spinner {
-      text-align: center;
-      padding: 60px 20px;
-      color: #6b7280;
-    }
+    .loading-spinner { text-align: center; padding: 60px 20px; color: #6b7280; }
     .loading-spinner::after {
-      content: "⏳";
-      font-size: 32px;
-      display: block;
-      margin-top: 10px;
+      content: "⏳"; font-size: 32px; display: block; margin-top: 10px;
       animation: pulse 1.5s ease-in-out infinite;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.4; }
-      50%      { opacity: 1; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    .rating-bars {
+      display: grid; grid-template-columns: 110px 1fr 40px;
+      gap: 6px 12px; align-items: center; font-size: 12px; margin-top: 8px;
     }
+    .rating-bar-track {
+      background: #f3f4f6; border-radius: 99px; height: 8px; overflow: hidden;
+    }
+    .rating-bar-fill { height: 100%; border-radius: 99px; }
+    .rating-bar-fill.strong-buy  { background: #15803d; }
+    .rating-bar-fill.buy         { background: #16a34a; }
+    .rating-bar-fill.hold        { background: #ca8a04; }
+    .rating-bar-fill.sell        { background: #dc2626; }
+    .rating-bar-fill.strong-sell { background: #991b1b; }
+    .rating-label { color: #374151; font-weight: 500; }
+    .rating-count { text-align: right; color: #6b7280; font-variant-numeric: tabular-nums; }
+
+    .actions-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+    .actions-table th { padding: 8px 10px; font-size: 11px; background: #f9fafb; }
+    .actions-table td { padding: 8px 10px; font-size: 13px; border-bottom: 1px solid #f3f4f6; }
+    .action-up   { color: #16a34a; font-weight: 600; }
+    .action-down { color: #dc2626; font-weight: 600; }
+    .action-init { color: #1d4ed8; font-weight: 600; }
+    .action-main { color: #6b7280; font-weight: 500; }
 
     @media (max-width: 640px) {
       body { padding: 10px; }
@@ -367,7 +239,7 @@
     <header>
       <div>
         <h1>📊 NSE Stock Dashboard</h1>
-        <div class="meta">Auto-refresh every 60s · Data from Yahoo Finance + Google News</div>
+        <div class="meta">Auto-refresh every 60s · Data from Yahoo Finance + Google News + NSE F&O</div>
       </div>
       <div>
         <div id="last-refresh" class="meta">Loading…</div>
@@ -378,13 +250,13 @@
 
     <div class="tabs">
       <button class="tab active" data-tab="intraday">
-        ⚡ Intraday Alerts <span class="count" id="count-intraday">—</span>
+        ⚡ Intraday <span class="count" id="count-intraday">—</span>
       </button>
       <button class="tab" data-tab="reversal">
-        🔄 Trend Reversals <span class="count" id="count-reversal">—</span>
+        🔄 Reversals <span class="count" id="count-reversal">—</span>
       </button>
       <button class="tab" data-tab="momentum">
-        📈 30-Day Momentum <span class="count" id="count-momentum">—</span>
+        📈 Momentum <span class="count" id="count-momentum">—</span>
       </button>
       <button class="tab" data-tab="analyze">
         🤖 Analyze Stock
@@ -432,10 +304,7 @@
       let inUl = false;
       for (const raw of lines) {
         const line = raw.trim();
-        if (!line) {
-          if (inUl) { html += "</ul>"; inUl = false; }
-          continue;
-        }
+        if (!line) { if (inUl) { html += "</ul>"; inUl = false; } continue; }
         if (line.startsWith("## ")) {
           if (inUl) { html += "</ul>"; inUl = false; }
           html += `<h2>${escapeHtml(line.slice(3))}</h2>`;
@@ -463,20 +332,16 @@
       return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // ===== Existing tab renderers (intraday/reversal/momentum) =====
+    // ===== Existing tab renderers (unchanged) =====
     function renderIntraday(data) {
       const panel = $("panel-intraday");
       const items = (data && data.items) || [];
       $("count-intraday").textContent = items.length;
-
       if (items.length === 0) {
-        panel.innerHTML = `
-          <div class="panel-header">Intraday Alerts</div>
-          <div class="empty">No active alerts. Updated ${timeAgo(data?.updated_at)}.</div>
-        `;
+        panel.innerHTML = `<div class="panel-header">Intraday Alerts</div>
+          <div class="empty">No active alerts. Updated ${timeAgo(data?.updated_at)}.</div>`;
         return;
       }
-
       const rows = items.map((s) => {
         const badges = [];
         if (s.is_new_52w_high) badges.push('<span class="badge badge-green">🏆 NEW 52W HIGH</span>');
@@ -486,163 +351,110 @@
         if (s.is_breakout_up)  badges.push('<span class="badge badge-green">BREAKOUT UP</span>');
         if (s.is_breakout_down)badges.push('<span class="badge badge-red">BREAKOUT DOWN</span>');
         if (s.volume_ratio > 2) badges.push(`<span class="badge badge-amber">VOL ${fmt(s.volume_ratio, 1)}x</span>`);
-        return `
-          <tr>
-            <td class="symbol"><a href="#" class="analyze-link" data-symbol="${s.symbol}">${s.symbol}</a></td>
-            <td>${badges.join("")}</td>
-            <td style="text-align:right;">₹${fmt(s.price)}</td>
-            <td style="text-align:right;" class="${cls(s.pct_change)}">${sign(s.pct_change)}${fmt(s.pct_change)}%</td>
-            <td style="text-align:right;">${sign(s.gap_pct)}${fmt(s.gap_pct)}%</td>
-            <td style="text-align:right;">${fmt(s.volume_ratio, 1)}x</td>
-            <td>${tvLink(s.symbol)} · ${nseLink(s.symbol)}</td>
-          </tr>
-        `;
+        return `<tr>
+          <td class="symbol"><a href="#" class="analyze-link" data-symbol="${s.symbol}">${s.symbol}</a></td>
+          <td>${badges.join("")}</td>
+          <td style="text-align:right;">₹${fmt(s.price)}</td>
+          <td style="text-align:right;" class="${cls(s.pct_change)}">${sign(s.pct_change)}${fmt(s.pct_change)}%</td>
+          <td style="text-align:right;">${sign(s.gap_pct)}${fmt(s.gap_pct)}%</td>
+          <td style="text-align:right;">${fmt(s.volume_ratio, 1)}x</td>
+          <td>${tvLink(s.symbol)} · ${nseLink(s.symbol)}</td>
+        </tr>`;
       }).join("");
-
       panel.innerHTML = `
-        <div class="panel-header">
-          Intraday Alerts (${items.length})
-          <div class="freshness">Updated ${timeAgo(data.updated_at)} · Click a symbol to analyze</div>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Symbol</th><th>Signals</th><th style="text-align:right;">Price</th>
-              <th style="text-align:right;">% Change</th><th style="text-align:right;">Gap %</th>
-              <th style="text-align:right;">Vol</th><th>Chart</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      `;
+        <div class="panel-header">Intraday Alerts (${items.length})
+          <div class="freshness">Updated ${timeAgo(data.updated_at)} · Click a symbol to analyze</div></div>
+        <table><thead><tr>
+          <th>Symbol</th><th>Signals</th><th style="text-align:right;">Price</th>
+          <th style="text-align:right;">% Change</th><th style="text-align:right;">Gap %</th>
+          <th style="text-align:right;">Vol</th><th>Chart</th>
+        </tr></thead><tbody>${rows}</tbody></table>`;
     }
 
     function renderReversal(data) {
       const panel = $("panel-reversal");
       const items = (data && data.items) || [];
       $("count-reversal").textContent = items.length;
-
       if (items.length === 0) {
-        panel.innerHTML = `
-          <div class="panel-header">Trend Reversals</div>
-          <div class="empty">No active reversal candidates. Updated ${timeAgo(data?.updated_at)}.</div>
-        `;
+        panel.innerHTML = `<div class="panel-header">Trend Reversals</div>
+          <div class="empty">No active reversal candidates. Updated ${timeAgo(data?.updated_at)}.</div>`;
         return;
       }
-
-      const sorted = [...items].sort((a, b) =>
-        a.direction === b.direction
-          ? b.signal_count - a.signal_count
-          : (a.direction === "bullish" ? -1 : 1)
-      );
-
+      const sorted = [...items].sort((a, b) => a.direction === b.direction
+        ? b.signal_count - a.signal_count : (a.direction === "bullish" ? -1 : 1));
       const rows = sorted.map((s) => {
         const dirBadge = s.direction === "bullish"
           ? '<span class="badge badge-green">🚀 BULL</span>'
           : '<span class="badge badge-red">📉 BEAR</span>';
         const confirmations = (s.confirmations || []).join(" · ");
-        return `
-          <tr>
-            <td class="symbol"><a href="#" class="analyze-link" data-symbol="${s.symbol}">${s.symbol}</a></td>
-            <td>${s.name || ""}</td>
-            <td>${dirBadge}</td>
-            <td style="text-align:center;"><strong>${s.signal_count}/5</strong></td>
-            <td style="text-align:right;">₹${fmt(s.price)}</td>
-            <td style="text-align:right;" class="${cls(s.pct_change_1d)}">${sign(s.pct_change_1d)}${fmt(s.pct_change_1d)}%</td>
-            <td style="font-size:12px; color:#6b7280;">${confirmations}</td>
-            <td>${tvLink(s.symbol)}</td>
-          </tr>
-        `;
+        return `<tr>
+          <td class="symbol"><a href="#" class="analyze-link" data-symbol="${s.symbol}">${s.symbol}</a></td>
+          <td>${s.name || ""}</td>
+          <td>${dirBadge}</td>
+          <td style="text-align:center;"><strong>${s.signal_count}/5</strong></td>
+          <td style="text-align:right;">₹${fmt(s.price)}</td>
+          <td style="text-align:right;" class="${cls(s.pct_change_1d)}">${sign(s.pct_change_1d)}${fmt(s.pct_change_1d)}%</td>
+          <td style="font-size:12px; color:#6b7280;">${confirmations}</td>
+          <td>${tvLink(s.symbol)}</td>
+        </tr>`;
       }).join("");
-
       panel.innerHTML = `
-        <div class="panel-header">
-          Trend Reversal Candidates (${items.length})
-          <div class="freshness">Updated ${timeAgo(data.updated_at)} · Click a symbol to analyze</div>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Symbol</th><th>Name</th><th>Direction</th><th>Signals</th>
-              <th style="text-align:right;">Price</th><th style="text-align:right;">1D %</th>
-              <th>Confirmations</th><th>Chart</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      `;
+        <div class="panel-header">Trend Reversal Candidates (${items.length})
+          <div class="freshness">Updated ${timeAgo(data.updated_at)} · Click a symbol to analyze</div></div>
+        <table><thead><tr>
+          <th>Symbol</th><th>Name</th><th>Direction</th><th>Signals</th>
+          <th style="text-align:right;">Price</th><th style="text-align:right;">1D %</th>
+          <th>Confirmations</th><th>Chart</th>
+        </tr></thead><tbody>${rows}</tbody></table>`;
     }
 
     function renderMomentum(data) {
       const panel = $("panel-momentum");
       const items = (data && data.items) || [];
       $("count-momentum").textContent = items.length;
-
       if (items.length === 0) {
-        panel.innerHTML = `
-          <div class="panel-header">30-Day Momentum</div>
-          <div class="empty">No data yet. Updated ${timeAgo(data?.updated_at)}.</div>
-        `;
+        panel.innerHTML = `<div class="panel-header">30-Day Momentum</div>
+          <div class="empty">No data yet. Updated ${timeAgo(data?.updated_at)}.</div>`;
         return;
       }
-
       const sorted = [...items].sort((a, b) => b.pct_change - a.pct_change);
-
-      const rows = sorted.map((s) => `
-        <tr>
-          <td class="symbol"><a href="#" class="analyze-link" data-symbol="${s.symbol}">${s.symbol}</a></td>
-          <td>${s.name || ""}</td>
-          <td style="text-align:right;">₹${fmt(s.start_price)}</td>
-          <td style="text-align:right;">₹${fmt(s.end_price)}</td>
-          <td style="text-align:right;" class="${cls(s.pct_change)}">${sign(s.pct_change)}${fmt(s.pct_change)}%</td>
-          <td>${tvLink(s.symbol)}</td>
-        </tr>
-      `).join("");
-
+      const rows = sorted.map((s) => `<tr>
+        <td class="symbol"><a href="#" class="analyze-link" data-symbol="${s.symbol}">${s.symbol}</a></td>
+        <td>${s.name || ""}</td>
+        <td style="text-align:right;">₹${fmt(s.start_price)}</td>
+        <td style="text-align:right;">₹${fmt(s.end_price)}</td>
+        <td style="text-align:right;" class="${cls(s.pct_change)}">${sign(s.pct_change)}${fmt(s.pct_change)}%</td>
+        <td>${tvLink(s.symbol)}</td>
+      </tr>`).join("");
       panel.innerHTML = `
-        <div class="panel-header">
-          30-Day Momentum (${items.length})
-          <div class="freshness">Updated ${timeAgo(data.updated_at)} · Click a symbol to analyze</div>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Symbol</th><th>Name</th><th style="text-align:right;">Start</th>
-              <th style="text-align:right;">Now</th><th style="text-align:right;">30D %</th>
-              <th>Chart</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      `;
+        <div class="panel-header">30-Day Momentum (${items.length})
+          <div class="freshness">Updated ${timeAgo(data.updated_at)} · Click a symbol to analyze</div></div>
+        <table><thead><tr>
+          <th>Symbol</th><th>Name</th><th style="text-align:right;">Start</th>
+          <th style="text-align:right;">Now</th><th style="text-align:right;">30D %</th>
+          <th>Chart</th>
+        </tr></thead><tbody>${rows}</tbody></table>`;
     }
 
-    // ===== Analyze panel =====
     function renderAnalyzePanel() {
       const panel = $("panel-analyze");
       panel.innerHTML = `
-        <div class="panel-header">
-          🤖 AI Technical Analysis
-          <div class="freshness">Enter an NSE symbol for full technical breakdown + analyst ratings + recommendation</div>
-        </div>
+        <div class="panel-header">🤖 AI Technical Analysis
+          <div class="freshness">Enter an NSE symbol for technicals + analyst ratings + options + AI recommendation</div></div>
         <div class="analyze-form">
-          <input type="text" id="analyze-input" placeholder="e.g. RELIANCE, TCS, HDFCBANK" autocomplete="off">
+          <input type="text" id="analyze-input" placeholder="e.g. RELIANCE, HDFCBANK" autocomplete="off">
           <button id="analyze-button" type="button">Analyze</button>
-          <div class="hint">Uses Claude to interpret technical indicators + analyst ratings + latest news. ~5-30 seconds per analysis.</div>
+          <div class="hint">Now includes F&O options sentiment (PCR, max pain, OI buildup). ~10-30 seconds per analysis.</div>
         </div>
-        <div id="analyze-result" class="analysis-content"></div>
-      `;
-
-      const input  = $("analyze-input");
+        <div id="analyze-result" class="analysis-content"></div>`;
+      const input = $("analyze-input");
       const button = $("analyze-button");
       const submit = () => {
         const symbol = input.value.trim().toUpperCase();
         if (symbol) runAnalysis(symbol);
       };
       button.addEventListener("click", submit);
-      input.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") submit();
-      });
+      input.addEventListener("keypress", (e) => { if (e.key === "Enter") submit(); });
       input.focus();
     }
 
@@ -655,8 +467,8 @@
       result.innerHTML = `
         <div class="loading-spinner">
           Analyzing ${symbol}…<br>
-          <span style="font-size:13px;">Fetching data → analyst ratings → news → AI interpretation</span><br>
-          <span style="font-size:12px;color:#9ca3af;">(First request after idle may take ~30s while server wakes)</span>
+          <span style="font-size:13px;">Fetching price → analyst ratings → F&O option chain → news → AI</span><br>
+          <span style="font-size:12px;color:#9ca3af;">(F&O data takes ~5-10s; first request after idle ~30s for server wake)</span>
         </div>
       `;
 
@@ -666,12 +478,10 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ symbol }),
         });
-
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
           throw new Error(err.error || `HTTP ${res.status}`);
         }
-
         const data = await res.json();
         renderAnalysisResult(data);
       } catch (err) {
@@ -695,13 +505,12 @@
           <div class="analyst-card">
             <div class="analyst-card-header">📊 Analyst Ratings</div>
             <div style="color:#6b7280;font-size:13px;font-style:italic;">
-              No analyst data available for this stock from Yahoo Finance.
+              No analyst data available for this stock.
             </div>
           </div>
         `;
       }
 
-      // Consensus + key metrics row
       const metrics = [];
       if (ratings.consensus) {
         const consensusClass = /buy/i.test(ratings.consensus) ? "gain" :
@@ -744,7 +553,6 @@
         }
       }
 
-      // Rating bars
       let ratingBars = "";
       if (ratings.summary && ratings.summary.total > 0) {
         const s = ratings.summary;
@@ -779,23 +587,15 @@
         }
       }
 
-      // Recent broker actions table
       let actionsTable = "";
       if (ratings.recent_actions && ratings.recent_actions.length > 0) {
         const rows = ratings.recent_actions.map(a => {
           const actionLower = (a.action || "").toLowerCase();
           let actionClass = "action-main";
           let actionIcon  = "·";
-          if (actionLower.includes("up")) {
-            actionClass = "action-up";
-            actionIcon  = "↑";
-          } else if (actionLower.includes("down")) {
-            actionClass = "action-down";
-            actionIcon  = "↓";
-          } else if (actionLower.includes("init")) {
-            actionClass = "action-init";
-            actionIcon  = "★";
-          }
+          if (actionLower.includes("up")) { actionClass = "action-up"; actionIcon = "↑"; }
+          else if (actionLower.includes("down")) { actionClass = "action-down"; actionIcon = "↓"; }
+          else if (actionLower.includes("init")) { actionClass = "action-init"; actionIcon = "★"; }
           const transition = (a.from_grade && a.to_grade && a.from_grade !== a.to_grade)
             ? `${escapeHtml(a.from_grade)} → ${escapeHtml(a.to_grade)}`
             : escapeHtml(a.to_grade || "");
@@ -808,16 +608,13 @@
             </tr>
           `;
         }).join("");
-
         actionsTable = `
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f3f4f6;">
             <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;">
               Recent Broker Actions
             </div>
             <table class="actions-table">
-              <thead>
-                <tr><th>Date</th><th>Firm</th><th>Action</th><th>Rating</th></tr>
-              </thead>
+              <thead><tr><th>Date</th><th>Firm</th><th>Action</th><th>Rating</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>
@@ -827,8 +624,7 @@
       return `
         <div class="analyst-card">
           <div class="analyst-card-header">
-            📊 Analyst Ratings
-            <span class="badge badge-gray">via Yahoo Finance</span>
+            📊 Analyst Ratings <span class="badge badge-gray">via Yahoo Finance</span>
           </div>
           <div class="analyst-summary">${metrics.join("")}</div>
           ${ratingBars}
@@ -837,6 +633,186 @@
       `;
     }
 
+    // ===== Render options card (NEW) =====
+    function signalToClass(signal) {
+      // Maps signal string to CSS class for the colored badge
+      const map = {
+        "Strong Bullish":    "signal-strong-bullish",
+        "Bullish":           "signal-bullish",
+        "Slightly Bullish":  "signal-slightly-bullish",
+        "Neutral":           "signal-neutral",
+        "Slightly Bearish":  "signal-slightly-bearish",
+        "Bearish":           "signal-bearish",
+        "Strong Bearish":    "signal-strong-bearish",
+      };
+      return map[signal] || "signal-neutral";
+    }
+
+    function renderOptionsCard(options, currentPrice) {
+      if (!options) {
+        return `
+          <div class="options-card">
+            <div class="options-card-header">⚙️ F&O Options Sentiment</div>
+            <div style="color:#6b7280;font-size:13px;font-style:italic;">
+              No options data available — this stock may not be in F&O segment,
+              or NSE option chain endpoint is temporarily unreachable.
+            </div>
+          </div>
+        `;
+      }
+
+      // Format expiry date nicely
+      let expiryDisplay = options.expiry_date || "";
+      // NSE returns dates like "29-May-2026"; keep as-is
+
+      // Compute pct from max pain
+      const pctFromPain = options.pct_from_max_pain || 0;
+      const painArrow = pctFromPain > 0 ? "↑" : (pctFromPain < 0 ? "↓" : "≈");
+
+      // PCR signal class
+      const pcrClass = /bull/i.test(options.pcr_signal) ? "gain" :
+                       /bear/i.test(options.pcr_signal) ? "loss" : "";
+
+      // Buildup signal class
+      const buildupClass = /buildup/i.test(options.buildup_signal) && /short/i.test(options.buildup_signal) ? "loss" :
+                          /unwinding/i.test(options.buildup_signal) ? "loss" :
+                          /buildup|covering/i.test(options.buildup_signal) ? "gain" : "";
+
+      // Build metrics grid
+      const metrics = `
+        <div class="options-metric">
+          <div class="options-metric-label">PCR (OI)</div>
+          <div class="options-metric-value ${pcrClass}">${fmt(options.pcr_oi)}</div>
+          <div style="font-size:11px;color:#6b7280;">${escapeHtml(options.pcr_signal)}</div>
+        </div>
+        <div class="options-metric">
+          <div class="options-metric-label">Max Pain</div>
+          <div class="options-metric-value">₹${fmt(options.max_pain)}</div>
+          <div style="font-size:11px;color:#6b7280;">
+            ${painArrow} Spot is ${pctFromPain >= 0 ? "+" : ""}${fmt(pctFromPain)}% from max pain
+          </div>
+        </div>
+        <div class="options-metric">
+          <div class="options-metric-label">OI Buildup</div>
+          <div class="options-metric-value ${buildupClass}" style="font-size:14px;">
+            ${escapeHtml(options.buildup_signal)}
+          </div>
+          <div style="font-size:11px;color:#6b7280;">
+            Call ΔOI: ${options.total_call_oi_change >= 0 ? "+" : ""}${options.total_call_oi_change.toLocaleString("en-IN")} ·
+            Put ΔOI: ${options.total_put_oi_change >= 0 ? "+" : ""}${options.total_put_oi_change.toLocaleString("en-IN")}
+          </div>
+        </div>
+        <div class="options-metric">
+          <div class="options-metric-label">Highest Call OI</div>
+          <div class="options-metric-value loss">₹${fmt(options.highest_call_oi_strike)}</div>
+          <div style="font-size:11px;color:#6b7280;">Likely resistance</div>
+        </div>
+        <div class="options-metric">
+          <div class="options-metric-label">Highest Put OI</div>
+          <div class="options-metric-value gain">₹${fmt(options.highest_put_oi_strike)}</div>
+          <div style="font-size:11px;color:#6b7280;">Likely support</div>
+        </div>
+        <div class="options-metric">
+          <div class="options-metric-label">Total OI (Calls / Puts)</div>
+          <div class="options-metric-value" style="font-size:13px;">
+            ${(options.total_call_oi / 100000).toFixed(1)}L / ${(options.total_put_oi / 100000).toFixed(1)}L
+          </div>
+        </div>
+      `;
+
+      // Confirmations list
+      let confirmationsHtml = "";
+      if (options.confirmations && options.confirmations.length > 0) {
+        confirmationsHtml = `
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f3f4f6;">
+            <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">
+              Signal Rationale (${options.composite_strength}/5 confidence)
+            </div>
+            <ul class="confirmations-list">
+              ${options.confirmations.map(c => `<li>${escapeHtml(c)}</li>`).join("")}
+            </ul>
+          </div>
+        `;
+      }
+
+      // Top strikes table — sort by strike ascending for natural reading
+      let strikesTable = "";
+      if (options.top_strikes && options.top_strikes.length > 0) {
+        const sortedStrikes = [...options.top_strikes].sort((a, b) => a.strike - b.strike);
+        const rows = sortedStrikes.map(s => {
+          // Determine row type
+          let rowClass = "";
+          let label = "";
+          const distFromATM = Math.abs(s.distance_from_spot);
+          const isATM = distFromATM < (currentPrice * 0.01);   // within 1% of spot
+          if (isATM) { rowClass = "strike-row-atm"; label = "ATM"; }
+          else if (s.distance_from_spot > 0) { rowClass = "strike-row-resistance"; label = "OTM Call"; }
+          else { rowClass = "strike-row-support"; label = "OTM Put"; }
+
+          const callOiChangeCls = s.call_oi_change >= 0 ? "oi-change-pos" : "oi-change-neg";
+          const putOiChangeCls  = s.put_oi_change  >= 0 ? "oi-change-pos" : "oi-change-neg";
+
+          return `
+            <tr class="${rowClass}">
+              <td style="white-space:nowrap;">₹${fmt(s.strike)}</td>
+              <td style="font-size:11px;color:#6b7280;">${label}</td>
+              <td style="text-align:right;">${(s.call_oi / 100000).toFixed(1)}L</td>
+              <td style="text-align:right;" class="${callOiChangeCls}">
+                ${s.call_oi_change >= 0 ? "+" : ""}${(s.call_oi_change / 1000).toFixed(0)}K
+              </td>
+              <td style="text-align:right;">${(s.put_oi / 100000).toFixed(1)}L</td>
+              <td style="text-align:right;" class="${putOiChangeCls}">
+                ${s.put_oi_change >= 0 ? "+" : ""}${(s.put_oi_change / 1000).toFixed(0)}K
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        strikesTable = `
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f3f4f6;">
+            <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">
+              Top OI Strikes (sorted by strike price)
+            </div>
+            <table class="strikes-table">
+              <thead>
+                <tr>
+                  <th>Strike</th>
+                  <th>Type</th>
+                  <th style="text-align:right;">Call OI</th>
+                  <th style="text-align:right;">Call ΔOI</th>
+                  <th style="text-align:right;">Put OI</th>
+                  <th style="text-align:right;">Put ΔOI</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+            <div style="font-size:11px;color:#9ca3af;margin-top:8px;">
+              💡 OI in lakhs (L) · ΔOI in thousands (K) · Yellow row = ATM strike (within 1% of spot)
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="options-card">
+          <div class="options-card-header">
+            ⚙️ F&O Options Sentiment
+            <span class="badge badge-gray">Expiry: ${escapeHtml(expiryDisplay)}</span>
+            <span class="badge badge-gray">via NSE</span>
+          </div>
+          <div style="margin-bottom:12px;">
+            <span class="composite-signal ${signalToClass(options.composite_signal)}">
+              ${escapeHtml(options.composite_signal)}
+            </span>
+          </div>
+          <div class="options-summary">${metrics}</div>
+          ${confirmationsHtml}
+          ${strikesTable}
+        </div>
+      `;
+    }
+
+    // ===== Main analysis result renderer =====
     function renderAnalysisResult(data) {
       const result = $("analyze-result");
       const p = data.price_data;
@@ -877,6 +853,7 @@
       `;
 
       const analystCard = renderAnalystCard(data.ratings, p.current_price);
+      const optionsCard = renderOptionsCard(data.options, p.current_price);
 
       let newsBlock = "";
       if (data.news && data.news.length > 0) {
@@ -909,6 +886,7 @@
       result.innerHTML = `
         <h1 style="font-size:20px; margin-bottom:6px;">${data.symbol}</h1>
         ${priceCard}
+        ${optionsCard}
         ${analystCard}
         <div class="analysis-text">${mdToHtml(data.analysis)}</div>
         ${newsBlock}
@@ -930,6 +908,7 @@
       });
     });
 
+    // Click handler — clicking any symbol in any table jumps to Analyze tab
     document.addEventListener("click", (e) => {
       const link = e.target.closest(".analyze-link");
       if (!link) return;
@@ -946,6 +925,7 @@
       runAnalysis(symbol);
     });
 
+    // ===== Snapshot fetcher (auto-refresh every 60s) =====
     async function refresh() {
       const status = $("status");
       try {
