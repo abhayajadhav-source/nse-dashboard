@@ -138,7 +138,6 @@
     }
     .analyst-metric-value, .options-metric-value { font-weight: 600; font-size: 15px; }
 
-    /* Composite signal big badge */
     .composite-signal {
       display: inline-block; padding: 8px 14px; border-radius: 8px;
       font-size: 15px; font-weight: 700; letter-spacing: 0.3px;
@@ -224,6 +223,95 @@
     .action-init { color: #1d4ed8; font-weight: 600; }
     .action-main { color: #6b7280; font-weight: 500; }
 
+    /* ===== Position Sizer styles ===== */
+    .sizer-settings-bar {
+      background: #fef3c7; padding: 10px 14px; font-size: 13px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid #fde68a; flex-wrap: wrap; gap: 8px;
+    }
+    .sizer-settings-bar a {
+      color: #92400e; font-weight: 600; text-decoration: none;
+    }
+    .sizer-settings-bar a:hover { text-decoration: underline; }
+    .sizer-mode-toggle {
+      display: flex; gap: 8px; padding: 14px 18px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .sizer-mode-btn {
+      padding: 8px 16px; background: #f3f4f6; border: 1px solid #e5e7eb;
+      border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;
+    }
+    .sizer-mode-btn.active {
+      background: #1d4ed8; color: #fff; border-color: #1d4ed8;
+    }
+    .sizer-form {
+      padding: 18px; display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .sizer-field { display: flex; flex-direction: column; gap: 4px; }
+    .sizer-field label {
+      font-size: 12px; font-weight: 600; color: #374151;
+      text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .sizer-field input {
+      padding: 10px 12px; font-size: 15px; border: 1px solid #d1d5db;
+      border-radius: 6px; font-family: ui-monospace, monospace;
+    }
+    .sizer-field input:focus {
+      outline: none; border-color: #1d4ed8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+    }
+    .sizer-field .field-hint {
+      font-size: 11px; color: #6b7280;
+    }
+    .sizer-results {
+      padding: 18px; border-top: 1px solid #e5e7eb;
+    }
+    .sizer-scenarios {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px; margin-top: 12px;
+    }
+    .sizer-scenario {
+      background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;
+      padding: 14px;
+    }
+    .sizer-scenario.balanced {
+      background: #eff6ff; border-color: #bfdbfe;
+    }
+    .sizer-scenario h4 {
+      font-size: 13px; margin-bottom: 10px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .sizer-scenario h4 .risk-pct {
+      font-size: 11px; background: #fff; padding: 2px 8px;
+      border-radius: 99px; color: #6b7280; font-weight: 600;
+    }
+    .sizer-row {
+      display: flex; justify-content: space-between;
+      padding: 6px 0; font-size: 13px; border-bottom: 1px dashed #e5e7eb;
+    }
+    .sizer-row:last-child { border-bottom: none; }
+    .sizer-row .label { color: #6b7280; }
+    .sizer-row .value { font-weight: 600; font-family: ui-monospace, monospace; }
+    .sizer-warning {
+      margin-top: 12px; padding: 10px 14px; border-radius: 6px;
+      background: #fee2e2; color: #991b1b; font-size: 13px;
+    }
+    .sizer-success {
+      margin-top: 12px; padding: 10px 14px; border-radius: 6px;
+      background: #d1fae5; color: #065f46; font-size: 13px;
+    }
+    .suggestion-card {
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;
+      padding: 12px; margin: 12px 18px; font-size: 13px;
+    }
+    .suggestion-card .src-tag {
+      display: inline-block; background: #1d4ed8; color: #fff;
+      padding: 2px 8px; border-radius: 4px; font-size: 10px;
+      font-weight: 600; margin-left: 6px;
+    }
+
     @media (max-width: 640px) {
       body { padding: 10px; }
       header { padding: 14px; }
@@ -261,19 +349,25 @@
       <button class="tab" data-tab="analyze">
         🤖 Analyze Stock
       </button>
+      <button class="tab" data-tab="sizer">
+        📐 Position Sizer
+      </button>
     </div>
 
     <div id="panel-intraday" class="panel"></div>
     <div id="panel-reversal" class="panel" style="display:none;"></div>
     <div id="panel-momentum" class="panel" style="display:none;"></div>
     <div id="panel-analyze"  class="panel" style="display:none;"></div>
+    <div id="panel-sizer"    class="panel" style="display:none;"></div>
   </div>
 
   <script>
-    const API_URL = "https://nse-dashboard-api.onrender.com/api/snapshot";
+    // ===== Configuration =====
+    const API_URL     = "https://nse-dashboard-api.onrender.com/api/snapshot";
     const ANALYZE_URL = "https://nse-dashboard-api.onrender.com/api/analyze";
-    const REFRESH_MS = 60_000;
+    const REFRESH_MS  = 60_000;
 
+    // ===== Helpers =====
     const $ = (id) => document.getElementById(id);
     const fmt = (n, places = 2) =>
       n.toLocaleString("en-IN", { minimumFractionDigits: places, maximumFractionDigits: places });
@@ -298,13 +392,17 @@
       return `${Math.floor(sec / 86400)}d ago`;
     }
 
+    // Simple Markdown → HTML for AI analysis output
     function mdToHtml(md) {
       const lines = md.split("\n");
       let html = "";
       let inUl = false;
       for (const raw of lines) {
         const line = raw.trim();
-        if (!line) { if (inUl) { html += "</ul>"; inUl = false; } continue; }
+        if (!line) {
+          if (inUl) { html += "</ul>"; inUl = false; }
+          continue;
+        }
         if (line.startsWith("## ")) {
           if (inUl) { html += "</ul>"; inUl = false; }
           html += `<h2>${escapeHtml(line.slice(3))}</h2>`;
@@ -329,10 +427,10 @@
       return t;
     }
     function escapeHtml(s) {
-      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // ===== Existing tab renderers (unchanged) =====
+    // ===== Snapshot tab renderers =====
     function renderIntraday(data) {
       const panel = $("panel-intraday");
       const items = (data && data.items) || [];
@@ -344,12 +442,12 @@
       }
       const rows = items.map((s) => {
         const badges = [];
-        if (s.is_new_52w_high) badges.push('<span class="badge badge-green">🏆 NEW 52W HIGH</span>');
-        if (s.is_new_52w_low)  badges.push('<span class="badge badge-red">⚠️ NEW 52W LOW</span>');
-        if (s.is_gap_up)       badges.push('<span class="badge badge-green">GAP UP</span>');
-        if (s.is_gap_down)     badges.push('<span class="badge badge-red">GAP DOWN</span>');
-        if (s.is_breakout_up)  badges.push('<span class="badge badge-green">BREAKOUT UP</span>');
-        if (s.is_breakout_down)badges.push('<span class="badge badge-red">BREAKOUT DOWN</span>');
+        if (s.is_new_52w_high)  badges.push('<span class="badge badge-green">🏆 NEW 52W HIGH</span>');
+        if (s.is_new_52w_low)   badges.push('<span class="badge badge-red">⚠️ NEW 52W LOW</span>');
+        if (s.is_gap_up)        badges.push('<span class="badge badge-green">GAP UP</span>');
+        if (s.is_gap_down)      badges.push('<span class="badge badge-red">GAP DOWN</span>');
+        if (s.is_breakout_up)   badges.push('<span class="badge badge-green">BREAKOUT UP</span>');
+        if (s.is_breakout_down) badges.push('<span class="badge badge-red">BREAKOUT DOWN</span>');
         if (s.volume_ratio > 2) badges.push(`<span class="badge badge-amber">VOL ${fmt(s.volume_ratio, 1)}x</span>`);
         return `<tr>
           <td class="symbol"><a href="#" class="analyze-link" data-symbol="${s.symbol}">${s.symbol}</a></td>
@@ -436,13 +534,14 @@
         </tr></thead><tbody>${rows}</tbody></table>`;
     }
 
+    // ===== Analyze tab =====
     function renderAnalyzePanel() {
       const panel = $("panel-analyze");
       panel.innerHTML = `
         <div class="panel-header">🤖 AI Technical Analysis
-          <div class="freshness">Enter an NSE symbol for technicals + analyst ratings + options + AI recommendation</div></div>
+          <div class="freshness">Enter an NSE symbol — get technicals + analyst ratings + F&O options + AI recommendation</div></div>
         <div class="analyze-form">
-          <input type="text" id="analyze-input" placeholder="e.g. RELIANCE, HDFCBANK" autocomplete="off">
+          <input type="text" id="analyze-input" placeholder="e.g. RELIANCE, HDFCBANK, TCS" autocomplete="off">
           <button id="analyze-button" type="button">Analyze</button>
           <div class="hint">Now includes F&O options sentiment (PCR, max pain, OI buildup). ~10-30 seconds per analysis.</div>
         </div>
@@ -468,7 +567,7 @@
         <div class="loading-spinner">
           Analyzing ${symbol}…<br>
           <span style="font-size:13px;">Fetching price → analyst ratings → F&O option chain → news → AI</span><br>
-          <span style="font-size:12px;color:#9ca3af;">(F&O data takes ~5-10s; first request after idle ~30s for server wake)</span>
+          <span style="font-size:12px;color:#9ca3af;">(F&O data takes ~5-10s; first request after idle may take ~30s)</span>
         </div>
       `;
 
@@ -496,7 +595,7 @@
       }
     }
 
-    // ===== Render analyst ratings card =====
+    // ===== Analyst card =====
     function renderAnalystCard(ratings, currentPrice) {
       if (!ratings || ratings.data_source === "unavailable" ||
           (!ratings.summary && !ratings.price_target &&
@@ -593,7 +692,7 @@
           const actionLower = (a.action || "").toLowerCase();
           let actionClass = "action-main";
           let actionIcon  = "·";
-          if (actionLower.includes("up")) { actionClass = "action-up"; actionIcon = "↑"; }
+          if (actionLower.includes("up"))   { actionClass = "action-up";   actionIcon = "↑"; }
           else if (actionLower.includes("down")) { actionClass = "action-down"; actionIcon = "↓"; }
           else if (actionLower.includes("init")) { actionClass = "action-init"; actionIcon = "★"; }
           const transition = (a.from_grade && a.to_grade && a.from_grade !== a.to_grade)
@@ -633,9 +732,8 @@
       `;
     }
 
-    // ===== Render options card (NEW) =====
+    // ===== Options card =====
     function signalToClass(signal) {
-      // Maps signal string to CSS class for the colored badge
       const map = {
         "Strong Bullish":    "signal-strong-bullish",
         "Bullish":           "signal-bullish",
@@ -661,24 +759,17 @@
         `;
       }
 
-      // Format expiry date nicely
-      let expiryDisplay = options.expiry_date || "";
-      // NSE returns dates like "29-May-2026"; keep as-is
+      const expiryDisplay = options.expiry_date || "";
+      const pctFromPain   = options.pct_from_max_pain || 0;
+      const painArrow     = pctFromPain > 0 ? "↑" : (pctFromPain < 0 ? "↓" : "≈");
 
-      // Compute pct from max pain
-      const pctFromPain = options.pct_from_max_pain || 0;
-      const painArrow = pctFromPain > 0 ? "↑" : (pctFromPain < 0 ? "↓" : "≈");
-
-      // PCR signal class
       const pcrClass = /bull/i.test(options.pcr_signal) ? "gain" :
                        /bear/i.test(options.pcr_signal) ? "loss" : "";
 
-      // Buildup signal class
-      const buildupClass = /buildup/i.test(options.buildup_signal) && /short/i.test(options.buildup_signal) ? "loss" :
-                          /unwinding/i.test(options.buildup_signal) ? "loss" :
-                          /buildup|covering/i.test(options.buildup_signal) ? "gain" : "";
+      const buildupClass =
+        /short.*buildup|long.*unwinding/i.test(options.buildup_signal) ? "loss" :
+        /long.*buildup|short.*covering/i.test(options.buildup_signal) ? "gain" : "";
 
-      // Build metrics grid
       const metrics = `
         <div class="options-metric">
           <div class="options-metric-label">PCR (OI)</div>
@@ -720,7 +811,6 @@
         </div>
       `;
 
-      // Confirmations list
       let confirmationsHtml = "";
       if (options.confirmations && options.confirmations.length > 0) {
         confirmationsHtml = `
@@ -735,16 +825,14 @@
         `;
       }
 
-      // Top strikes table — sort by strike ascending for natural reading
       let strikesTable = "";
       if (options.top_strikes && options.top_strikes.length > 0) {
         const sortedStrikes = [...options.top_strikes].sort((a, b) => a.strike - b.strike);
         const rows = sortedStrikes.map(s => {
-          // Determine row type
           let rowClass = "";
           let label = "";
           const distFromATM = Math.abs(s.distance_from_spot);
-          const isATM = distFromATM < (currentPrice * 0.01);   // within 1% of spot
+          const isATM = distFromATM < (currentPrice * 0.01);
           if (isATM) { rowClass = "strike-row-atm"; label = "ATM"; }
           else if (s.distance_from_spot > 0) { rowClass = "strike-row-resistance"; label = "OTM Call"; }
           else { rowClass = "strike-row-support"; label = "OTM Put"; }
@@ -852,8 +940,8 @@
         </div>
       `;
 
-      const analystCard = renderAnalystCard(data.ratings, p.current_price);
       const optionsCard = renderOptionsCard(data.options, p.current_price);
+      const analystCard = renderAnalystCard(data.ratings, p.current_price);
 
       let newsBlock = "";
       if (data.news && data.news.length > 0) {
@@ -894,6 +982,380 @@
       `;
     }
 
+    // ===== Position Sizer =====
+    const SIZER_STORAGE_KEY = "nse_sizer_settings";
+
+    function getSizerSettings() {
+      try {
+        const stored = localStorage.getItem(SIZER_STORAGE_KEY);
+        if (!stored) return null;
+        return JSON.parse(stored);
+      } catch { return null; }
+    }
+
+    function saveSizerSettings(settings) {
+      localStorage.setItem(SIZER_STORAGE_KEY, JSON.stringify(settings));
+    }
+
+    function promptSizerSetup() {
+      const current = getSizerSettings() || {};
+      const account = prompt(
+        "Enter your trading account size in ₹\n(used for position sizing calculations)",
+        current.account || "500000"
+      );
+      if (!account) return null;
+      const accountNum = parseFloat(account.replace(/,/g, ""));
+      if (isNaN(accountNum) || accountNum <= 0) {
+        alert("Invalid account size");
+        return null;
+      }
+      const riskPct = prompt(
+        "Default risk % per trade (e.g. 1 for 1%)\nRecommended: 0.5–2%",
+        current.risk_pct || "1"
+      );
+      if (!riskPct) return null;
+      const riskNum = parseFloat(riskPct);
+      if (isNaN(riskNum) || riskNum <= 0 || riskNum > 5) {
+        alert("Risk % must be between 0 and 5");
+        return null;
+      }
+      const settings = { account: accountNum, risk_pct: riskNum };
+      saveSizerSettings(settings);
+      return settings;
+    }
+
+    function calculatePosition(account, riskPct, entry, stop, target) {
+      const riskAmount = account * (riskPct / 100);
+      const riskPerShare = Math.abs(entry - stop);
+      if (riskPerShare === 0) return null;
+
+      const shares = Math.floor(riskAmount / riskPerShare);
+      const capitalRequired = shares * entry;
+      const capitalPctOfAccount = (capitalRequired / account) * 100;
+
+      let rMultiple = null, rewardAmount = null;
+      if (target && target !== entry) {
+        const rewardPerShare = Math.abs(target - entry);
+        rMultiple = rewardPerShare / riskPerShare;
+        rewardAmount = shares * rewardPerShare;
+      }
+
+      return {
+        shares,
+        riskAmount,
+        riskPerShare,
+        capitalRequired,
+        capitalPctOfAccount,
+        rMultiple,
+        rewardAmount,
+      };
+    }
+
+    function renderSizerPanel() {
+      const panel = $("panel-sizer");
+      const settings = getSizerSettings();
+
+      if (!settings) {
+        panel.innerHTML = `
+          <div class="panel-header">📐 Position Sizer & Risk Calculator</div>
+          <div style="padding:40px 20px; text-align:center;">
+            <p style="font-size:14px; color:#6b7280; margin-bottom:16px;">
+              Configure your account size and default risk % to get started.
+            </p>
+            <button id="sizer-setup-btn" style="padding:10px 20px; background:#1d4ed8; color:#fff;
+              border:none; border-radius:6px; cursor:pointer; font-weight:600;">
+              Set up →
+            </button>
+            <p style="font-size:11px; color:#9ca3af; margin-top:14px;">
+              Settings stored locally in your browser only — never sent to any server.
+            </p>
+          </div>
+        `;
+        $("sizer-setup-btn").addEventListener("click", () => {
+          if (promptSizerSetup()) renderSizerPanel();
+        });
+        return;
+      }
+
+      panel.innerHTML = `
+        <div class="panel-header">📐 Position Sizer & Risk Calculator</div>
+        <div class="sizer-settings-bar">
+          <div>
+            Account: <strong>₹${settings.account.toLocaleString("en-IN")}</strong> ·
+            Default Risk: <strong>${settings.risk_pct}%</strong>
+          </div>
+          <a href="#" id="sizer-edit-settings">Edit settings</a>
+        </div>
+        <div class="sizer-mode-toggle">
+          <button class="sizer-mode-btn active" data-mode="manual">Manual Entry</button>
+          <button class="sizer-mode-btn" data-mode="auto">Auto-suggest from Stock</button>
+        </div>
+        <div id="sizer-content"></div>
+      `;
+
+      $("sizer-edit-settings").addEventListener("click", (e) => {
+        e.preventDefault();
+        if (promptSizerSetup()) renderSizerPanel();
+      });
+
+      document.querySelectorAll(".sizer-mode-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".sizer-mode-btn").forEach(b =>
+            b.classList.toggle("active", b === btn));
+          if (btn.dataset.mode === "manual") renderManualMode(settings);
+          else renderAutoMode(settings);
+        });
+      });
+
+      renderManualMode(settings);
+    }
+
+    function renderManualMode(settings) {
+      const content = $("sizer-content");
+      content.innerHTML = `
+        <div class="sizer-form">
+          <div class="sizer-field">
+            <label>Symbol (optional)</label>
+            <input type="text" id="m-symbol" placeholder="e.g. RELIANCE" style="text-transform:uppercase;">
+            <div class="field-hint">Just for your reference</div>
+          </div>
+          <div class="sizer-field">
+            <label>Entry Price ₹</label>
+            <input type="number" id="m-entry" step="0.05" placeholder="2,450.00">
+          </div>
+          <div class="sizer-field">
+            <label>Stop Loss ₹</label>
+            <input type="number" id="m-stop" step="0.05" placeholder="2,380.00">
+            <div class="field-hint">Below entry for long, above for short</div>
+          </div>
+          <div class="sizer-field">
+            <label>Target ₹ (optional)</label>
+            <input type="number" id="m-target" step="0.05" placeholder="2,600.00">
+            <div class="field-hint">For R:R calculation</div>
+          </div>
+        </div>
+        <div id="sizer-results" class="sizer-results" style="display:none;"></div>
+      `;
+      ["m-entry", "m-stop", "m-target"].forEach(id => {
+        $(id).addEventListener("input", () => recalcManual(settings));
+      });
+    }
+
+    function recalcManual(settings) {
+      const entry = parseFloat($("m-entry").value);
+      const stop = parseFloat($("m-stop").value);
+      const target = parseFloat($("m-target").value);
+      const resultsDiv = $("sizer-results");
+
+      if (isNaN(entry) || isNaN(stop) || entry === stop) {
+        resultsDiv.style.display = "none";
+        return;
+      }
+      resultsDiv.style.display = "block";
+      renderScenarios(resultsDiv, settings, entry, stop, isNaN(target) ? null : target);
+    }
+
+    function renderScenarios(container, settings, entry, stop, target) {
+      const scenarios = [
+        { name: "Conservative", riskPct: 0.5, klass: "" },
+        { name: "Balanced",     riskPct: settings.risk_pct, klass: "balanced" },
+        { name: "Aggressive",   riskPct: 2.0, klass: "" },
+      ];
+
+      const cards = scenarios.map(s => {
+        const calc = calculatePosition(settings.account, s.riskPct, entry, stop, target);
+        if (!calc || calc.shares === 0) {
+          return `
+            <div class="sizer-scenario ${s.klass}">
+              <h4>${s.name} <span class="risk-pct">${s.riskPct}%</span></h4>
+              <div style="font-size:12px;color:#dc2626;">
+                Risk per share (₹${Math.abs(entry-stop).toFixed(2)}) exceeds risk budget.
+                Widen stop or increase account size.
+              </div>
+            </div>
+          `;
+        }
+        const rrDisplay = calc.rMultiple
+          ? `<div class="sizer-row">
+              <span class="label">R-Multiple to target</span>
+              <span class="value ${calc.rMultiple >= 1.5 ? 'gain' : 'loss'}">${calc.rMultiple.toFixed(2)}R</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Potential reward</span>
+              <span class="value gain">₹${calc.rewardAmount.toLocaleString("en-IN", {maximumFractionDigits:0})}</span>
+            </div>`
+          : "";
+        return `
+          <div class="sizer-scenario ${s.klass}">
+            <h4>${s.name} <span class="risk-pct">${s.riskPct}%</span></h4>
+            <div class="sizer-row">
+              <span class="label">Position size</span>
+              <span class="value">${calc.shares.toLocaleString("en-IN")} shares</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Capital required</span>
+              <span class="value">₹${calc.capitalRequired.toLocaleString("en-IN", {maximumFractionDigits:0})}</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">% of account</span>
+              <span class="value ${calc.capitalPctOfAccount > 30 ? 'loss' : ''}">${calc.capitalPctOfAccount.toFixed(1)}%</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Risk amount</span>
+              <span class="value loss">₹${calc.riskAmount.toLocaleString("en-IN", {maximumFractionDigits:0})}</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Risk per share</span>
+              <span class="value">₹${calc.riskPerShare.toFixed(2)}</span>
+            </div>
+            ${rrDisplay}
+          </div>
+        `;
+      }).join("");
+
+      const warnings = [];
+      const balancedCalc = calculatePosition(settings.account, settings.risk_pct, entry, stop, target);
+      if (balancedCalc && balancedCalc.capitalPctOfAccount > 30) {
+        warnings.push(`⚠️ Balanced scenario uses ${balancedCalc.capitalPctOfAccount.toFixed(0)}% of account — concentration risk.`);
+      }
+      if (target && balancedCalc && balancedCalc.rMultiple && balancedCalc.rMultiple < 1.5) {
+        warnings.push(`⚠️ R:R of ${balancedCalc.rMultiple.toFixed(2)} is below 1.5 — poor risk/reward. Reconsider trade.`);
+      }
+      const stopPctFromEntry = (Math.abs(entry - stop) / entry) * 100;
+      if (stopPctFromEntry < 1) {
+        warnings.push(`⚠️ Stop is only ${stopPctFromEntry.toFixed(2)}% from entry — may get hit by noise.`);
+      }
+
+      let successMsg = "";
+      if (warnings.length === 0 && target && balancedCalc && balancedCalc.rMultiple >= 2) {
+        successMsg = `<div class="sizer-success">✓ Solid setup: ${balancedCalc.rMultiple.toFixed(2)}R reward potential, sized appropriately.</div>`;
+      }
+
+      container.innerHTML = `
+        <h3 style="font-size:14px; margin-bottom:6px;">📊 Position Scenarios</h3>
+        <p style="font-size:12px; color:#6b7280;">
+          ${target ? `Entry ₹${entry} → Stop ₹${stop} → Target ₹${target}` : `Entry ₹${entry} → Stop ₹${stop}`}
+        </p>
+        <div class="sizer-scenarios">${cards}</div>
+        ${warnings.map(w => `<div class="sizer-warning">${w}</div>`).join("")}
+        ${successMsg}
+      `;
+    }
+
+    function renderAutoMode(settings) {
+      const content = $("sizer-content");
+      content.innerHTML = `
+        <div class="sizer-form">
+          <div class="sizer-field" style="grid-column: span 2;">
+            <label>NSE Symbol</label>
+            <input type="text" id="a-symbol" placeholder="e.g. RELIANCE" style="text-transform:uppercase;">
+            <div class="field-hint">
+              Pulls current price, ATR, support/resistance, analyst target — then suggests entry/stop/target
+            </div>
+          </div>
+          <div class="sizer-field" style="align-self:end;">
+            <button id="a-fetch-btn" style="padding:10px 20px; background:#1d4ed8; color:#fff;
+              border:none; border-radius:6px; cursor:pointer; font-weight:600;">
+              Fetch & Suggest
+            </button>
+          </div>
+        </div>
+        <div id="auto-results"></div>
+      `;
+      $("a-fetch-btn").addEventListener("click", () => fetchAndSuggest(settings));
+      $("a-symbol").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") fetchAndSuggest(settings);
+      });
+    }
+
+    async function fetchAndSuggest(settings) {
+      const symbol = $("a-symbol").value.trim().toUpperCase();
+      if (!symbol) return;
+      const button = $("a-fetch-btn");
+      const results = $("auto-results");
+      button.disabled = true;
+      button.textContent = "Fetching…";
+      results.innerHTML = `<div class="loading-spinner">Fetching ${symbol} data…</div>`;
+
+      try {
+        const res = await fetch(ANALYZE_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ symbol }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        renderAutoSuggestion(data, settings);
+      } catch (err) {
+        results.innerHTML = `<div class="status error" style="margin:18px;">⚠️ ${err.message}</div>`;
+      } finally {
+        button.disabled = false;
+        button.textContent = "Fetch & Suggest";
+      }
+    }
+
+    function renderAutoSuggestion(data, settings) {
+      const p = data.price_data;
+      const price = p.current_price;
+      const atr = p.atr_14 || (price * 0.02);
+      const sma50 = p.sma_50 || price;
+      const bbLower = p.bb_lower || (price - 2 * atr);
+      const high52w = p.high_52w;
+      const analystTarget = data.ratings?.price_target?.mean;
+
+      const entry = price;
+      const stopCandidates = [
+        { value: price - 2 * atr,         source: "Entry - 2×ATR (₹" + atr.toFixed(2) + ")"},
+        { value: sma50 * 0.99,            source: "1% below SMA 50" },
+        { value: bbLower,                 source: "Bollinger Band lower" },
+      ].filter(s => s.value > 0 && s.value < price);
+      const stopChoice = stopCandidates.reduce((max, s) => s.value > max.value ? s : max, stopCandidates[0]);
+      const stop = stopChoice.value;
+
+      const riskPerShare = entry - stop;
+      const targetCandidates = [];
+      if (analystTarget && analystTarget > entry) {
+        targetCandidates.push({ value: analystTarget, source: "Analyst mean target" });
+      }
+      if (high52w > entry * 1.02) {
+        targetCandidates.push({ value: high52w, source: "52-week high" });
+      }
+      targetCandidates.push({ value: entry + (2 * riskPerShare), source: "2R from stop (default)" });
+      const targetChoice = targetCandidates[0];
+      const target = targetChoice.value;
+
+      const results = $("auto-results");
+      results.innerHTML = `
+        <div class="suggestion-card">
+          <div style="font-weight:600; font-size:14px; margin-bottom:8px;">
+            💡 Suggested Trade Setup for ${data.symbol}
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px;">
+            <div>
+              <div style="font-size:11px; color:#6b7280;">ENTRY</div>
+              <div style="font-weight:600; font-size:16px;">₹${entry.toFixed(2)}</div>
+              <div style="font-size:11px; color:#6b7280;">Current price <span class="src-tag">SPOT</span></div>
+            </div>
+            <div>
+              <div style="font-size:11px; color:#6b7280;">STOP LOSS</div>
+              <div style="font-weight:600; font-size:16px; color:#dc2626;">₹${stop.toFixed(2)}</div>
+              <div style="font-size:11px; color:#6b7280;">${stopChoice.source} <span class="src-tag">${((entry-stop)/entry*100).toFixed(1)}%</span></div>
+            </div>
+            <div>
+              <div style="font-size:11px; color:#6b7280;">TARGET</div>
+              <div style="font-weight:600; font-size:16px; color:#16a34a;">₹${target.toFixed(2)}</div>
+              <div style="font-size:11px; color:#6b7280;">${targetChoice.source} <span class="src-tag">${((target-entry)/entry*100).toFixed(1)}%</span></div>
+            </div>
+          </div>
+          <div style="margin-top:10px; font-size:11px; color:#6b7280; font-style:italic;">
+            These are algorithmic suggestions — adjust based on your read of the chart and market context.
+          </div>
+        </div>
+        <div id="auto-scenarios" class="sizer-results"></div>
+      `;
+      renderScenarios($("auto-scenarios"), settings, entry, stop, target);
+    }
+
     // ===== Tab switching =====
     document.querySelectorAll(".tab").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -904,6 +1366,9 @@
         });
         if (tab === "analyze" && !$("panel-analyze").innerHTML.trim()) {
           renderAnalyzePanel();
+        }
+        if (tab === "sizer" && !$("panel-sizer").innerHTML.trim()) {
+          renderSizerPanel();
         }
       });
     });
@@ -925,7 +1390,7 @@
       runAnalysis(symbol);
     });
 
-    // ===== Snapshot fetcher (auto-refresh every 60s) =====
+    // ===== Snapshot auto-refresh =====
     async function refresh() {
       const status = $("status");
       try {
