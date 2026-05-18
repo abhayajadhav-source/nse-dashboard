@@ -328,6 +328,126 @@
       font-weight: 600; margin-left: 6px;
     }
 
+    /* ===== Compare Tab styles ===== */
+    .compare-form {
+      padding: 18px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .compare-form .symbols-row {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px;
+    }
+    .compare-form .vs-divider {
+      font-weight: 700; color: #6b7280; font-size: 18px; padding: 0 4px;
+    }
+    .compare-form input[type="text"] {
+      flex: 1; min-width: 140px; padding: 10px 14px; font-size: 15px;
+      border: 1px solid #d1d5db; border-radius: 6px;
+      font-family: ui-monospace, monospace; text-transform: uppercase;
+    }
+    .compare-form input[type="text"]:focus {
+      outline: none; border-color: #1d4ed8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+    }
+    .compare-form button {
+      padding: 10px 20px; background: #1d4ed8; color: #fff; border: none;
+      border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;
+    }
+    .compare-form button:hover { background: #1e3a8a; }
+    .compare-form button:disabled { background: #9ca3af; cursor: not-allowed; }
+    .compare-form .hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+    .compare-content { padding: 18px; }
+
+    .compare-headers {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;
+    }
+    .compare-header-card {
+      background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px;
+    }
+    .compare-header-card .symbol-large {
+      font-size: 20px; font-weight: 700; font-family: ui-monospace, monospace; margin-bottom: 4px;
+    }
+    .compare-header-card .price-large { font-size: 16px; font-weight: 600; }
+    .compare-header-card .change-small { font-size: 13px; font-weight: 600; }
+    .compare-header-card.winner {
+      border-color: #16a34a; border-width: 2px; background: #f0fdf4;
+    }
+    .winner-crown { display: inline-block; margin-left: 6px; font-size: 16px; }
+
+    .compare-scorecard {
+      background: #1f2937; color: #fff; border-radius: 8px; padding: 14px;
+      margin-bottom: 18px; display: flex; justify-content: space-around;
+      text-align: center; flex-wrap: wrap; gap: 10px;
+    }
+    .scorecard-item { display: flex; flex-direction: column; align-items: center; }
+    .scorecard-label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+      opacity: 0.7; margin-bottom: 4px;
+    }
+    .scorecard-value { font-size: 22px; font-weight: 700; }
+    .scorecard-value.win  { color: #4ade80; }
+    .scorecard-value.lose { color: #f87171; }
+
+    .compare-table {
+      width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 14px;
+    }
+    .compare-table th {
+      background: #f9fafb; padding: 10px 12px; text-align: left;
+      font-size: 12px; font-weight: 600; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .compare-table th.metric-col { width: 32%; }
+    .compare-table th.value-col  { width: 28%; }
+    .compare-table th.winner-col { width: 12%; text-align: center; }
+    .compare-table td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; }
+    .compare-table tr.section-header td {
+      background: #eff6ff; font-weight: 700; font-size: 12px; color: #1e40af;
+      text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px;
+    }
+    .compare-table .metric-name { color: #374151; }
+    .compare-table .value-cell  { font-family: ui-monospace, monospace; }
+    .compare-table .value-cell.win  {
+      background: #f0fdf4; color: #065f46; font-weight: 600;
+    }
+    .compare-table .value-cell.lose { color: #6b7280; }
+    .compare-table .winner-cell { text-align: center; font-size: 12px; font-weight: 600; }
+    .compare-table .winner-cell.a   { color: #16a34a; }
+    .compare-table .winner-cell.b   { color: #16a34a; }
+    .compare-table .winner-cell.tie { color: #6b7280; }
+    .compare-table .winner-cell.na  { color: #d1d5db; }
+
+    .verdict-card {
+      background: #fff; border: 2px solid #1d4ed8; border-radius: 10px;
+      padding: 18px; margin-bottom: 16px;
+    }
+    .verdict-card-header {
+      font-size: 16px; font-weight: 700; color: #1e40af;
+      margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .verdict-card .analysis-text { font-size: 14px; }
+
+    .compare-news {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px;
+    }
+    .compare-news-col {
+      background: #f9fafb; border-radius: 8px; padding: 14px;
+    }
+    .compare-news-col-header {
+      font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 10px;
+    }
+    .compare-news-col ul { list-style: none; padding: 0; margin: 0; }
+    .compare-news-col li {
+      font-size: 13px; padding: 6px 0; border-bottom: 1px solid #e5e7eb;
+    }
+    .compare-news-col li:last-child { border-bottom: none; }
+    .compare-news-col a { color: #1d4ed8; text-decoration: none; }
+    .compare-news-col a:hover { text-decoration: underline; }
+    .compare-news-col .news-meta {
+      color: #9ca3af; font-size: 11px; margin-top: 2px;
+    }
+
     @media (max-width: 640px) {
       body { padding: 10px; }
       header { padding: 14px; }
@@ -335,6 +455,11 @@
       th, td { padding: 8px 10px; font-size: 13px; }
       .tab { padding: 8px 12px; font-size: 13px; }
       .rating-bars { grid-template-columns: 90px 1fr 32px; }
+      .compare-headers, .compare-news { grid-template-columns: 1fr; }
+      .compare-table th.metric-col { width: 40%; }
+      .compare-table th.value-col  { width: 25%; }
+      .compare-table { font-size: 13px; }
+      .compare-table td, .compare-table th { padding: 8px; }
     }
   </style>
 </head>
@@ -368,6 +493,9 @@
       <button class="tab" data-tab="sizer">
         📐 Position Sizer
       </button>
+      <button class="tab" data-tab="compare">
+        📊 Compare
+      </button>
     </div>
 
     <div id="panel-intraday" class="panel"></div>
@@ -375,12 +503,14 @@
     <div id="panel-momentum" class="panel" style="display:none;"></div>
     <div id="panel-analyze"  class="panel" style="display:none;"></div>
     <div id="panel-sizer"    class="panel" style="display:none;"></div>
+    <div id="panel-compare"  class="panel" style="display:none;"></div>
   </div>
 
   <script>
     // ===== Configuration =====
     const API_URL     = "https://nse-dashboard-api.onrender.com/api/snapshot";
     const ANALYZE_URL = "https://nse-dashboard-api.onrender.com/api/analyze";
+    const COMPARE_URL = "https://nse-dashboard-api.onrender.com/api/compare";
     const REFRESH_MS  = 60_000;
 
     // ===== Helpers =====
@@ -1040,41 +1170,20 @@
       return settings;
     }
 
-    // direction: "long" or "short"
-    // manualQty: if provided, overrides risk-based sizing (returns qty-based calc instead)
-    function calculatePosition(account, riskPct, entry, stop, target, direction = "long", manualQty = null) {
+    function calculatePosition(account, riskPct, entry, stop, target) {
+      const riskAmount = account * (riskPct / 100);
       const riskPerShare = Math.abs(entry - stop);
       if (riskPerShare === 0) return null;
 
-      // Validate direction makes sense vs stop placement
-      let directionValid = true;
-      if (direction === "long" && stop >= entry) directionValid = false;
-      if (direction === "short" && stop <= entry) directionValid = false;
-
-      let shares, riskAmount;
-      if (manualQty !== null && manualQty > 0) {
-        // Manual qty mode: derive risk amount from quantity
-        shares = Math.floor(manualQty);
-        riskAmount = shares * riskPerShare;
-      } else {
-        // Risk-based mode: derive quantity from risk budget
-        riskAmount = account * (riskPct / 100);
-        shares = Math.floor(riskAmount / riskPerShare);
-      }
-
+      const shares = Math.floor(riskAmount / riskPerShare);
       const capitalRequired = shares * entry;
       const capitalPctOfAccount = (capitalRequired / account) * 100;
-      const effectiveRiskPct = (riskAmount / account) * 100;
 
       let rMultiple = null, rewardAmount = null;
       if (target && target !== entry) {
-        // For long: reward only if target > entry. For short: reward only if target < entry.
-        const targetValid = direction === "long" ? target > entry : target < entry;
-        if (targetValid) {
-          const rewardPerShare = Math.abs(target - entry);
-          rMultiple = rewardPerShare / riskPerShare;
-          rewardAmount = shares * rewardPerShare;
-        }
+        const rewardPerShare = Math.abs(target - entry);
+        rMultiple = rewardPerShare / riskPerShare;
+        rewardAmount = shares * rewardPerShare;
       }
 
       return {
@@ -1085,10 +1194,6 @@
         capitalPctOfAccount,
         rMultiple,
         rewardAmount,
-        direction,
-        directionValid,
-        effectiveRiskPct,
-        manualQty: manualQty !== null,
       };
     }
 
@@ -1237,7 +1342,7 @@
       // If manualQty is provided, show only ONE card with that qty (not 3 scenarios)
       if (manualQty !== null) {
         const calc = calculatePosition(settings.account, settings.risk_pct, entry, stop, target, direction, manualQty);
-        return renderSingleScenario(container, settings, entry, stop, target, direction, calc);
+        return renderSingleScenario(container, settings, entry, stop, target, direction, calc, "Manual Quantity");
       }
 
       const scenarios = [
@@ -1248,7 +1353,7 @@
 
       const cards = scenarios.map(s => {
         const calc = calculatePosition(settings.account, s.riskPct, entry, stop, target, direction);
-        return renderScenarioCard(s.name, s.riskPct.toString(), s.klass, calc, entry, stop, direction);
+        return renderScenarioCard(s.name, s.riskPct, s.klass, calc, entry, stop, direction);
       }).join("");
 
       const warnings = buildWarnings(settings, entry, stop, target, direction);
@@ -1274,12 +1379,12 @@
       `;
     }
 
-    function renderScenarioCard(name, riskPctLabel, klass, calc, entry, stop, direction) {
+    function renderScenarioCard(name, riskPct, klass, calc, entry, stop, direction) {
       if (!calc) {
         return `
           <div class="sizer-scenario ${klass}">
-            <h4>${name} <span class="risk-pct">${riskPctLabel}%</span></h4>
-            <div style="font-size:12px;color:#dc2626;">Invalid inputs (entry = stop).</div>
+            <h4>${name} <span class="risk-pct">${riskPct}%</span></h4>
+            <div style="font-size:12px;color:#dc2626;">Invalid inputs.</div>
           </div>
         `;
       }
@@ -1287,7 +1392,7 @@
         const expectedSide = direction === "long" ? "below" : "above";
         return `
           <div class="sizer-scenario ${klass}">
-            <h4>${name} <span class="risk-pct">${riskPctLabel}%</span></h4>
+            <h4>${name} <span class="risk-pct">${riskPct}%</span></h4>
             <div style="font-size:12px;color:#dc2626;">
               ⚠ Stop must be ${expectedSide} entry for ${direction.toUpperCase()} positions.
             </div>
@@ -1297,7 +1402,7 @@
       if (calc.shares === 0) {
         return `
           <div class="sizer-scenario ${klass}">
-            <h4>${name} <span class="risk-pct">${riskPctLabel}%</span></h4>
+            <h4>${name} <span class="risk-pct">${riskPct}%</span></h4>
             <div style="font-size:12px;color:#dc2626;">
               Risk per share (₹${calc.riskPerShare.toFixed(2)}) exceeds risk budget.
               Widen stop or increase account size.
@@ -1317,7 +1422,7 @@
         : "";
       return `
         <div class="sizer-scenario ${klass}">
-          <h4>${name} <span class="risk-pct">${riskPctLabel}%</span></h4>
+          <h4>${name} <span class="risk-pct">${riskPct}%</span></h4>
           <div class="sizer-row">
             <span class="label">Position size</span>
             <span class="value">${calc.shares.toLocaleString("en-IN")} shares</span>
@@ -1343,11 +1448,8 @@
       `;
     }
 
-    function renderSingleScenario(container, settings, entry, stop, target, direction, calc) {
-      const riskPctLabel = calc && calc.directionValid && calc.shares > 0
-        ? calc.effectiveRiskPct.toFixed(2)
-        : "—";
-      const card = renderScenarioCard("Manual Quantity", riskPctLabel, "balanced", calc, entry, stop, direction);
+    function renderSingleScenario(container, settings, entry, stop, target, direction, calc, label) {
+      const card = renderScenarioCard(label, calc?.effectiveRiskPct.toFixed(2) || "0", "balanced", calc, entry, stop, direction);
       const warnings = buildWarnings(settings, entry, stop, target, direction, calc);
       const dirBadge = direction === "long"
         ? '<span class="badge badge-green">📈 LONG</span>'
@@ -1355,17 +1457,17 @@
 
       let effectiveRiskNote = "";
       if (calc && calc.directionValid && calc.shares > 0) {
-        const riskClass = calc.effectiveRiskPct > 2 ? "loss" : (calc.effectiveRiskPct <= settings.risk_pct ? "gain" : "");
-        const overBudgetMsg = calc.effectiveRiskPct > 2
-          ? '<span style="color:#dc2626; font-weight:600;"> — exceeds 2% guideline</span>'
-          : calc.effectiveRiskPct > settings.risk_pct
-            ? `<span style="color:#92400e;"> — exceeds your default of ${settings.risk_pct}%</span>`
-            : '';
+        const riskClass = calc.effectiveRiskPct > 2 ? "loss" : (calc.effectiveRiskPct < 0.5 ? "" : "gain");
         effectiveRiskNote = `
           <div style="margin-top:10px; padding:10px 14px; background:#f9fafb; border-radius:6px; font-size:13px;">
             <strong>Effective risk:</strong>
             <span class="${riskClass}">${calc.effectiveRiskPct.toFixed(2)}% of account</span>
-            (₹${calc.riskAmount.toLocaleString("en-IN", {maximumFractionDigits:0})})${overBudgetMsg}
+            (₹${calc.riskAmount.toLocaleString("en-IN", {maximumFractionDigits:0})})
+            ${calc.effectiveRiskPct > 2
+              ? '<span style="color:#dc2626; font-weight:600;">— exceeds 2% guideline</span>'
+              : calc.effectiveRiskPct > settings.risk_pct
+                ? `<span style="color:#92400e;">— exceeds your default of ${settings.risk_pct}%</span>`
+                : ''}
           </div>
         `;
       }
@@ -1391,18 +1493,19 @@
         warnings.push(`⚠️ Stop loss must be ${expected} entry price for ${direction.toUpperCase()} positions.`);
         return warnings;
       }
-      if (target) {
-        const targetValid = direction === "long" ? target > entry : target < entry;
-        if (!targetValid) {
-          const expected = direction === "long" ? "above" : "below";
-          warnings.push(`⚠️ Target must be ${expected} entry for ${direction.toUpperCase()} positions.`);
-        }
-      }
       if (calc.capitalPctOfAccount > 30) {
         warnings.push(`⚠️ Position uses ${calc.capitalPctOfAccount.toFixed(0)}% of account — concentration risk.`);
       }
       if (target && calc.rMultiple && calc.rMultiple < 1.5) {
         warnings.push(`⚠️ R:R of ${calc.rMultiple.toFixed(2)} is below 1.5 — poor risk/reward. Reconsider trade.`);
+      }
+      if (target) {
+        // Validate target direction
+        const targetValid = direction === "long" ? target > entry : target < entry;
+        if (!targetValid) {
+          const expected = direction === "long" ? "above" : "below";
+          warnings.push(`⚠️ Target must be ${expected} entry for ${direction.toUpperCase()} positions.`);
+        }
       }
       const stopPctFromEntry = (Math.abs(entry - stop) / entry) * 100;
       if (stopPctFromEntry < 1) {
@@ -1413,7 +1516,6 @@
       }
       return warnings;
     }
-
     function renderAutoMode(settings) {
       const content = $("sizer-content");
       content.innerHTML = `
@@ -1866,6 +1968,216 @@
       `;
     }
 
+    // ===== Compare tab =====
+    function renderComparePanel() {
+      const panel = $("panel-compare");
+      panel.innerHTML = `
+        <div class="panel-header">
+          📊 Stock Comparison
+          <div class="freshness">Enter 2 NSE symbols — side-by-side technicals, options, analyst, news + AI verdict</div>
+        </div>
+        <div class="compare-form">
+          <div class="symbols-row">
+            <input type="text" id="compare-input-a" placeholder="Stock A (e.g. RELIANCE)" autocomplete="off">
+            <div class="vs-divider">VS</div>
+            <input type="text" id="compare-input-b" placeholder="Stock B (e.g. HDFCBANK)" autocomplete="off">
+            <button id="compare-button" type="button">Compare</button>
+          </div>
+          <div class="hint">Compares price, trend, F&O options sentiment, analyst ratings, and news. ~15-30 seconds.</div>
+        </div>
+        <div id="compare-result" class="compare-content"></div>
+      `;
+
+      const inputA = $("compare-input-a");
+      const inputB = $("compare-input-b");
+      const button = $("compare-button");
+      const submit = () => {
+        const symA = inputA.value.trim().toUpperCase();
+        const symB = inputB.value.trim().toUpperCase();
+        if (symA && symB) runComparison(symA, symB);
+      };
+      button.addEventListener("click", submit);
+      inputA.addEventListener("keypress", (e) => { if (e.key === "Enter") inputB.focus(); });
+      inputB.addEventListener("keypress", (e) => { if (e.key === "Enter") submit(); });
+      inputA.focus();
+    }
+
+    async function runComparison(symA, symB) {
+      const button = $("compare-button");
+      const result = $("compare-result");
+      button.disabled = true;
+      button.textContent = "Comparing…";
+      result.innerHTML = `
+        <div class="loading-spinner">
+          Comparing ${symA} vs ${symB}…<br>
+          <span style="font-size:13px;">Fetching data for both → metric scoring → AI verdict</span><br>
+          <span style="font-size:12px;color:#9ca3af;">(First request after idle may take ~30s while server wakes)</span>
+        </div>
+      `;
+      try {
+        const res = await fetch(COMPARE_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ symbols: [symA, symB] }),
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        renderComparisonResult(data);
+      } catch (err) {
+        result.innerHTML = `
+          <div class="status error" style="margin:0;">
+            ⚠️ ${escapeHtml(err.message)}
+          </div>
+        `;
+      } finally {
+        button.disabled = false;
+        button.textContent = "Compare";
+      }
+    }
+
+    function renderComparisonResult(data) {
+      const result   = $("compare-result");
+      const symA     = data.symbols[0];
+      const symB     = data.symbols[1];
+      const stockA   = data.stock_a;
+      const stockB   = data.stock_b;
+      const verdict  = data.metrics.verdict;
+      const scores   = data.metrics.scores;
+      const pa = stockA.price;
+      const pb = stockB.price;
+
+      // Header cards — winner gets a green border
+      const headerA = `
+        <div class="compare-header-card ${verdict === 'a' ? 'winner' : ''}">
+          <div class="symbol-large">${escapeHtml(symA)}${verdict === 'a' ? '<span class="winner-crown">👑</span>' : ''}</div>
+          <div class="price-large">₹${fmt(pa.current_price)}</div>
+          <div class="change-small ${cls(pa.pct_change_1d)}">${sign(pa.pct_change_1d)}${fmt(pa.pct_change_1d)}% today</div>
+        </div>
+      `;
+      const headerB = `
+        <div class="compare-header-card ${verdict === 'b' ? 'winner' : ''}">
+          <div class="symbol-large">${escapeHtml(symB)}${verdict === 'b' ? '<span class="winner-crown">👑</span>' : ''}</div>
+          <div class="price-large">₹${fmt(pb.current_price)}</div>
+          <div class="change-small ${cls(pb.pct_change_1d)}">${sign(pb.pct_change_1d)}${fmt(pb.pct_change_1d)}% today</div>
+        </div>
+      `;
+      const headersHTML = `<div class="compare-headers">${headerA}${headerB}</div>`;
+
+      // Scorecard
+      const scoreAClass = scores.a > scores.b ? 'win' : scores.a < scores.b ? 'lose' : '';
+      const scoreBClass = scores.b > scores.a ? 'win' : scores.b < scores.a ? 'lose' : '';
+      const scorecardHTML = `
+        <div class="compare-scorecard">
+          <div class="scorecard-item">
+            <div class="scorecard-label">${escapeHtml(symA)} wins</div>
+            <div class="scorecard-value ${scoreAClass}">${scores.a}</div>
+          </div>
+          <div class="scorecard-item">
+            <div class="scorecard-label">${escapeHtml(symB)} wins</div>
+            <div class="scorecard-value ${scoreBClass}">${scores.b}</div>
+          </div>
+          <div class="scorecard-item">
+            <div class="scorecard-label">Ties</div>
+            <div class="scorecard-value">${scores.ties}</div>
+          </div>
+          <div class="scorecard-item">
+            <div class="scorecard-label">N/A</div>
+            <div class="scorecard-value">${scores.na}</div>
+          </div>
+        </div>
+      `;
+
+      // Comparison table — group rows by section
+      let lastSection = "";
+      const tableRows = data.metrics.rows.map(row => {
+        let html = "";
+        if (row.section !== lastSection) {
+          html += `<tr class="section-header"><td colspan="4">${escapeHtml(row.section)}</td></tr>`;
+          lastSection = row.section;
+        }
+        const aClass = row.winner === 'a' ? 'win' : row.winner === 'b' ? 'lose' : '';
+        const bClass = row.winner === 'b' ? 'win' : row.winner === 'a' ? 'lose' : '';
+        let winnerSymbol = "—";
+        if      (row.winner === 'a')   winnerSymbol = `→ ${escapeHtml(symA)}`;
+        else if (row.winner === 'b')   winnerSymbol = `→ ${escapeHtml(symB)}`;
+        else if (row.winner === 'tie') winnerSymbol = "Tie";
+        else if (row.winner === 'na')  winnerSymbol = "N/A";
+
+        html += `
+          <tr>
+            <td class="metric-name" title="${escapeHtml(row.reason || '')}">${escapeHtml(row.metric)}</td>
+            <td class="value-cell ${aClass}">${escapeHtml(row.a_display)}</td>
+            <td class="value-cell ${bClass}">${escapeHtml(row.b_display)}</td>
+            <td class="winner-cell ${row.winner}">${winnerSymbol}</td>
+          </tr>
+        `;
+        return html;
+      }).join("");
+
+      const tableHTML = `
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th class="metric-col">Metric</th>
+              <th class="value-col">${escapeHtml(symA)}</th>
+              <th class="value-col">${escapeHtml(symB)}</th>
+              <th class="winner-col">Winner</th>
+            </tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      `;
+
+      // AI Verdict card
+      const verdictHTML = `
+        <div class="verdict-card">
+          <div class="verdict-card-header">🤖 AI Verdict</div>
+          <div class="analysis-text">${mdToHtml(data.verdict)}</div>
+        </div>
+      `;
+
+      // News side-by-side
+      const newsA = (stockA.news || []).map(n => `
+        <li>
+          <a href="${escapeHtml(n.link)}" target="_blank">${escapeHtml(n.title)}</a>
+          <div class="news-meta">${escapeHtml(n.source)} · ${n.age_days === 0 ? 'today' : n.age_days + 'd ago'}</div>
+        </li>
+      `).join("") || '<li style="color:#9ca3af;font-style:italic;">No recent headlines</li>';
+
+      const newsB = (stockB.news || []).map(n => `
+        <li>
+          <a href="${escapeHtml(n.link)}" target="_blank">${escapeHtml(n.title)}</a>
+          <div class="news-meta">${escapeHtml(n.source)} · ${n.age_days === 0 ? 'today' : n.age_days + 'd ago'}</div>
+        </li>
+      `).join("") || '<li style="color:#9ca3af;font-style:italic;">No recent headlines</li>';
+
+      const newsHTML = `
+        <div class="compare-news">
+          <div class="compare-news-col">
+            <div class="compare-news-col-header">📰 ${escapeHtml(symA)} — Last 7 days</div>
+            <ul>${newsA}</ul>
+          </div>
+          <div class="compare-news-col">
+            <div class="compare-news-col-header">📰 ${escapeHtml(symB)} — Last 7 days</div>
+            <ul>${newsB}</ul>
+          </div>
+        </div>
+      `;
+
+      // Footer with timestamps and links
+      const footerHTML = `
+        <div style="margin-top:18px; padding-top:14px; border-top:1px solid #e5e7eb; font-size:12px; color:#9ca3af;">
+          ${tvLink(symA)} · ${nseLink(symA)} · ${tvLink(symB)} · ${nseLink(symB)} ·
+          Analyzed ${timeAgo(data.analyzed_at)} · Model: ${escapeHtml(data.model)}
+        </div>
+      `;
+
+      result.innerHTML = headersHTML + scorecardHTML + verdictHTML + tableHTML + newsHTML + footerHTML;
+    }
+
     // ===== Tab switching =====
     document.querySelectorAll(".tab").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -1879,6 +2191,9 @@
         }
         if (tab === "sizer" && !$("panel-sizer").innerHTML.trim()) {
           renderSizerPanel();
+        }
+        if (tab === "compare" && !$("panel-compare").innerHTML.trim()) {
+          renderComparePanel();
         }
       });
     });
