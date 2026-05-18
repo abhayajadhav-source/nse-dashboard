@@ -244,6 +244,22 @@
     .sizer-mode-btn.active {
       background: #1d4ed8; color: #fff; border-color: #1d4ed8;
     }
+    .direction-toggle {
+      display: inline-flex; gap: 4px;
+      background: #f3f4f6; padding: 3px; border-radius: 6px;
+    }
+    .dir-btn, .dir-btn-auto, .dir-btn-addon {
+      padding: 6px 12px; background: transparent; border: none;
+      border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;
+      color: #6b7280; transition: all 0.15s;
+    }
+    .dir-btn:hover, .dir-btn-auto:hover, .dir-btn-addon:hover {
+      color: #111827;
+    }
+    .dir-btn.active, .dir-btn-auto.active, .dir-btn-addon.active {
+      background: #fff; color: #111827;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
     .sizer-form {
       padding: 18px; display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1024,20 +1040,41 @@
       return settings;
     }
 
-    function calculatePosition(account, riskPct, entry, stop, target) {
-      const riskAmount = account * (riskPct / 100);
+    // direction: "long" or "short"
+    // manualQty: if provided, overrides risk-based sizing (returns qty-based calc instead)
+    function calculatePosition(account, riskPct, entry, stop, target, direction = "long", manualQty = null) {
       const riskPerShare = Math.abs(entry - stop);
       if (riskPerShare === 0) return null;
 
-      const shares = Math.floor(riskAmount / riskPerShare);
+      // Validate direction makes sense vs stop placement
+      let directionValid = true;
+      if (direction === "long" && stop >= entry) directionValid = false;
+      if (direction === "short" && stop <= entry) directionValid = false;
+
+      let shares, riskAmount;
+      if (manualQty !== null && manualQty > 0) {
+        // Manual qty mode: derive risk amount from quantity
+        shares = Math.floor(manualQty);
+        riskAmount = shares * riskPerShare;
+      } else {
+        // Risk-based mode: derive quantity from risk budget
+        riskAmount = account * (riskPct / 100);
+        shares = Math.floor(riskAmount / riskPerShare);
+      }
+
       const capitalRequired = shares * entry;
       const capitalPctOfAccount = (capitalRequired / account) * 100;
+      const effectiveRiskPct = (riskAmount / account) * 100;
 
       let rMultiple = null, rewardAmount = null;
       if (target && target !== entry) {
-        const rewardPerShare = Math.abs(target - entry);
-        rMultiple = rewardPerShare / riskPerShare;
-        rewardAmount = shares * rewardPerShare;
+        // For long: reward only if target > entry. For short: reward only if target < entry.
+        const targetValid = direction === "long" ? target > entry : target < entry;
+        if (targetValid) {
+          const rewardPerShare = Math.abs(target - entry);
+          rMultiple = rewardPerShare / riskPerShare;
+          rewardAmount = shares * rewardPerShare;
+        }
       }
 
       return {
@@ -1048,6 +1085,10 @@
         capitalPctOfAccount,
         rMultiple,
         rewardAmount,
+        direction,
+        directionValid,
+        effectiveRiskPct,
+        manualQty: manualQty !== null,
       };
     }
 
@@ -1087,8 +1128,9 @@
           <a href="#" id="sizer-edit-settings">Edit settings</a>
         </div>
         <div class="sizer-mode-toggle">
-          <button class="sizer-mode-btn active" data-mode="manual">Manual Entry</button>
-          <button class="sizer-mode-btn" data-mode="auto">Auto-suggest from Stock</button>
+          <button class="sizer-mode-btn active" data-mode="manual">New Position</button>
+          <button class="sizer-mode-btn" data-mode="auto">Auto-suggest</button>
+          <button class="sizer-mode-btn" data-mode="addon">Add to Position</button>
         </div>
         <div id="sizer-content"></div>
       `;
@@ -1102,8 +1144,9 @@
         btn.addEventListener("click", () => {
           document.querySelectorAll(".sizer-mode-btn").forEach(b =>
             b.classList.toggle("active", b === btn));
-          if (btn.dataset.mode === "manual") renderManualMode(settings);
-          else renderAutoMode(settings);
+          if (btn.dataset.mode === "manual")      renderManualMode(settings);
+          else if (btn.dataset.mode === "auto")   renderAutoMode(settings);
+          else if (btn.dataset.mode === "addon")  renderAddOnMode(settings);
         });
       });
 
@@ -1113,6 +1156,15 @@
     function renderManualMode(settings) {
       const content = $("sizer-content");
       content.innerHTML = `
+        <div style="padding:14px 18px 0; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+          <span style="font-size:12px; font-weight:600; color:#374151; text-transform:uppercase; letter-spacing:0.3px;">
+            Direction:
+          </span>
+          <div class="direction-toggle">
+            <button class="dir-btn active" data-dir="long">📈 LONG (Buy)</button>
+            <button class="dir-btn" data-dir="short">📉 SHORT (Sell)</button>
+          </div>
+        </div>
         <div class="sizer-form">
           <div class="sizer-field">
             <label>Symbol (optional)</label>
@@ -1126,25 +1178,46 @@
           <div class="sizer-field">
             <label>Stop Loss ₹</label>
             <input type="number" id="m-stop" step="0.05" placeholder="2,380.00">
-            <div class="field-hint">Below entry for long, above for short</div>
+            <div class="field-hint" id="m-stop-hint">Below entry for long</div>
           </div>
           <div class="sizer-field">
             <label>Target ₹ (optional)</label>
             <input type="number" id="m-target" step="0.05" placeholder="2,600.00">
-            <div class="field-hint">For R:R calculation</div>
+            <div class="field-hint" id="m-target-hint">Above entry for long</div>
+          </div>
+          <div class="sizer-field">
+            <label>Manual Qty (optional)</label>
+            <input type="number" id="m-qty" step="1" min="0" placeholder="auto from risk %">
+            <div class="field-hint">Override risk-based sizing</div>
           </div>
         </div>
         <div id="sizer-results" class="sizer-results" style="display:none;"></div>
       `;
-      ["m-entry", "m-stop", "m-target"].forEach(id => {
+
+      // Direction toggle handler
+      document.querySelectorAll(".dir-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".dir-btn").forEach(b =>
+            b.classList.toggle("active", b === btn));
+          const dir = btn.dataset.dir;
+          $("m-stop-hint").textContent  = dir === "long" ? "Below entry for long" : "Above entry for short";
+          $("m-target-hint").textContent = dir === "long" ? "Above entry for long" : "Below entry for short";
+          recalcManual(settings);
+        });
+      });
+
+      ["m-entry", "m-stop", "m-target", "m-qty"].forEach(id => {
         $(id).addEventListener("input", () => recalcManual(settings));
       });
     }
 
     function recalcManual(settings) {
-      const entry = parseFloat($("m-entry").value);
-      const stop = parseFloat($("m-stop").value);
+      const entry  = parseFloat($("m-entry").value);
+      const stop   = parseFloat($("m-stop").value);
       const target = parseFloat($("m-target").value);
+      const qty    = parseFloat($("m-qty").value);
+      const dirBtn = document.querySelector(".dir-btn.active");
+      const direction = dirBtn ? dirBtn.dataset.dir : "long";
       const resultsDiv = $("sizer-results");
 
       if (isNaN(entry) || isNaN(stop) || entry === stop) {
@@ -1152,87 +1225,46 @@
         return;
       }
       resultsDiv.style.display = "block";
-      renderScenarios(resultsDiv, settings, entry, stop, isNaN(target) ? null : target);
+      renderScenarios(
+        resultsDiv, settings, entry, stop,
+        isNaN(target) ? null : target,
+        direction,
+        isNaN(qty) || qty <= 0 ? null : qty
+      );
     }
 
-    function renderScenarios(container, settings, entry, stop, target) {
+    function renderScenarios(container, settings, entry, stop, target, direction = "long", manualQty = null) {
+      // If manualQty is provided, show only ONE card with that qty (not 3 scenarios)
+      if (manualQty !== null) {
+        const calc = calculatePosition(settings.account, settings.risk_pct, entry, stop, target, direction, manualQty);
+        return renderSingleScenario(container, settings, entry, stop, target, direction, calc);
+      }
+
       const scenarios = [
-        { name: "Conservative", riskPct: 0.5, klass: "" },
-        { name: "Balanced",     riskPct: settings.risk_pct, klass: "balanced" },
-        { name: "Aggressive",   riskPct: 2.0, klass: "" },
+        { name: "Conservative", riskPct: 0.5,                klass: "" },
+        { name: "Balanced",     riskPct: settings.risk_pct,  klass: "balanced" },
+        { name: "Aggressive",   riskPct: 2.0,                klass: "" },
       ];
 
       const cards = scenarios.map(s => {
-        const calc = calculatePosition(settings.account, s.riskPct, entry, stop, target);
-        if (!calc || calc.shares === 0) {
-          return `
-            <div class="sizer-scenario ${s.klass}">
-              <h4>${s.name} <span class="risk-pct">${s.riskPct}%</span></h4>
-              <div style="font-size:12px;color:#dc2626;">
-                Risk per share (₹${Math.abs(entry-stop).toFixed(2)}) exceeds risk budget.
-                Widen stop or increase account size.
-              </div>
-            </div>
-          `;
-        }
-        const rrDisplay = calc.rMultiple
-          ? `<div class="sizer-row">
-              <span class="label">R-Multiple to target</span>
-              <span class="value ${calc.rMultiple >= 1.5 ? 'gain' : 'loss'}">${calc.rMultiple.toFixed(2)}R</span>
-            </div>
-            <div class="sizer-row">
-              <span class="label">Potential reward</span>
-              <span class="value gain">₹${calc.rewardAmount.toLocaleString("en-IN", {maximumFractionDigits:0})}</span>
-            </div>`
-          : "";
-        return `
-          <div class="sizer-scenario ${s.klass}">
-            <h4>${s.name} <span class="risk-pct">${s.riskPct}%</span></h4>
-            <div class="sizer-row">
-              <span class="label">Position size</span>
-              <span class="value">${calc.shares.toLocaleString("en-IN")} shares</span>
-            </div>
-            <div class="sizer-row">
-              <span class="label">Capital required</span>
-              <span class="value">₹${calc.capitalRequired.toLocaleString("en-IN", {maximumFractionDigits:0})}</span>
-            </div>
-            <div class="sizer-row">
-              <span class="label">% of account</span>
-              <span class="value ${calc.capitalPctOfAccount > 30 ? 'loss' : ''}">${calc.capitalPctOfAccount.toFixed(1)}%</span>
-            </div>
-            <div class="sizer-row">
-              <span class="label">Risk amount</span>
-              <span class="value loss">₹${calc.riskAmount.toLocaleString("en-IN", {maximumFractionDigits:0})}</span>
-            </div>
-            <div class="sizer-row">
-              <span class="label">Risk per share</span>
-              <span class="value">₹${calc.riskPerShare.toFixed(2)}</span>
-            </div>
-            ${rrDisplay}
-          </div>
-        `;
+        const calc = calculatePosition(settings.account, s.riskPct, entry, stop, target, direction);
+        return renderScenarioCard(s.name, s.riskPct.toString(), s.klass, calc, entry, stop, direction);
       }).join("");
 
-      const warnings = [];
-      const balancedCalc = calculatePosition(settings.account, settings.risk_pct, entry, stop, target);
-      if (balancedCalc && balancedCalc.capitalPctOfAccount > 30) {
-        warnings.push(`⚠️ Balanced scenario uses ${balancedCalc.capitalPctOfAccount.toFixed(0)}% of account — concentration risk.`);
-      }
-      if (target && balancedCalc && balancedCalc.rMultiple && balancedCalc.rMultiple < 1.5) {
-        warnings.push(`⚠️ R:R of ${balancedCalc.rMultiple.toFixed(2)} is below 1.5 — poor risk/reward. Reconsider trade.`);
-      }
-      const stopPctFromEntry = (Math.abs(entry - stop) / entry) * 100;
-      if (stopPctFromEntry < 1) {
-        warnings.push(`⚠️ Stop is only ${stopPctFromEntry.toFixed(2)}% from entry — may get hit by noise.`);
-      }
+      const warnings = buildWarnings(settings, entry, stop, target, direction);
 
       let successMsg = "";
+      const balancedCalc = calculatePosition(settings.account, settings.risk_pct, entry, stop, target, direction);
       if (warnings.length === 0 && target && balancedCalc && balancedCalc.rMultiple >= 2) {
         successMsg = `<div class="sizer-success">✓ Solid setup: ${balancedCalc.rMultiple.toFixed(2)}R reward potential, sized appropriately.</div>`;
       }
 
+      const dirBadge = direction === "long"
+        ? '<span class="badge badge-green">📈 LONG</span>'
+        : '<span class="badge badge-red">📉 SHORT</span>';
+
       container.innerHTML = `
-        <h3 style="font-size:14px; margin-bottom:6px;">📊 Position Scenarios</h3>
+        <h3 style="font-size:14px; margin-bottom:6px;">📊 Position Scenarios ${dirBadge}</h3>
         <p style="font-size:12px; color:#6b7280;">
           ${target ? `Entry ₹${entry} → Stop ₹${stop} → Target ₹${target}` : `Entry ₹${entry} → Stop ₹${stop}`}
         </p>
@@ -1242,9 +1274,158 @@
       `;
     }
 
+    function renderScenarioCard(name, riskPctLabel, klass, calc, entry, stop, direction) {
+      if (!calc) {
+        return `
+          <div class="sizer-scenario ${klass}">
+            <h4>${name} <span class="risk-pct">${riskPctLabel}%</span></h4>
+            <div style="font-size:12px;color:#dc2626;">Invalid inputs (entry = stop).</div>
+          </div>
+        `;
+      }
+      if (!calc.directionValid) {
+        const expectedSide = direction === "long" ? "below" : "above";
+        return `
+          <div class="sizer-scenario ${klass}">
+            <h4>${name} <span class="risk-pct">${riskPctLabel}%</span></h4>
+            <div style="font-size:12px;color:#dc2626;">
+              ⚠ Stop must be ${expectedSide} entry for ${direction.toUpperCase()} positions.
+            </div>
+          </div>
+        `;
+      }
+      if (calc.shares === 0) {
+        return `
+          <div class="sizer-scenario ${klass}">
+            <h4>${name} <span class="risk-pct">${riskPctLabel}%</span></h4>
+            <div style="font-size:12px;color:#dc2626;">
+              Risk per share (₹${calc.riskPerShare.toFixed(2)}) exceeds risk budget.
+              Widen stop or increase account size.
+            </div>
+          </div>
+        `;
+      }
+      const rrDisplay = calc.rMultiple
+        ? `<div class="sizer-row">
+            <span class="label">R-Multiple to target</span>
+            <span class="value ${calc.rMultiple >= 1.5 ? 'gain' : 'loss'}">${calc.rMultiple.toFixed(2)}R</span>
+          </div>
+          <div class="sizer-row">
+            <span class="label">Potential reward</span>
+            <span class="value gain">₹${calc.rewardAmount.toLocaleString("en-IN", {maximumFractionDigits:0})}</span>
+          </div>`
+        : "";
+      return `
+        <div class="sizer-scenario ${klass}">
+          <h4>${name} <span class="risk-pct">${riskPctLabel}%</span></h4>
+          <div class="sizer-row">
+            <span class="label">Position size</span>
+            <span class="value">${calc.shares.toLocaleString("en-IN")} shares</span>
+          </div>
+          <div class="sizer-row">
+            <span class="label">Capital required</span>
+            <span class="value">₹${calc.capitalRequired.toLocaleString("en-IN", {maximumFractionDigits:0})}</span>
+          </div>
+          <div class="sizer-row">
+            <span class="label">% of account</span>
+            <span class="value ${calc.capitalPctOfAccount > 30 ? 'loss' : ''}">${calc.capitalPctOfAccount.toFixed(1)}%</span>
+          </div>
+          <div class="sizer-row">
+            <span class="label">Risk amount</span>
+            <span class="value loss">₹${calc.riskAmount.toLocaleString("en-IN", {maximumFractionDigits:0})}</span>
+          </div>
+          <div class="sizer-row">
+            <span class="label">Risk per share</span>
+            <span class="value">₹${calc.riskPerShare.toFixed(2)}</span>
+          </div>
+          ${rrDisplay}
+        </div>
+      `;
+    }
+
+    function renderSingleScenario(container, settings, entry, stop, target, direction, calc) {
+      const riskPctLabel = calc && calc.directionValid && calc.shares > 0
+        ? calc.effectiveRiskPct.toFixed(2)
+        : "—";
+      const card = renderScenarioCard("Manual Quantity", riskPctLabel, "balanced", calc, entry, stop, direction);
+      const warnings = buildWarnings(settings, entry, stop, target, direction, calc);
+      const dirBadge = direction === "long"
+        ? '<span class="badge badge-green">📈 LONG</span>'
+        : '<span class="badge badge-red">📉 SHORT</span>';
+
+      let effectiveRiskNote = "";
+      if (calc && calc.directionValid && calc.shares > 0) {
+        const riskClass = calc.effectiveRiskPct > 2 ? "loss" : (calc.effectiveRiskPct <= settings.risk_pct ? "gain" : "");
+        const overBudgetMsg = calc.effectiveRiskPct > 2
+          ? '<span style="color:#dc2626; font-weight:600;"> — exceeds 2% guideline</span>'
+          : calc.effectiveRiskPct > settings.risk_pct
+            ? `<span style="color:#92400e;"> — exceeds your default of ${settings.risk_pct}%</span>`
+            : '';
+        effectiveRiskNote = `
+          <div style="margin-top:10px; padding:10px 14px; background:#f9fafb; border-radius:6px; font-size:13px;">
+            <strong>Effective risk:</strong>
+            <span class="${riskClass}">${calc.effectiveRiskPct.toFixed(2)}% of account</span>
+            (₹${calc.riskAmount.toLocaleString("en-IN", {maximumFractionDigits:0})})${overBudgetMsg}
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <h3 style="font-size:14px; margin-bottom:6px;">📊 Manual Quantity Sizing ${dirBadge}</h3>
+        <p style="font-size:12px; color:#6b7280;">
+          ${target ? `Entry ₹${entry} → Stop ₹${stop} → Target ₹${target}` : `Entry ₹${entry} → Stop ₹${stop}`}
+          · You specified ${calc?.shares || 0} shares
+        </p>
+        <div class="sizer-scenarios" style="grid-template-columns: minmax(280px, 1fr);">${card}</div>
+        ${effectiveRiskNote}
+        ${warnings.map(w => `<div class="sizer-warning">${w}</div>`).join("")}
+      `;
+    }
+
+    function buildWarnings(settings, entry, stop, target, direction, providedCalc) {
+      const warnings = [];
+      const calc = providedCalc || calculatePosition(settings.account, settings.risk_pct, entry, stop, target, direction);
+      if (!calc) return warnings;
+      if (!calc.directionValid) {
+        const expected = direction === "long" ? "below" : "above";
+        warnings.push(`⚠️ Stop loss must be ${expected} entry price for ${direction.toUpperCase()} positions.`);
+        return warnings;
+      }
+      if (target) {
+        const targetValid = direction === "long" ? target > entry : target < entry;
+        if (!targetValid) {
+          const expected = direction === "long" ? "above" : "below";
+          warnings.push(`⚠️ Target must be ${expected} entry for ${direction.toUpperCase()} positions.`);
+        }
+      }
+      if (calc.capitalPctOfAccount > 30) {
+        warnings.push(`⚠️ Position uses ${calc.capitalPctOfAccount.toFixed(0)}% of account — concentration risk.`);
+      }
+      if (target && calc.rMultiple && calc.rMultiple < 1.5) {
+        warnings.push(`⚠️ R:R of ${calc.rMultiple.toFixed(2)} is below 1.5 — poor risk/reward. Reconsider trade.`);
+      }
+      const stopPctFromEntry = (Math.abs(entry - stop) / entry) * 100;
+      if (stopPctFromEntry < 1) {
+        warnings.push(`⚠️ Stop is only ${stopPctFromEntry.toFixed(2)}% from entry — may get hit by noise.`);
+      }
+      if (calc.manualQty && calc.effectiveRiskPct > 2) {
+        warnings.push(`⚠️ Manual quantity puts ${calc.effectiveRiskPct.toFixed(2)}% of account at risk — above 2% guideline.`);
+      }
+      return warnings;
+    }
+
     function renderAutoMode(settings) {
       const content = $("sizer-content");
       content.innerHTML = `
+        <div style="padding:14px 18px 0; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+          <span style="font-size:12px; font-weight:600; color:#374151; text-transform:uppercase; letter-spacing:0.3px;">
+            Direction:
+          </span>
+          <div class="direction-toggle">
+            <button class="dir-btn-auto active" data-dir="long">📈 LONG (Buy)</button>
+            <button class="dir-btn-auto" data-dir="short">📉 SHORT (Sell)</button>
+          </div>
+        </div>
         <div class="sizer-form">
           <div class="sizer-field" style="grid-column: span 2;">
             <label>NSE Symbol</label>
@@ -1262,6 +1443,12 @@
         </div>
         <div id="auto-results"></div>
       `;
+      document.querySelectorAll(".dir-btn-auto").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".dir-btn-auto").forEach(b =>
+            b.classList.toggle("active", b === btn));
+        });
+      });
       $("a-fetch-btn").addEventListener("click", () => fetchAndSuggest(settings));
       $("a-symbol").addEventListener("keypress", (e) => {
         if (e.key === "Enter") fetchAndSuggest(settings);
@@ -1271,6 +1458,8 @@
     async function fetchAndSuggest(settings) {
       const symbol = $("a-symbol").value.trim().toUpperCase();
       if (!symbol) return;
+      const dirBtn = document.querySelector(".dir-btn-auto.active");
+      const direction = dirBtn ? dirBtn.dataset.dir : "long";
       const button = $("a-fetch-btn");
       const results = $("auto-results");
       button.disabled = true;
@@ -1285,7 +1474,7 @@
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        renderAutoSuggestion(data, settings);
+        renderAutoSuggestion(data, settings, direction);
       } catch (err) {
         results.innerHTML = `<div class="status error" style="margin:18px;">⚠️ ${err.message}</div>`;
       } finally {
@@ -1294,41 +1483,79 @@
       }
     }
 
-    function renderAutoSuggestion(data, settings) {
+    function renderAutoSuggestion(data, settings, direction = "long") {
       const p = data.price_data;
       const price = p.current_price;
       const atr = p.atr_14 || (price * 0.02);
       const sma50 = p.sma_50 || price;
+      const bbUpper = p.bb_upper || (price + 2 * atr);
       const bbLower = p.bb_lower || (price - 2 * atr);
       const high52w = p.high_52w;
+      const low52w  = p.low_52w;
       const analystTarget = data.ratings?.price_target?.mean;
 
       const entry = price;
-      const stopCandidates = [
-        { value: price - 2 * atr,         source: "Entry - 2×ATR (₹" + atr.toFixed(2) + ")"},
-        { value: sma50 * 0.99,            source: "1% below SMA 50" },
-        { value: bbLower,                 source: "Bollinger Band lower" },
-      ].filter(s => s.value > 0 && s.value < price);
-      const stopChoice = stopCandidates.reduce((max, s) => s.value > max.value ? s : max, stopCandidates[0]);
-      const stop = stopChoice.value;
+      let stop, stopChoice, target, targetChoice;
 
-      const riskPerShare = entry - stop;
-      const targetCandidates = [];
-      if (analystTarget && analystTarget > entry) {
-        targetCandidates.push({ value: analystTarget, source: "Analyst mean target" });
+      if (direction === "long") {
+        // Stop = highest among candidates BELOW entry (= tightest stop)
+        const stopCandidates = [
+          { value: price - 2 * atr,  source: "Entry − 2×ATR (₹" + atr.toFixed(2) + ")"},
+          { value: sma50 * 0.99,     source: "1% below SMA 50" },
+          { value: bbLower,          source: "Bollinger Band lower" },
+        ].filter(s => s.value > 0 && s.value < price);
+        stopChoice = stopCandidates.length
+          ? stopCandidates.reduce((max, s) => s.value > max.value ? s : max, stopCandidates[0])
+          : { value: price * 0.98, source: "2% below entry (fallback)" };
+        stop = stopChoice.value;
+
+        const riskPerShare = entry - stop;
+        const targetCandidates = [];
+        if (analystTarget && analystTarget > entry) {
+          targetCandidates.push({ value: analystTarget, source: "Analyst mean target" });
+        }
+        if (high52w > entry * 1.02) {
+          targetCandidates.push({ value: high52w, source: "52-week high" });
+        }
+        targetCandidates.push({ value: entry + (2 * riskPerShare), source: "2R from stop (default)" });
+        targetChoice = targetCandidates[0];
+        target = targetChoice.value;
+      } else {
+        // SHORT: Stop = lowest among candidates ABOVE entry (= tightest stop above)
+        const stopCandidates = [
+          { value: price + 2 * atr,  source: "Entry + 2×ATR (₹" + atr.toFixed(2) + ")"},
+          { value: sma50 * 1.01,     source: "1% above SMA 50" },
+          { value: bbUpper,          source: "Bollinger Band upper" },
+        ].filter(s => s.value > price);
+        stopChoice = stopCandidates.length
+          ? stopCandidates.reduce((min, s) => s.value < min.value ? s : min, stopCandidates[0])
+          : { value: price * 1.02, source: "2% above entry (fallback)" };
+        stop = stopChoice.value;
+
+        const riskPerShare = stop - entry;
+        const targetCandidates = [];
+        if (analystTarget && analystTarget < entry) {
+          targetCandidates.push({ value: analystTarget, source: "Analyst mean target" });
+        }
+        if (low52w && low52w < entry * 0.98) {
+          targetCandidates.push({ value: low52w, source: "52-week low" });
+        }
+        targetCandidates.push({ value: entry - (2 * riskPerShare), source: "2R from stop (default)" });
+        targetChoice = targetCandidates[0];
+        target = targetChoice.value;
       }
-      if (high52w > entry * 1.02) {
-        targetCandidates.push({ value: high52w, source: "52-week high" });
-      }
-      targetCandidates.push({ value: entry + (2 * riskPerShare), source: "2R from stop (default)" });
-      const targetChoice = targetCandidates[0];
-      const target = targetChoice.value;
+
+      const stopPct    = ((stop - entry) / entry * 100);
+      const targetPct  = ((target - entry) / entry * 100);
+      const dirBadge = direction === "long"
+        ? '<span class="badge badge-green">📈 LONG</span>'
+        : '<span class="badge badge-red">📉 SHORT</span>';
 
       const results = $("auto-results");
       results.innerHTML = `
         <div class="suggestion-card">
           <div style="font-weight:600; font-size:14px; margin-bottom:8px;">
-            💡 Suggested Trade Setup for ${data.symbol}
+            💡 Suggested Trade Setup for ${data.symbol} ${dirBadge}
           </div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px;">
             <div>
@@ -1339,12 +1566,12 @@
             <div>
               <div style="font-size:11px; color:#6b7280;">STOP LOSS</div>
               <div style="font-weight:600; font-size:16px; color:#dc2626;">₹${stop.toFixed(2)}</div>
-              <div style="font-size:11px; color:#6b7280;">${stopChoice.source} <span class="src-tag">${((entry-stop)/entry*100).toFixed(1)}%</span></div>
+              <div style="font-size:11px; color:#6b7280;">${stopChoice.source} <span class="src-tag">${stopPct >= 0 ? "+" : ""}${stopPct.toFixed(1)}%</span></div>
             </div>
             <div>
               <div style="font-size:11px; color:#6b7280;">TARGET</div>
               <div style="font-weight:600; font-size:16px; color:#16a34a;">₹${target.toFixed(2)}</div>
-              <div style="font-size:11px; color:#6b7280;">${targetChoice.source} <span class="src-tag">${((target-entry)/entry*100).toFixed(1)}%</span></div>
+              <div style="font-size:11px; color:#6b7280;">${targetChoice.source} <span class="src-tag">${targetPct >= 0 ? "+" : ""}${targetPct.toFixed(1)}%</span></div>
             </div>
           </div>
           <div style="margin-top:10px; font-size:11px; color:#6b7280; font-style:italic;">
@@ -1353,7 +1580,290 @@
         </div>
         <div id="auto-scenarios" class="sizer-results"></div>
       `;
-      renderScenarios($("auto-scenarios"), settings, entry, stop, target);
+      renderScenarios($("auto-scenarios"), settings, entry, stop, target, direction);
+    }
+
+    // ===== Add-On Mode (Averaging / Scaling-in) =====
+    function renderAddOnMode(settings) {
+      const content = $("sizer-content");
+      content.innerHTML = `
+        <div style="padding:14px 18px 0; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+          <span style="font-size:12px; font-weight:600; color:#374151; text-transform:uppercase; letter-spacing:0.3px;">
+            Direction:
+          </span>
+          <div class="direction-toggle">
+            <button class="dir-btn-addon active" data-dir="long">📈 LONG (Buy)</button>
+            <button class="dir-btn-addon" data-dir="short">📉 SHORT (Sell)</button>
+          </div>
+        </div>
+
+        <div style="padding:14px 18px 6px; font-size:13px; color:#374151; font-weight:600;">
+          Existing Position
+        </div>
+        <div class="sizer-form" style="padding-top:6px;">
+          <div class="sizer-field">
+            <label>Symbol (optional)</label>
+            <input type="text" id="ao-symbol" placeholder="e.g. RELIANCE" style="text-transform:uppercase;">
+          </div>
+          <div class="sizer-field">
+            <label>Existing Qty</label>
+            <input type="number" id="ao-existing-qty" step="1" min="0" placeholder="100">
+          </div>
+          <div class="sizer-field">
+            <label>Avg Entry ₹</label>
+            <input type="number" id="ao-existing-avg" step="0.05" placeholder="2,450.00">
+          </div>
+          <div class="sizer-field">
+            <label>Current Stop ₹</label>
+            <input type="number" id="ao-existing-stop" step="0.05" placeholder="2,380.00">
+            <div class="field-hint">Stop on existing position</div>
+          </div>
+        </div>
+
+        <div style="padding:6px 18px; font-size:13px; color:#374151; font-weight:600; border-top:1px solid #f3f4f6; margin-top:6px;">
+          Add-On Lot
+        </div>
+        <div class="sizer-form" style="padding-top:6px;">
+          <div class="sizer-field">
+            <label>Add-On Price ₹</label>
+            <input type="number" id="ao-add-price" step="0.05" placeholder="2,475.00">
+            <div class="field-hint" id="ao-add-hint">Price for new shares</div>
+          </div>
+          <div class="sizer-field">
+            <label>Add-On Qty</label>
+            <input type="number" id="ao-add-qty" step="1" min="0" placeholder="50">
+            <div class="field-hint">Additional shares to buy/sell</div>
+          </div>
+          <div class="sizer-field">
+            <label>New Stop ₹ (optional)</label>
+            <input type="number" id="ao-new-stop" step="0.05" placeholder="leave blank to keep current">
+            <div class="field-hint">Raise stop with new position?</div>
+          </div>
+          <div class="sizer-field">
+            <label>Target ₹ (optional)</label>
+            <input type="number" id="ao-target" step="0.05" placeholder="2,600.00">
+          </div>
+        </div>
+        <div id="addon-results" class="sizer-results" style="display:none;"></div>
+      `;
+
+      document.querySelectorAll(".dir-btn-addon").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".dir-btn-addon").forEach(b =>
+            b.classList.toggle("active", b === btn));
+          recalcAddOn(settings);
+        });
+      });
+
+      ["ao-existing-qty", "ao-existing-avg", "ao-existing-stop", "ao-add-price",
+       "ao-add-qty", "ao-new-stop", "ao-target"].forEach(id => {
+        $(id).addEventListener("input", () => recalcAddOn(settings));
+      });
+    }
+
+    function recalcAddOn(settings) {
+      const existingQty   = parseFloat($("ao-existing-qty").value);
+      const existingAvg   = parseFloat($("ao-existing-avg").value);
+      const existingStop  = parseFloat($("ao-existing-stop").value);
+      const addPrice      = parseFloat($("ao-add-price").value);
+      const addQty        = parseFloat($("ao-add-qty").value);
+      const newStopInput  = parseFloat($("ao-new-stop").value);
+      const targetInput   = parseFloat($("ao-target").value);
+      const dirBtn        = document.querySelector(".dir-btn-addon.active");
+      const direction     = dirBtn ? dirBtn.dataset.dir : "long";
+      const results       = $("addon-results");
+
+      // Require minimum inputs
+      if (isNaN(existingQty) || isNaN(existingAvg) || isNaN(existingStop) ||
+          isNaN(addPrice) || isNaN(addQty) ||
+          existingQty <= 0 || addQty <= 0) {
+        results.style.display = "none";
+        return;
+      }
+
+      // Use new stop if provided, else keep existing
+      const finalStop = isNaN(newStopInput) ? existingStop : newStopInput;
+      const target = isNaN(targetInput) ? null : targetInput;
+
+      results.style.display = "block";
+      renderAddOnResults(results, settings, {
+        existingQty, existingAvg, existingStop,
+        addPrice, addQty, finalStop, target, direction
+      });
+    }
+
+    function renderAddOnResults(container, settings, inp) {
+      const { existingQty, existingAvg, existingStop, addPrice, addQty,
+              finalStop, target, direction } = inp;
+
+      // Blended average price
+      const totalQty = existingQty + addQty;
+      const blendedAvg = ((existingQty * existingAvg) + (addQty * addPrice)) / totalQty;
+
+      // Direction validation
+      const stopValidExisting = direction === "long" ? existingStop < existingAvg : existingStop > existingAvg;
+      const stopValidBlended = direction === "long" ? finalStop < blendedAvg : finalStop > blendedAvg;
+
+      // Risk metrics — BEFORE add-on (existing position only)
+      const riskPerShareBefore = Math.abs(existingAvg - existingStop);
+      const totalRiskBefore = existingQty * riskPerShareBefore;
+      const riskPctBefore = (totalRiskBefore / settings.account) * 100;
+      const capitalBefore = existingQty * existingAvg;
+      const capitalPctBefore = (capitalBefore / settings.account) * 100;
+
+      // Risk metrics — AFTER add-on (combined position with final stop)
+      const riskPerShareAfter = Math.abs(blendedAvg - finalStop);
+      const totalRiskAfter = totalQty * riskPerShareAfter;
+      const riskPctAfter = (totalRiskAfter / settings.account) * 100;
+      const capitalAfter = totalQty * blendedAvg;
+      const capitalPctAfter = (capitalAfter / settings.account) * 100;
+
+      // Risk on the add-on lot in isolation
+      const addOnIsolatedRisk = addQty * Math.abs(addPrice - finalStop);
+      const addOnIsolatedRiskPct = (addOnIsolatedRisk / settings.account) * 100;
+
+      // Capital required for add-on
+      const addOnCapital = addQty * addPrice;
+
+      // R-multiple if target provided
+      let rMultiple = null, rewardAmount = null;
+      if (target !== null) {
+        const targetValid = direction === "long" ? target > blendedAvg : target < blendedAvg;
+        if (targetValid && riskPerShareAfter > 0) {
+          const rewardPerShare = Math.abs(target - blendedAvg);
+          rMultiple = rewardPerShare / riskPerShareAfter;
+          rewardAmount = totalQty * rewardPerShare;
+        }
+      }
+
+      // Validate prices vs direction
+      let priceAlerts = [];
+      if (direction === "long" && addPrice < existingAvg) {
+        const drop = ((existingAvg - addPrice) / existingAvg * 100).toFixed(2);
+        priceAlerts.push(`📉 Averaging down: add-on price is ${drop}% below existing avg. Confirm trade thesis still valid before adding to a losing position.`);
+      } else if (direction === "long" && addPrice > existingAvg) {
+        const rise = ((addPrice - existingAvg) / existingAvg * 100).toFixed(2);
+        priceAlerts.push(`📈 Pyramiding up: add-on price is ${rise}% above existing avg. Confirm trend is intact.`);
+      } else if (direction === "short" && addPrice > existingAvg) {
+        const rise = ((addPrice - existingAvg) / existingAvg * 100).toFixed(2);
+        priceAlerts.push(`📈 Averaging up (short): add-on price is ${rise}% above existing avg. Confirm trade thesis still valid before adding to a losing short.`);
+      }
+
+      // Warnings
+      const warnings = [];
+      if (!stopValidExisting) {
+        const expected = direction === "long" ? "below" : "above";
+        warnings.push(`⚠️ Existing stop must be ${expected} avg entry for ${direction.toUpperCase()} positions.`);
+      }
+      if (!stopValidBlended) {
+        const expected = direction === "long" ? "below" : "above";
+        warnings.push(`⚠️ Final stop (₹${finalStop.toFixed(2)}) must be ${expected} blended avg (₹${blendedAvg.toFixed(2)}).`);
+      }
+      if (riskPctAfter > 2) {
+        warnings.push(`⚠️ Total risk after add-on (${riskPctAfter.toFixed(2)}%) exceeds 2% guideline.`);
+      } else if (riskPctAfter > settings.risk_pct) {
+        warnings.push(`⚠️ Total risk after add-on (${riskPctAfter.toFixed(2)}%) exceeds your default of ${settings.risk_pct}%.`);
+      }
+      if (capitalPctAfter > 30) {
+        warnings.push(`⚠️ Combined position will use ${capitalPctAfter.toFixed(0)}% of account — concentration risk.`);
+      }
+      if (target && rMultiple && rMultiple < 1.5) {
+        warnings.push(`⚠️ Blended R:R of ${rMultiple.toFixed(2)} is below 1.5 — poor risk/reward on combined position.`);
+      }
+
+      const dirBadge = direction === "long"
+        ? '<span class="badge badge-green">📈 LONG</span>'
+        : '<span class="badge badge-red">📉 SHORT</span>';
+
+      // Risk change visualization
+      const riskDelta = riskPctAfter - riskPctBefore;
+      const riskDeltaCls = riskDelta > 0.5 ? "loss" : (riskDelta < -0.1 ? "gain" : "");
+      const riskDeltaSign = riskDelta > 0 ? "+" : "";
+
+      const rrRow = rMultiple
+        ? `<div class="sizer-row">
+            <span class="label">Blended R-Multiple</span>
+            <span class="value ${rMultiple >= 1.5 ? 'gain' : 'loss'}">${rMultiple.toFixed(2)}R</span>
+          </div>
+          <div class="sizer-row">
+            <span class="label">Potential reward</span>
+            <span class="value gain">₹${rewardAmount.toLocaleString("en-IN", {maximumFractionDigits:0})}</span>
+          </div>`
+        : "";
+
+      container.innerHTML = `
+        <h3 style="font-size:14px; margin-bottom:6px;">📊 Position After Add-On ${dirBadge}</h3>
+        <p style="font-size:12px; color:#6b7280;">
+          ${existingQty} @ ₹${existingAvg.toFixed(2)} + ${addQty} @ ₹${addPrice.toFixed(2)}
+          → ${totalQty} @ ₹${blendedAvg.toFixed(2)} (blended)
+        </p>
+
+        ${priceAlerts.map(a => `<div style="margin:10px 0; padding:8px 12px; background:#fef3c7; color:#92400e; border-radius:6px; font-size:13px;">${a}</div>`).join("")}
+
+        <div class="sizer-scenarios" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+          <div class="sizer-scenario">
+            <h4>Before Add-On <span class="risk-pct">existing only</span></h4>
+            <div class="sizer-row">
+              <span class="label">Shares</span>
+              <span class="value">${existingQty.toLocaleString("en-IN")}</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Avg entry</span>
+              <span class="value">₹${existingAvg.toFixed(2)}</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Stop</span>
+              <span class="value">₹${existingStop.toFixed(2)}</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Capital</span>
+              <span class="value">₹${capitalBefore.toLocaleString("en-IN", {maximumFractionDigits:0})} (${capitalPctBefore.toFixed(1)}%)</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Total risk</span>
+              <span class="value loss">₹${totalRiskBefore.toLocaleString("en-IN", {maximumFractionDigits:0})} (${riskPctBefore.toFixed(2)}%)</span>
+            </div>
+          </div>
+
+          <div class="sizer-scenario balanced">
+            <h4>After Add-On <span class="risk-pct">combined</span></h4>
+            <div class="sizer-row">
+              <span class="label">Shares</span>
+              <span class="value">${totalQty.toLocaleString("en-IN")} (+${addQty})</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Blended avg</span>
+              <span class="value">₹${blendedAvg.toFixed(2)}</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Stop</span>
+              <span class="value">₹${finalStop.toFixed(2)}${finalStop !== existingStop ? ' (changed)' : ''}</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Capital</span>
+              <span class="value ${capitalPctAfter > 30 ? 'loss' : ''}">₹${capitalAfter.toLocaleString("en-IN", {maximumFractionDigits:0})} (${capitalPctAfter.toFixed(1)}%)</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Total risk</span>
+              <span class="value loss">₹${totalRiskAfter.toLocaleString("en-IN", {maximumFractionDigits:0})} (${riskPctAfter.toFixed(2)}%)</span>
+            </div>
+            <div class="sizer-row">
+              <span class="label">Risk change</span>
+              <span class="value ${riskDeltaCls}">${riskDeltaSign}${riskDelta.toFixed(2)}%</span>
+            </div>
+            ${rrRow}
+          </div>
+        </div>
+
+        <div style="margin-top:14px; padding:12px 14px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; font-size:13px;">
+          <strong>Add-On Lot in isolation:</strong>
+          ${addQty} shares × ₹${addPrice.toFixed(2)} = ₹${addOnCapital.toLocaleString("en-IN", {maximumFractionDigits:0})} capital
+          · Isolated risk: ₹${addOnIsolatedRisk.toLocaleString("en-IN", {maximumFractionDigits:0})}
+          (${addOnIsolatedRiskPct.toFixed(2)}% of account, at final stop ₹${finalStop.toFixed(2)})
+        </div>
+
+        ${warnings.map(w => `<div class="sizer-warning">${w}</div>`).join("")}
+      `;
     }
 
     // ===== Tab switching =====
