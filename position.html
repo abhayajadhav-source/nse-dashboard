@@ -538,12 +538,240 @@
     }
     .footer-meta a { color: var(--accent); text-decoration: none; }
     .footer-meta a:hover { text-decoration: underline; }
+    /* ===== Print button (sits next to back-link, only shown when report is ready) ===== */
+    .header-actions {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      gap: 8px;
+    }
+    .header-actions .back-link { position: static; }
+    .print-btn {
+      color: var(--accent);
+      background: transparent;
+      border: 1px solid var(--accent);
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;   /* shown via JS once a report is rendered */
+      transition: all 0.15s;
+    }
+    .print-btn:hover {
+      background: var(--accent);
+      color: var(--bg-deep);
+    }
+    .print-btn.visible { display: inline-block; }
+
+    /* ===== Print stylesheet — for "Save as PDF" via browser print dialog =====
+       Strategy: switch to a light theme on paper, drop input panel + buttons,
+       expand all content, force page-break behaviour for readability.
+    */
+    @media print {
+      @page {
+        size: A4;
+        margin: 14mm 12mm;
+      }
+
+      body {
+        background: #ffffff !important;
+        background-image: none !important;
+        color: #1a1a1a !important;
+        font-size: 11pt;
+      }
+
+      .container { max-width: 100%; padding: 0; }
+
+      /* Hide interactive elements */
+      .input-panel,
+      .header-actions,
+      .loading,
+      .error-card,
+      .submit-btn {
+        display: none !important;
+      }
+
+      /* Header — slim it down for print */
+      header {
+        padding: 0 0 14px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid #ccc;
+      }
+      header::before { display: none; }
+      .eyebrow {
+        color: #b07000 !important;
+        font-size: 9pt;
+        margin-bottom: 6px;
+      }
+      h1 {
+        color: #1a1a1a !important;
+        font-size: 22pt;
+        margin-bottom: 4px;
+      }
+      h1 em { color: #b07000 !important; }
+      .subtitle {
+        color: #555 !important;
+        font-size: 10pt;
+      }
+
+      /* Snapshot — convert dark card to clean print version */
+      .snapshot {
+        background: #fff !important;
+        border: 1px solid #999 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        margin-bottom: 16px;
+        padding: 14px 16px;
+      }
+      .snapshot-symbol { color: #1a1a1a !important; font-size: 20pt; }
+      .stat-label { color: #666 !important; }
+      .stat-value { color: #1a1a1a !important; }
+      .stat-value.gain { color: #1a7f3a !important; }
+      .stat-value.loss { color: #c0392b !important; }
+      .stat-sub { color: #666 !important; }
+      .pnl-display { border-left-color: #ccc !important; }
+      .pnl-label { color: #666 !important; }
+      .pnl-amount.gain { color: #1a7f3a !important; }
+      .pnl-amount.loss { color: #c0392b !important; }
+      .pnl-pct.gain { color: #1a7f3a !important; }
+      .pnl-pct.loss { color: #c0392b !important; }
+      .dir-pill.long {
+        background: #e8f5ec !important;
+        color: #1a7f3a !important;
+        border-color: #1a7f3a !important;
+      }
+      .dir-pill.short {
+        background: #fdeae8 !important;
+        color: #c0392b !important;
+        border-color: #c0392b !important;
+      }
+
+      /* Context cards — flatten to print-friendly */
+      .context-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px;
+        margin-bottom: 16px;
+        page-break-inside: avoid;
+      }
+      .context-card {
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        padding: 10px 12px;
+        font-size: 9.5pt;
+      }
+      .context-card-title { color: #666 !important; }
+      .context-card-title::before { background: #b07000 !important; }
+      .context-row { border-bottom-color: #eee !important; padding: 3px 0; }
+      .context-row .label { color: #555 !important; }
+      .context-row .value { color: #1a1a1a !important; }
+      .context-row .value.gain { color: #1a7f3a !important; }
+      .context-row .value.loss { color: #c0392b !important; }
+      .context-row .value.neutral { color: #b07000 !important; }
+      .sig-bullish {
+        background: #e8f5ec !important;
+        color: #1a7f3a !important;
+      }
+      .sig-bearish {
+        background: #fdeae8 !important;
+        color: #c0392b !important;
+      }
+      .sig-neutral {
+        background: #fef5e0 !important;
+        color: #b07000 !important;
+      }
+
+      /* AI analysis — the meat of the report */
+      .ai-analysis {
+        background: #fff !important;
+        border: 1px solid #999 !important;
+        box-shadow: none !important;
+        padding: 20px 22px !important;
+        page-break-inside: auto;
+      }
+      .ai-analysis::before { display: none; }
+      .ai-header {
+        color: #b07000 !important;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 8px;
+        margin-bottom: 14px;
+      }
+      .ai-body { color: #1a1a1a !important; font-size: 10.5pt; }
+      .ai-body h2,
+      .ai-body h3 {
+        color: #1a1a1a !important;
+        border-bottom-color: #ccc !important;
+        page-break-after: avoid;
+        margin-top: 18px;
+      }
+      .ai-body strong { color: #b07000 !important; }
+      .ai-body em { color: #555 !important; }
+      .ai-body p, .ai-body li { color: #1a1a1a !important; }
+      .ai-body code {
+        background: #f4f4f4 !important;
+        color: #b07000 !important;
+        border: 1px solid #e0e0e0;
+      }
+
+      /* Verdict block — keep the highlight visible on paper */
+      .verdict-block {
+        background: #fef5e0 !important;
+        border: 1.5px solid #b07000 !important;
+        page-break-inside: avoid;
+      }
+      .verdict-block::before {
+        background: #fff !important;
+        color: #b07000 !important;
+      }
+      .verdict-block h3 { color: #b07000 !important; }
+
+      /* News block */
+      .news-block {
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+        margin-top: 14px;
+      }
+      .news-list li { border-bottom-color: #eee !important; }
+      .news-list a { color: #1a1a1a !important; }
+      .news-list .meta { color: #888 !important; }
+
+      /* Footer */
+      .footer-meta {
+        color: #888 !important;
+        border-top-color: #ccc !important;
+        font-size: 8.5pt;
+        margin-top: 16px;
+      }
+      .footer-meta a { color: #b07000 !important; }
+
+      /* No animations on print */
+      #result { animation: none !important; }
+
+      /* Add a small "printed on" timestamp */
+      .print-timestamp {
+        display: block !important;
+        text-align: right;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 8.5pt;
+        color: #888;
+        margin-bottom: 8px;
+      }
+    }
+
+    /* The timestamp is print-only — hide on screen */
+    .print-timestamp { display: none; }
+
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <a href="https://nse-dashboard.abhay-a-jadhav.workers.dev/" class="back-link">← Back to dashboard</a>
+      <div class="header-actions">
+        <button type="button" id="print-btn" class="print-btn" title="Save report as PDF">↓ Save PDF</button>
+        <a href="https://nse-dashboard.abhay-a-jadhav.workers.dev/" class="back-link">← Back to dashboard</a>
+      </div>
       <div class="eyebrow">Active Position Manager</div>
       <h1>Position <em>Insights</em></h1>
       <p class="subtitle">
@@ -677,6 +905,7 @@
       const btn = $("analyze-btn");
       btn.disabled = true;
       btn.textContent = "Analyzing…";
+      $("print-btn").classList.remove("visible");
 
       $("result").innerHTML = `
         <div class="loading">
@@ -712,6 +941,7 @@
 
     function showError(msg) {
       $("result").innerHTML = `<div class="error-card">⚠ ${escapeHtml(msg)}</div>`;
+      $("print-btn").classList.remove("visible");
     }
 
     // ===== Renderers =====
@@ -781,6 +1011,7 @@
       const newsHtml = renderNews(data.news);
 
       $("result").innerHTML = snapshot + contextRow + aiHtml + newsHtml;
+      $("print-btn").classList.add("visible");
       window.scrollTo({ top: $("result").offsetTop - 20, behavior: "smooth" });
     }
 
@@ -967,6 +1198,39 @@
 
     // Focus symbol input on load
     $("symbol").focus();
+
+    // ===== Print to PDF =====
+    $("print-btn").addEventListener("click", () => {
+      // Inject/refresh a "printed on" timestamp at the top of the result
+      let ts = document.getElementById("print-timestamp");
+      if (!ts) {
+        ts = document.createElement("div");
+        ts.id = "print-timestamp";
+        ts.className = "print-timestamp";
+        const result = $("result");
+        result.insertBefore(ts, result.firstChild);
+      }
+      const now = new Date();
+      const stamp = now.toLocaleString("en-IN", {
+        year: "numeric", month: "short", day: "numeric",
+        hour: "2-digit", minute: "2-digit",
+        timeZone: "Asia/Kolkata",
+      });
+      ts.textContent = `Report generated · ${stamp} IST`;
+
+      // Set a meaningful filename in the browser's print dialog.
+      // Browsers use document.title as the default Save-as-PDF filename.
+      const symbol = $("symbol").value.trim().toUpperCase() || "POSITION";
+      const datePart = now.toISOString().slice(0, 10);   // YYYY-MM-DD
+      const originalTitle = document.title;
+      document.title = `${symbol}_Position_Insights_${datePart}`;
+
+      window.print();
+
+      // Restore the title after the print dialog closes
+      // (use a short timeout — print() is synchronous in some browsers, async in others)
+      setTimeout(() => { document.title = originalTitle; }, 1000);
+    });
   </script>
 </body>
 </html>
