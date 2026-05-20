@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Position Insights · NSE Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== Reset & base ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-deep:   #0d1117;
+      --bg-card:   #161b22;
+      --bg-elev:   #1c232c;
+      --border:    #2d333b;
+      --border-bright: #3d444d;
+
+      --text:      #e6edf3;
+      --text-dim:  #9ba8b8;
+      --text-mute: #6e7681;
+
+      --accent:    #f5a623;     /* warm amber — verdict color */
+      --accent-soft: #3b2f0e;   /* amber background tint */
+      --gain:      #3fb950;
+      --loss:      #f85149;
+      --neutral:   #d29922;
+
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-deep);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0;
+      line-height: 1.55;
+      /* Subtle dot grid backdrop */
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.025) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 48px; }
+
+    /* ===== Header — restrained, intentional ===== */
+    header {
+      padding: 36px 0 28px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+      position: relative;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 60px; height: 2px;
+      background: var(--accent);
+    }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(28px, 4.5vw, 44px);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    h1 em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--accent);
+    }
+    .subtitle {
+      color: var(--text-dim);
+      font-size: 15px;
+      max-width: 560px;
+    }
+    .back-link {
+      position: absolute;
+      top: 0; right: 0;
+      color: var(--text-mute);
+      text-decoration: none;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+    .back-link:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ===== Input panel ===== */
+    .input-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+    .panel-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-mute);
+      margin-bottom: 18px;
+    }
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
+      gap: 14px;
+      align-items: end;
+    }
+    @media (max-width: 800px) {
+      .input-grid { grid-template-columns: 1fr 1fr; }
+      .input-grid > button { grid-column: 1 / -1; }
+    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-mute);
+    }
+    .field input {
+      background: var(--bg-elev);
+      border: 1px solid var(--border-bright);
+      border-radius: 5px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .field input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--bg-deep);
+    }
+    .field input::placeholder { color: var(--text-mute); }
+    #symbol { text-transform: uppercase; }
+
+    /* Direction toggle */
+    .dir-toggle { display: flex; gap: 4px; }
+    .dir-btn {
+      flex: 1;
+      padding: 11px 8px;
+      background: var(--bg-elev);
+      border: 1px solid var(--border-bright);
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: all 0.15s;
+    }
+    .dir-btn:first-child { border-radius: 5px 0 0 5px; border-right: none; }
+    .dir-btn:last-child  { border-radius: 0 5px 5px 0; }
+    .dir-btn.active.long {
+      background: rgba(63, 185, 80, 0.15);
+      border-color: var(--gain);
+      color: var(--gain);
+    }
+    .dir-btn.active.short {
+      background: rgba(248, 81, 73, 0.15);
+      border-color: var(--loss);
+      color: var(--loss);
+    }
+
+    .submit-btn {
+      padding: 11px 24px;
+      background: var(--accent);
+      color: var(--bg-deep);
+      border: none;
+      border-radius: 5px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .submit-btn:hover { background: #ffb84a; transform: translateY(-1px); }
+    .submit-btn:disabled {
+      background: var(--border-bright);
+      color: var(--text-mute);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ===== Loading state ===== */
+    .loading {
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+    .loading-dots::after {
+      content: '';
+      display: inline-block;
+      animation: dots 1.4s steps(4) infinite;
+    }
+    @keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+    .loading-progress {
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--text-mute);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* ===== Error state ===== */
+    .error-card {
+      background: rgba(248, 81, 73, 0.08);
+      border: 1px solid rgba(248, 81, 73, 0.4);
+      border-radius: 8px;
+      padding: 18px 22px;
+      color: var(--loss);
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    /* ===== Results ===== */
+    #result { animation: fadeIn 0.5s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Position snapshot strip */
+    .snapshot {
+      background: linear-gradient(180deg, var(--bg-card), var(--bg-elev));
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 22px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 28px;
+      align-items: center;
+    }
+    @media (max-width: 700px) {
+      .snapshot { grid-template-columns: 1fr; gap: 18px; }
+    }
+    .snapshot-symbol {
+      font-family: 'Fraunces', serif;
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .snapshot-symbol .dir-pill {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 99px;
+      margin-left: 10px;
+      vertical-align: middle;
+      letter-spacing: 1px;
+    }
+    .dir-pill.long {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--gain);
+      border: 1px solid rgba(63, 185, 80, 0.4);
+    }
+    .dir-pill.short {
+      background: rgba(248, 81, 73, 0.15);
+      color: var(--loss);
+      border: 1px solid rgba(248, 81, 73, 0.4);
+    }
+    .snapshot-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 18px;
+    }
+    .stat { font-family: 'JetBrains Mono', monospace; }
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-mute);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+    }
+    .stat-value { font-size: 17px; font-weight: 500; color: var(--text); }
+    .stat-value.gain { color: var(--gain); }
+    .stat-value.loss { color: var(--loss); }
+    .stat-value.neutral { color: var(--neutral); }
+    .stat-sub {
+      font-size: 11px;
+      color: var(--text-mute);
+      margin-top: 2px;
+    }
+
+    .pnl-display {
+      text-align: right;
+      padding-left: 24px;
+      border-left: 1px solid var(--border);
+    }
+    @media (max-width: 700px) {
+      .pnl-display { text-align: left; padding-left: 0; border-left: none; border-top: 1px solid var(--border); padding-top: 18px; }
+    }
+    .pnl-label {
+      font-size: 11px;
+      color: var(--text-mute);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .pnl-amount {
+      font-family: 'Fraunces', serif;
+      font-size: 30px;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .pnl-amount.gain { color: var(--gain); }
+    .pnl-amount.loss { color: var(--loss); }
+    .pnl-pct {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+    .pnl-pct.gain { color: var(--gain); }
+    .pnl-pct.loss { color: var(--loss); }
+
+    /* ===== Context cards (technicals, options, ratings) ===== */
+    .context-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .context-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 18px;
+    }
+    .context-card-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-mute);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .context-card-title::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+    .context-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 5px 0;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+    .context-row:last-child { border-bottom: none; }
+    .context-row .label { color: var(--text-dim); }
+    .context-row .value {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .context-row .value.gain { color: var(--gain); }
+    .context-row .value.loss { color: var(--loss); }
+    .context-row .value.neutral { color: var(--neutral); }
+
+    /* Composite signal badges */
+    .sig-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .sig-bullish      { background: rgba(63, 185, 80, 0.15);  color: var(--gain); }
+    .sig-bearish      { background: rgba(248, 81, 73, 0.15);  color: var(--loss); }
+    .sig-neutral      { background: rgba(210, 153, 34, 0.15); color: var(--neutral); }
+
+    /* ===== AI Analysis ===== */
+    .ai-analysis {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 32px 36px;
+      position: relative;
+      box-shadow: var(--shadow-md);
+    }
+    .ai-analysis::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 32px;
+      width: 36px; height: 2px;
+      background: var(--accent);
+    }
+    .ai-header {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--accent);
+      margin-bottom: 22px;
+      padding-top: 8px;
+    }
+    .ai-body {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .ai-body h3 {
+      font-family: 'Fraunces', serif;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 28px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .ai-body h3:first-child { margin-top: 0; }
+    .ai-body h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin: 32px 0 14px;
+      color: var(--text);
+    }
+    .ai-body h2:first-child { margin-top: 0; }
+    .ai-body strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .ai-body em { color: var(--text-dim); font-style: italic; }
+    .ai-body p { margin: 10px 0; color: var(--text); }
+    .ai-body ul { margin: 12px 0 12px 22px; }
+    .ai-body li {
+      margin: 8px 0;
+      color: var(--text);
+    }
+    .ai-body li strong { color: var(--accent); }
+    .ai-body code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      background: var(--bg-elev);
+      padding: 1px 6px;
+      border-radius: 3px;
+      color: var(--accent);
+    }
+
+    /* Verdict highlight — the first h3 (### 1. Verdict) gets special styling
+       via JS injection (.verdict-block) — see renderAI() */
+    .verdict-block {
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 18px 22px;
+      margin: 0 0 22px;
+      position: relative;
+    }
+    .verdict-block::before {
+      content: 'CURRENT VERDICT';
+      position: absolute;
+      top: -10px; left: 16px;
+      background: var(--bg-card);
+      padding: 0 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      color: var(--accent);
+    }
+    .verdict-block h3 {
+      border: none;
+      padding: 0;
+      margin: 0 0 8px;
+      font-size: 24px;
+      color: var(--accent);
+    }
+
+    /* News footer */
+    .news-block {
+      margin-top: 24px;
+      padding: 22px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .news-list { list-style: none; padding: 0; }
+    .news-list li {
+      padding: 10px 0;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+    .news-list li:last-child { border-bottom: none; }
+    .news-list a { color: var(--text); text-decoration: none; }
+    .news-list a:hover { color: var(--accent); text-decoration: underline; }
+    .news-list .meta {
+      color: var(--text-mute);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      margin-left: 8px;
+    }
+
+    /* Footer */
+    .footer-meta {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-mute);
+      text-align: center;
+    }
+    .footer-meta a { color: var(--accent); text-decoration: none; }
+    .footer-meta a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="https://nse-dashboard.abhay-a-jadhav.workers.dev/" class="back-link">← Back to dashboard</a>
+      <div class="eyebrow">Active Position Manager</div>
+      <h1>Position <em>Insights</em></h1>
+      <p class="subtitle">
+        AI-powered guidance on what to do with a position you already hold —
+        hold, exit, scale, or adjust risk based on live technicals, options sentiment, and news.
+      </p>
+    </header>
+
+    <div class="input-panel">
+      <div class="panel-title">Your Position</div>
+      <div class="input-grid">
+        <div class="field">
+          <label for="symbol">NSE Symbol</label>
+          <input type="text" id="symbol" placeholder="e.g. RELIANCE" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Direction</label>
+          <div class="dir-toggle">
+            <button type="button" class="dir-btn active long" data-dir="long">LONG</button>
+            <button type="button" class="dir-btn short" data-dir="short">SHORT</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="entry-price">Entry Price ₹</label>
+          <input type="number" id="entry-price" step="0.05" placeholder="2450.00">
+        </div>
+        <div class="field">
+          <label for="quantity">Quantity</label>
+          <input type="number" id="quantity" step="1" placeholder="50">
+        </div>
+        <button type="button" id="analyze-btn" class="submit-btn">Analyze →</button>
+      </div>
+    </div>
+
+    <div id="result"></div>
+
+    <div class="footer-meta">
+      Insights powered by Claude Haiku · Live data via Yahoo Finance + Upstox + Google News<br>
+      Not investment advice · For personal trading research only
+    </div>
+  </div>
+
+  <script>
+    // ===== Configuration =====
+    const API_BASE = "https://nse-dashboard-api.onrender.com";
+    const POSITION_URL = `${API_BASE}/api/position`;
+
+    // ===== Helpers =====
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n, places = 2) => {
+      if (n === null || n === undefined) return "—";
+      return Number(n).toLocaleString("en-IN", {
+        minimumFractionDigits: places,
+        maximumFractionDigits: places,
+      });
+    };
+    const sign = (n) => (n >= 0 ? "+" : "");
+    const escapeHtml = (s) =>
+      String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    // Markdown → HTML (handles ### / ## / **bold** / *italic* / lists / `code`)
+    function mdToHtml(md) {
+      const lines = md.split("\n");
+      let html = "";
+      let inUl = false;
+      const closeList = () => { if (inUl) { html += "</ul>"; inUl = false; } };
+
+      for (const raw of lines) {
+        const line = raw.trim();
+        if (!line) { closeList(); continue; }
+
+        if (line.startsWith("### ")) {
+          closeList();
+          html += `<h3>${inlineMd(line.slice(4))}</h3>`;
+        } else if (line.startsWith("## ")) {
+          closeList();
+          html += `<h2>${inlineMd(line.slice(3))}</h2>`;
+        } else if (line.startsWith("- ") || line.startsWith("* ")) {
+          if (!inUl) { html += "<ul>"; inUl = true; }
+          html += `<li>${inlineMd(line.slice(2))}</li>`;
+        } else {
+          closeList();
+          html += `<p>${inlineMd(line)}</p>`;
+        }
+      }
+      closeList();
+      return html;
+    }
+    function inlineMd(text) {
+      let t = escapeHtml(text);
+      t = t.replace(/`([^`]+)`/g, "<code>$1</code>");
+      t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      t = t.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+      return t;
+    }
+
+    // ===== Direction toggle =====
+    document.querySelectorAll(".dir-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".dir-btn").forEach(b => {
+          b.classList.remove("active", "long", "short");
+        });
+        btn.classList.add("active", btn.dataset.dir);
+      });
+    });
+
+    // ===== Form submit =====
+    function getDirection() {
+      const active = document.querySelector(".dir-btn.active");
+      return active ? active.dataset.dir : "long";
+    }
+
+    $("analyze-btn").addEventListener("click", runAnalysis);
+    ["symbol", "entry-price", "quantity"].forEach(id => {
+      $(id).addEventListener("keypress", (e) => {
+        if (e.key === "Enter") runAnalysis();
+      });
+    });
+
+    async function runAnalysis() {
+      const symbol = $("symbol").value.trim().toUpperCase();
+      const entryPrice = parseFloat($("entry-price").value);
+      const quantity = parseInt($("quantity").value, 10);
+      const direction = getDirection();
+
+      // Validation
+      if (!symbol) return showError("Enter an NSE symbol");
+      if (!entryPrice || entryPrice <= 0) return showError("Enter a valid entry price");
+      if (!quantity || quantity <= 0) return showError("Enter a valid quantity");
+
+      const btn = $("analyze-btn");
+      btn.disabled = true;
+      btn.textContent = "Analyzing…";
+
+      $("result").innerHTML = `
+        <div class="loading">
+          Analyzing your ${direction} position in ${symbol}<span class="loading-dots"></span>
+          <div class="loading-progress">PRICE → OPTIONS → ANALYST → NEWS → AI</div>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(POSITION_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            symbol,
+            entry_price: entryPrice,
+            direction,
+            quantity,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+        renderResult(data);
+      } catch (err) {
+        showError(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Analyze →";
+      }
+    }
+
+    function showError(msg) {
+      $("result").innerHTML = `<div class="error-card">⚠ ${escapeHtml(msg)}</div>`;
+    }
+
+    // ===== Renderers =====
+    function renderResult(data) {
+      const pos = data.position;
+      const p   = data.price_data;
+      const opt = data.options;
+
+      const pnlClass = pos.unrealized_pnl > 0 ? "gain"
+                     : pos.unrealized_pnl < 0 ? "loss" : "";
+
+      const snapshot = `
+        <div class="snapshot">
+          <div>
+            <div class="snapshot-symbol">
+              ${data.symbol}
+              <span class="dir-pill ${pos.direction}">${pos.direction.toUpperCase()}</span>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-mute);margin-top:6px;">
+              ${pos.quantity} shares @ ₹${fmt(pos.entry_price)}
+            </div>
+          </div>
+          <div class="snapshot-stats">
+            <div class="stat">
+              <div class="stat-label">Current Price</div>
+              <div class="stat-value">₹${fmt(pos.current_price)}</div>
+              <div class="stat-sub">${sign(pos.price_move_pct)}${fmt(pos.price_move_pct)}% from entry</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Invested</div>
+              <div class="stat-value">₹${fmt(pos.invested_amount, 0)}</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Current Value</div>
+              <div class="stat-value">₹${fmt(pos.current_value, 0)}</div>
+            </div>
+          </div>
+          <div class="pnl-display">
+            <div class="pnl-label">Unrealized P&L</div>
+            <div class="pnl-amount ${pnlClass}">
+              ${pos.unrealized_pnl >= 0 ? "+" : ""}₹${fmt(Math.abs(pos.unrealized_pnl), 0)}
+            </div>
+            <div class="pnl-pct ${pnlClass}">
+              ${sign(pos.unrealized_pnl_pct)}${fmt(pos.unrealized_pnl_pct)}%
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Context cards
+      const techCard = renderTechCard(p);
+      const optCard  = renderOptionsCard(opt, pos);
+      const ratCard  = renderRatingsCard(data.ratings, pos.current_price);
+
+      const contextRow = `
+        <div class="context-grid">
+          ${techCard}
+          ${optCard}
+          ${ratCard}
+        </div>
+      `;
+
+      // AI analysis with verdict highlighted
+      const aiHtml = renderAI(data.ai_analysis);
+
+      // News
+      const newsHtml = renderNews(data.news);
+
+      $("result").innerHTML = snapshot + contextRow + aiHtml + newsHtml;
+      window.scrollTo({ top: $("result").offsetTop - 20, behavior: "smooth" });
+    }
+
+    function renderTechCard(p) {
+      const rsiClass = p.rsi_14 > 70 ? "loss" : p.rsi_14 < 30 ? "gain" : "";
+      const macdClass = (p.macd || 0) > (p.macd_signal || 0) ? "gain" : "loss";
+      const trend1d = p.pct_change_1d >= 0 ? "gain" : "loss";
+      const trend30d = p.pct_change_30d >= 0 ? "gain" : "loss";
+
+      return `
+        <div class="context-card">
+          <div class="context-card-title">Technicals</div>
+          <div class="context-row">
+            <span class="label">RSI (14)</span>
+            <span class="value ${rsiClass}">${fmt(p.rsi_14, 1)}</span>
+          </div>
+          <div class="context-row">
+            <span class="label">ATR (14)</span>
+            <span class="value">₹${fmt(p.atr_14 || 0)}</span>
+          </div>
+          <div class="context-row">
+            <span class="label">SMA 50 / 200</span>
+            <span class="value">₹${fmt(p.sma_50 || 0, 0)} / ₹${fmt(p.sma_200 || 0, 0)}</span>
+          </div>
+          <div class="context-row">
+            <span class="label">MACD</span>
+            <span class="value ${macdClass}">${fmt(p.macd || 0)}</span>
+          </div>
+          <div class="context-row">
+            <span class="label">1D change</span>
+            <span class="value ${trend1d}">${sign(p.pct_change_1d)}${fmt(p.pct_change_1d)}%</span>
+          </div>
+          <div class="context-row">
+            <span class="label">30D change</span>
+            <span class="value ${trend30d}">${sign(p.pct_change_30d)}${fmt(p.pct_change_30d)}%</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderOptionsCard(opt, pos) {
+      if (!opt) {
+        return `
+          <div class="context-card">
+            <div class="context-card-title">Options Sentiment</div>
+            <div style="font-size:13px;color:var(--text-mute);font-style:italic;padding:18px 0;">
+              Not in F&O segment — options data unavailable.
+            </div>
+          </div>
+        `;
+      }
+      const compositeClass =
+        /bull/i.test(opt.composite_signal) ? "sig-bullish" :
+        /bear/i.test(opt.composite_signal) ? "sig-bearish" : "sig-neutral";
+
+      const pcrClass = opt.pcr_oi >= 1.0 ? "gain" : opt.pcr_oi <= 0.8 ? "loss" : "neutral";
+      const paintClass = (pos.distance_to_max_pain || 0) >= 0 ? "neutral" : "gain";
+
+      return `
+        <div class="context-card">
+          <div class="context-card-title">Options Sentiment</div>
+          <div class="context-row">
+            <span class="label">Composite</span>
+            <span class="value">
+              <span class="sig-badge ${compositeClass}">${escapeHtml(opt.composite_signal)}</span>
+            </span>
+          </div>
+          <div class="context-row">
+            <span class="label">PCR (OI)</span>
+            <span class="value ${pcrClass}">${fmt(opt.pcr_oi)}</span>
+          </div>
+          <div class="context-row">
+            <span class="label">Max Pain</span>
+            <span class="value">₹${fmt(opt.max_pain, 0)}</span>
+          </div>
+          <div class="context-row">
+            <span class="label">vs Max Pain</span>
+            <span class="value ${paintClass}">${sign(pos.distance_to_max_pain || 0)}${fmt(pos.distance_to_max_pain || 0)}%</span>
+          </div>
+          <div class="context-row">
+            <span class="label">Resistance</span>
+            <span class="value">₹${fmt(opt.highest_call_oi_strike, 0)}</span>
+          </div>
+          <div class="context-row">
+            <span class="label">Support</span>
+            <span class="value">₹${fmt(opt.highest_put_oi_strike, 0)}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRatingsCard(ratings, currentPrice) {
+      if (!ratings || ratings.data_source === "unavailable") {
+        return `
+          <div class="context-card">
+            <div class="context-card-title">Analyst View</div>
+            <div style="font-size:13px;color:var(--text-mute);font-style:italic;padding:18px 0;">
+              No analyst data available.
+            </div>
+          </div>
+        `;
+      }
+      const consensus = ratings.consensus || "—";
+      const pt = ratings.price_target || {};
+      const upside = pt.mean ? ((pt.mean - currentPrice) / currentPrice) * 100 : null;
+      const upsideClass = upside !== null ? (upside >= 0 ? "gain" : "loss") : "";
+
+      let summaryRow = "";
+      if (ratings.summary && ratings.summary.total > 0) {
+        const s = ratings.summary;
+        summaryRow = `
+          <div class="context-row">
+            <span class="label">Analysts</span>
+            <span class="value">${s.total}</span>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="context-card">
+          <div class="context-card-title">Analyst View</div>
+          <div class="context-row">
+            <span class="label">Consensus</span>
+            <span class="value">${escapeHtml(consensus)}</span>
+          </div>
+          ${pt.mean ? `
+            <div class="context-row">
+              <span class="label">Mean Target</span>
+              <span class="value">₹${fmt(pt.mean, 0)}</span>
+            </div>
+            <div class="context-row">
+              <span class="label">Upside</span>
+              <span class="value ${upsideClass}">${sign(upside)}${fmt(upside)}%</span>
+            </div>
+          ` : ""}
+          ${pt.low && pt.high ? `
+            <div class="context-row">
+              <span class="label">Range</span>
+              <span class="value">₹${fmt(pt.low, 0)} – ₹${fmt(pt.high, 0)}</span>
+            </div>
+          ` : ""}
+          ${summaryRow}
+        </div>
+      `;
+    }
+
+    function renderAI(aiText) {
+      // Parse markdown
+      const html = mdToHtml(aiText);
+
+      // Wrap the first h3 (Verdict section) in a special block.
+      // We look for "### 1. Verdict" output → "<h3>1. Verdict</h3>"
+      const wrapped = html.replace(
+        /(<h3>1\..*?Verdict<\/h3>)([\s\S]*?)(?=<h[23]>)/i,
+        '<div class="verdict-block">$1$2</div>'
+      );
+
+      return `
+        <div class="ai-analysis">
+          <div class="ai-header">AI Position Analysis</div>
+          <div class="ai-body">${wrapped}</div>
+        </div>
+      `;
+    }
+
+    function renderNews(news) {
+      if (!news || news.length === 0) return "";
+      const items = news.slice(0, 5).map(n => {
+        const age = n.age_days === 0 ? "today" : `${n.age_days}d ago`;
+        return `
+          <li>
+            <a href="${n.link}" target="_blank" rel="noopener">${escapeHtml(n.title)}</a>
+            <span class="meta">${escapeHtml(n.source)} · ${age}</span>
+          </li>
+        `;
+      }).join("");
+      return `
+        <div class="news-block">
+          <div class="context-card-title">Recent News</div>
+          <ul class="news-list">${items}</ul>
+        </div>
+      `;
+    }
+
+    // Focus symbol input on load
+    $("symbol").focus();
+  </script>
+</body>
+</html>
