@@ -472,7 +472,51 @@
       .compare-table th.value-col  { width: 25%; }
       .compare-table { font-size: 13px; }
       .compare-table td, .compare-table th { padding: 8px; }
+    }    /* ===== RSI Extremes tab styles ===== */
+    .rsi-filter-bar {
+      padding: 12px 18px; background: #f9fafb; border-bottom: 1px solid #e5e7eb;
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
     }
+    .rsi-filter-bar .filter-label {
+      font-size: 12px; font-weight: 600; color: #374151;
+      text-transform: uppercase; letter-spacing: 0.3px; margin-right: 4px;
+    }
+    .rsi-filter-btn {
+      padding: 6px 14px; background: #fff; border: 1px solid #e5e7eb;
+      border-radius: 99px; cursor: pointer; font-size: 12px; font-weight: 500;
+      color: #6b7280; transition: all 0.15s;
+    }
+    .rsi-filter-btn:hover { background: #f3f4f6; color: #111827; }
+    .rsi-filter-btn.active {
+      background: #1d4ed8; color: #fff; border-color: #1d4ed8;
+    }
+    .rsi-filter-btn .count {
+      display: inline-block; background: rgba(0,0,0,0.1);
+      padding: 1px 7px; border-radius: 99px; font-size: 10px; margin-left: 4px;
+    }
+    .rsi-filter-btn.active .count { background: rgba(255,255,255,0.25); }
+    .rsi-row-ob { background: #fef2f2; }
+    .rsi-row-os { background: #f0fdf4; }
+    .rsi-row-ob:hover td { background: #fee2e2 !important; }
+    .rsi-row-os:hover td { background: #dcfce7 !important; }
+    .rsi-tier-extreme {
+      display: inline-block; background: #dc2626; color: #fff;
+      padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 600;
+    }
+    .rsi-tier-standard {
+      display: inline-block; background: #e5e7eb; color: #374151;
+      padding: 2px 7px; border-radius: 3px; font-size: 10px;
+    }
+    .rsi-tier-extreme.bull {
+      background: #16a34a;
+    }
+    .rsi-direction-ob { color: #dc2626; font-weight: 600; }
+    .rsi-direction-os { color: #16a34a; font-weight: 600; }
+    .rsi-help {
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px;
+      padding: 10px 14px; font-size: 12px; color: #1e40af; margin: 14px 18px 4px;
+    }
+
   </style>
 </head>
 <body>
@@ -499,6 +543,9 @@
       <button class="tab" data-tab="momentum">
         📈 Momentum <span class="count" id="count-momentum">—</span>
       </button>
+      <button class="tab" data-tab="rsi-extremes">
+        🌡️ RSI Extremes <span class="count" id="count-rsi-extremes">—</span>
+      </button>
       <button class="tab" data-tab="analyze">
         🤖 Analyze Stock
       </button>
@@ -513,6 +560,7 @@
     <div id="panel-intraday" class="panel"></div>
     <div id="panel-reversal" class="panel" style="display:none;"></div>
     <div id="panel-momentum" class="panel" style="display:none;"></div>
+    <div id="panel-rsi-extremes" class="panel" style="display:none;"></div>
     <div id="panel-analyze"  class="panel" style="display:none;"></div>
     <div id="panel-sizer"    class="panel" style="display:none;"></div>
     <div id="panel-compare"  class="panel" style="display:none;"></div>
@@ -690,6 +738,137 @@
           <th style="text-align:right;">Now</th><th style="text-align:right;">30D %</th>
           <th>Chart</th>
         </tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    // ===== RSI Extremes tab =====
+    // Module-level filter state, persisted across re-renders within a session.
+    // Tab is filter-only — data lives in the snapshot payload, refreshed by refresh().
+    let rsiFilter = "all";          // "all" | "overbought" | "oversold"
+    let rsiSnapshot = null;         // last snapshot data block, for re-render on filter change
+
+    function renderRsiExtremes(data) {
+      rsiSnapshot = data;
+      const panel = $("panel-rsi-extremes");
+      const items = (data && data.items) || [];
+      $("count-rsi-extremes").textContent = items.length;
+
+      // Counts per direction for the filter pills
+      const obCount = items.filter(s => s.direction === "overbought").length;
+      const osCount = items.filter(s => s.direction === "oversold").length;
+      const extremeCount = items.filter(s => s.tier === "extreme").length;
+
+      // Apply active filter
+      let visible = items;
+      if (rsiFilter === "overbought") visible = items.filter(s => s.direction === "overbought");
+      else if (rsiFilter === "oversold") visible = items.filter(s => s.direction === "oversold");
+      else if (rsiFilter === "extreme")  visible = items.filter(s => s.tier === "extreme");
+
+      // Sort: extreme tier first, then by RSI (most stretched at top)
+      visible = [...visible].sort((a, b) => {
+        if (a.tier !== b.tier) return a.tier === "extreme" ? -1 : 1;
+        // Within a tier: overbought sorted by RSI desc, oversold by RSI asc
+        if (a.direction !== b.direction) return a.direction === "overbought" ? -1 : 1;
+        return a.direction === "overbought" ? b.rsi - a.rsi : a.rsi - b.rsi;
+      });
+
+      const filterBar = `
+        <div class="rsi-filter-bar">
+          <span class="filter-label">Filter:</span>
+          <button class="rsi-filter-btn ${rsiFilter === 'all' ? 'active' : ''}" data-filter="all">
+            All <span class="count">${items.length}</span>
+          </button>
+          <button class="rsi-filter-btn ${rsiFilter === 'overbought' ? 'active' : ''}" data-filter="overbought">
+            🔴 Overbought <span class="count">${obCount}</span>
+          </button>
+          <button class="rsi-filter-btn ${rsiFilter === 'oversold' ? 'active' : ''}" data-filter="oversold">
+            🟢 Oversold <span class="count">${osCount}</span>
+          </button>
+          <button class="rsi-filter-btn ${rsiFilter === 'extreme' ? 'active' : ''}" data-filter="extreme">
+            ⚠️ Extreme Only <span class="count">${extremeCount}</span>
+          </button>
+        </div>
+      `;
+
+      if (items.length === 0) {
+        panel.innerHTML = `
+          <div class="panel-header">RSI Extremes</div>
+          ${filterBar}
+          <div class="empty">
+            No stocks at RSI extremes with conviction volume right now.
+            ${data?.updated_at ? `Updated ${timeAgo(data.updated_at)}.` : ""}
+          </div>
+        `;
+        attachRsiFilterHandlers();
+        return;
+      }
+
+      const rows = visible.map(s => {
+        const dirLabel = s.direction === "overbought" ? "🔴 OB" : "🟢 OS";
+        const dirClass = s.direction === "overbought" ? "rsi-direction-ob" : "rsi-direction-os";
+        const rowClass = s.direction === "overbought" ? "rsi-row-ob" : "rsi-row-os";
+        const tierBadge = s.tier === "extreme"
+          ? `<span class="rsi-tier-extreme ${s.direction === 'oversold' ? 'bull' : ''}">EXTREME</span>`
+          : `<span class="rsi-tier-standard">Standard</span>`;
+        const rsiClass = s.direction === "overbought" ? "loss" : "gain";
+        const distSign = s.distance_from_sma_50_pct >= 0 ? "+" : "";
+
+        return `<tr class="${rowClass}">
+          <td class="symbol">
+            <a href="#" class="analyze-link" data-symbol="${s.symbol}">${s.symbol}</a>
+            <div style="color:#9ca3af;font-size:11px;font-weight:400;">${escapeHtml(s.name || "")}</div>
+          </td>
+          <td><span class="${dirClass}">${dirLabel}</span></td>
+          <td>${tierBadge}</td>
+          <td style="text-align:right;" class="${rsiClass}">${fmt(s.rsi, 1)}</td>
+          <td style="text-align:right;">₹${fmt(s.price)}</td>
+          <td style="text-align:right;" class="${cls(s.pct_change_1d)}">
+            ${sign(s.pct_change_1d)}${fmt(s.pct_change_1d)}%
+          </td>
+          <td style="text-align:right;">${fmt(s.volume_ratio, 1)}x</td>
+          <td style="text-align:right; color:#6b7280;">
+            ${distSign}${fmt(s.distance_from_sma_50_pct, 1)}%
+          </td>
+          <td>${tvLink(s.symbol)} · ${nseLink(s.symbol)}</td>
+        </tr>`;
+      }).join("");
+
+      panel.innerHTML = `
+        <div class="panel-header">
+          RSI Extremes (${items.length})
+          <div class="freshness">
+            Daily RSI(14) ≥70 or ≤30 with volume &gt;1.5× the 20-day avg ·
+            Updated ${timeAgo(data.updated_at)} · Click a symbol to analyze
+          </div>
+        </div>
+        ${filterBar}
+        <div class="rsi-help">
+          <strong>Reading the signals:</strong>
+          🔴 Overbought + heavy volume → potential mean reversion (but can extend in strong trends).
+          🟢 Oversold + heavy volume → potential bounce / capitulation low.
+          ⚠️ Extreme tier (RSI ≥80 / ≤20) marks the most stretched moves.
+        </div>
+        <table><thead><tr>
+          <th>Symbol</th>
+          <th>Direction</th>
+          <th>Tier</th>
+          <th style="text-align:right;">RSI</th>
+          <th style="text-align:right;">Price</th>
+          <th style="text-align:right;">1D %</th>
+          <th style="text-align:right;">Volume</th>
+          <th style="text-align:right;">vs SMA50</th>
+          <th>Chart</th>
+        </tr></thead><tbody>${rows}</tbody></table>
+      `;
+      attachRsiFilterHandlers();
+    }
+
+    function attachRsiFilterHandlers() {
+      document.querySelectorAll(".rsi-filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          rsiFilter = btn.dataset.filter;
+          if (rsiSnapshot) renderRsiExtremes(rsiSnapshot);
+        });
+      });
     }
 
     // ===== Analyze tab =====
@@ -2237,6 +2416,7 @@
         renderIntraday(data.intraday);
         renderReversal(data.reversal);
         renderMomentum(data.momentum);
+        renderRsiExtremes(data.rsi_extremes);
         $("last-refresh").textContent = `Last refresh: ${new Date().toLocaleTimeString()}`;
         status.className = "status ok";
         status.textContent = "✓ Live · Auto-refresh every 60s";
