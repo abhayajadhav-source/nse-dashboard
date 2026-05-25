@@ -542,6 +542,253 @@
       color: #d1d5db;
       font-style: italic;
     }
+    /* ===== Print button (header) ===== */
+    #print-pdf-btn {
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    #print-pdf-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+    #print-pdf-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Hidden by default, only visible in print mode */
+    .print-only-header { display: none; }
+
+    /* ===== Print stylesheet — applies when user invokes browser print =====
+       Strategy:
+         - Switch to white/black for paper readability
+         - Hide all panels except the one marked .printing-active
+         - Hide all chrome (tabs, status, search forms, buttons, refresh time)
+         - Force page-break behaviour for stock rows + AI cards
+    */
+    @media print {
+      @page {
+        size: A4;
+        margin: 12mm 10mm;
+      }
+
+      body {
+        background: #fff !important;
+        color: #111 !important;
+        padding: 0 !important;
+        font-size: 10pt;
+      }
+      .container {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      /* Hide everything not part of the printable report */
+      header,
+      .tabs,
+      #status,
+      #print-pdf-btn,
+      #pwa-install-banner,
+      .analyze-form,
+      .compare-form,
+      .sizer-mode-toggle,
+      .sizer-form,
+      .sizer-settings-bar,
+      .direction-toggle,
+      .rsi-filter-bar,
+      #print-pdf-btn,
+      button {
+        display: none !important;
+      }
+
+      /* Hide all panels except the one currently being printed */
+      .panel {
+        display: none !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .panel.printing-active {
+        display: block !important;
+        page-break-inside: auto;
+      }
+
+      /* Print-only report header inserted by JS */
+      .print-only-header {
+        display: block !important;
+        border-bottom: 2px solid #1f2937;
+        padding-bottom: 10px;
+        margin-bottom: 14px;
+      }
+      .print-only-header h1 {
+        font-size: 20pt;
+        color: #1f2937;
+        margin: 0;
+        font-weight: 700;
+      }
+      .print-only-header .print-meta {
+        font-size: 9pt;
+        color: #6b7280;
+        margin-top: 4px;
+      }
+
+      /* Panel header restyle for print */
+      .panel-header {
+        background: #fff !important;
+        border-bottom: 1px solid #ccc !important;
+        padding: 8px 0 !important;
+        font-size: 12pt;
+        font-weight: 700;
+        color: #1f2937 !important;
+      }
+      .freshness { color: #6b7280 !important; }
+
+      /* Tables — make them paper-friendly */
+      table {
+        page-break-inside: auto;
+        font-size: 9pt;
+      }
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+      thead { display: table-header-group; }
+      th {
+        background: #f3f4f6 !important;
+        color: #374151 !important;
+        font-size: 8pt;
+        padding: 6px 8px;
+      }
+      td {
+        padding: 5px 8px;
+        font-size: 9pt;
+        border-bottom: 1px solid #eee !important;
+      }
+      tr:hover td { background: #fff !important; }
+
+      /* Color-coded cells stay readable on paper */
+      .gain { color: #15803d !important; font-weight: 600; }
+      .loss { color: #b91c1c !important; font-weight: 600; }
+      .symbol a { color: #1f2937 !important; text-decoration: none; }
+      .ext-link { color: #1f2937 !important; }
+
+      /* Badges */
+      .badge-green  { background: #d1fae5 !important; color: #065f46 !important; }
+      .badge-red    { background: #fee2e2 !important; color: #991b1b !important; }
+      .badge-amber  { background: #fef3c7 !important; color: #92400e !important; }
+      .badge-blue   { background: #dbeafe !important; color: #1e40af !important; }
+      .badge-gray   { background: #f3f4f6 !important; color: #374151 !important; }
+
+      /* Fundamental cells (Momentum tab) */
+      .fund-good { background: #d1fae5 !important; color: #065f46 !important; }
+      .fund-warn { background: #fef3c7 !important; color: #92400e !important; }
+      .fund-bad  { background: #fee2e2 !important; color: #991b1b !important; }
+      .fund-na   { color: #aaa !important; }
+
+      /* AI analysis card (Analyze tab) */
+      .analysis-text {
+        page-break-inside: auto;
+        font-size: 10pt;
+      }
+      .analysis-text h2 {
+        page-break-after: avoid;
+        margin-top: 12pt;
+        font-size: 12pt;
+        color: #1f2937 !important;
+      }
+      .analysis-text ul, .analysis-text p { page-break-inside: avoid; }
+
+      /* Price card + analyst/options cards */
+      .price-card, .analyst-card, .options-card {
+        page-break-inside: avoid;
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        margin-bottom: 10px;
+      }
+      .metric-label, .analyst-metric-label, .options-metric-label {
+        color: #6b7280 !important;
+      }
+      .metric-value, .analyst-metric-value, .options-metric-value {
+        color: #1f2937 !important;
+      }
+      .composite-signal {
+        page-break-inside: avoid;
+        background: #f3f4f6 !important;
+        color: #1f2937 !important;
+        border: 1px solid #ccc;
+      }
+      .signal-strong-bullish, .signal-bullish, .signal-slightly-bullish {
+        color: #15803d !important;
+      }
+      .signal-strong-bearish, .signal-bearish, .signal-slightly-bearish {
+        color: #b91c1c !important;
+      }
+
+      /* Compare tab */
+      .compare-headers, .compare-scorecard, .verdict-card {
+        page-break-inside: avoid;
+        background: #fff !important;
+        color: #1f2937 !important;
+      }
+      .compare-scorecard {
+        border: 1px solid #1f2937 !important;
+      }
+      .compare-scorecard .scorecard-label,
+      .compare-scorecard .scorecard-value {
+        color: #1f2937 !important;
+      }
+      .compare-header-card.winner {
+        border: 2px solid #15803d !important;
+        background: #f0fdf4 !important;
+      }
+      .verdict-card { border: 2px solid #1f2937 !important; }
+      .verdict-card-header { color: #1f2937 !important; }
+
+      /* Sizer cards */
+      .sizer-scenario, .suggestion-card {
+        page-break-inside: avoid;
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+      }
+      .sizer-scenario.balanced { background: #f0f9ff !important; }
+      .sizer-warning { background: #fee2e2 !important; color: #991b1b !important; }
+      .sizer-success { background: #d1fae5 !important; color: #065f46 !important; }
+
+      /* Help banners — keep them but slim down */
+      .rsi-help {
+        background: #f3f4f6 !important;
+        border: 1px solid #ccc !important;
+        color: #1f2937 !important;
+        font-size: 9pt;
+      }
+
+      /* News block (Analyze tab footer) */
+      .news-list a { color: #1f2937 !important; text-decoration: none; }
+      .news-list .news-meta { color: #6b7280 !important; }
+
+      /* Footer signature for the printed report */
+      .print-footer {
+        display: block !important;
+        margin-top: 18px;
+        padding-top: 8px;
+        border-top: 1px solid #ccc;
+        font-size: 8pt;
+        color: #6b7280;
+        text-align: center;
+      }
+    }
+
+    /* Print-only footer hidden on screen */
+    .print-footer { display: none; }
 
   </style>
 </head>
@@ -554,6 +801,9 @@
       </div>
       <div>
         <div id="last-refresh" class="meta">Loading…</div>
+        <button id="print-pdf-btn" type="button" title="Save current tab as PDF">
+          🖨️ Save PDF
+        </button>
       </div>
     </header>
 
@@ -2516,6 +2766,111 @@
         status.textContent = `⚠️ Failed to load data: ${err.message}. Retrying in 60s.`;
       }
     }
+
+    // ===== Print to PDF =====
+    // The dashboard has 6 tabs but all live in the same DOM. For PDF export:
+    //   1. Find the currently active panel (by checking which .tab.active is set)
+    //   2. Mark that panel with .printing-active so the @media print CSS shows it
+    //   3. Inject a print-only header with title + timestamp + symbol context
+    //   4. Set document.title to a smart filename
+    //   5. Call window.print() — browser handles "Save as PDF" choice
+    //   6. Clean up afterward so screen rendering is unchanged
+
+    const TAB_LABELS = {
+      "intraday":     "Intraday Alerts",
+      "reversal":     "Trend Reversal Candidates",
+      "momentum":     "30-Day Momentum",
+      "rsi-extremes": "RSI Extremes",
+      "analyze":      "AI Technical Analysis",
+      "sizer":        "Position Sizer",
+      "compare":      "Stock Comparison",
+    };
+
+    function getActiveTab() {
+      const activeTab = document.querySelector(".tab.active");
+      return activeTab ? activeTab.dataset.tab : "intraday";
+    }
+
+    function buildPrintFilename(activeTab) {
+      const today = new Date();
+      const datePart = today.toISOString().slice(0, 10);
+
+      // For analyze/compare/sizer/position, try to include the symbol(s)
+      // currently shown in the report.
+      let suffix = "";
+      if (activeTab === "analyze") {
+        const symbol = $("analyze-input")?.value?.trim().toUpperCase();
+        if (symbol) suffix = `_${symbol}`;
+      } else if (activeTab === "compare") {
+        const symA = $("compare-input-a")?.value?.trim().toUpperCase();
+        const symB = $("compare-input-b")?.value?.trim().toUpperCase();
+        if (symA && symB) suffix = `_${symA}_vs_${symB}`;
+      }
+      const tabSlug = (TAB_LABELS[activeTab] || activeTab)
+        .replace(/[^A-Za-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
+      return `NSE_${tabSlug}${suffix}_${datePart}`;
+    }
+
+    function buildPrintHeader(activeTab) {
+      const now = new Date().toLocaleString("en-IN", {
+        year: "numeric", month: "short", day: "numeric",
+        hour: "2-digit", minute: "2-digit",
+        timeZone: "Asia/Kolkata",
+      });
+      const label = TAB_LABELS[activeTab] || activeTab;
+      return `
+        <div class="print-only-header">
+          <h1>NSE Dashboard — ${escapeHtml(label)}</h1>
+          <div class="print-meta">Generated ${escapeHtml(now)} IST · Auto-refreshed every 60s on screen</div>
+        </div>
+      `;
+    }
+
+    function buildPrintFooter() {
+      return `
+        <div class="print-footer">
+          Powered by Yahoo Finance + Google News + NSE F&O · Not investment advice · For personal use only
+        </div>
+      `;
+    }
+
+    $("print-pdf-btn").addEventListener("click", () => {
+      const activeTab = getActiveTab();
+      const activePanel = $(`panel-${activeTab}`);
+      if (!activePanel) return;
+
+      // Mark active panel for print CSS
+      activePanel.classList.add("printing-active");
+
+      // Inject the print-only header and footer into the active panel
+      const headerHtml = buildPrintHeader(activeTab);
+      const footerHtml = buildPrintFooter();
+      const headerDiv = document.createElement("div");
+      headerDiv.innerHTML = headerHtml;
+      const footerDiv = document.createElement("div");
+      footerDiv.innerHTML = footerHtml;
+      activePanel.insertBefore(headerDiv.firstElementChild, activePanel.firstChild);
+      activePanel.appendChild(footerDiv.firstElementChild);
+
+      // Set filename via document.title (browsers use it for Save-as-PDF default)
+      const originalTitle = document.title;
+      document.title = buildPrintFilename(activeTab);
+
+      window.print();
+
+      // Cleanup — restore after the print dialog closes.
+      // window.print() is synchronous in some browsers, async in others; use a
+      // short timeout that covers both cases.
+      setTimeout(() => {
+        document.title = originalTitle;
+        activePanel.classList.remove("printing-active");
+        const printHeader = activePanel.querySelector(".print-only-header");
+        if (printHeader) printHeader.remove();
+        const printFooter = activePanel.querySelector(".print-footer");
+        if (printFooter) printFooter.remove();
+      }, 1000);
+    });
 
     refresh();
     setInterval(refresh, REFRESH_MS);
