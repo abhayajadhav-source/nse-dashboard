@@ -779,10 +779,17 @@
         if (g >= 0)  return "fund-ok";
         return "fund-bad";
       };
-      const fiiClass = (fii) => {
-        if (fii === null || fii === undefined) return "fund-na";
-        if (fii >= 20) return "fund-good";
-        if (fii >= 10) return "fund-ok";
+      const fiiClass = (promoter) => {
+        // Promoter holding interpretation for Indian stocks:
+        //  > 50% : strong promoter control (typical for family-run / founder-led)
+        //  35-50%: solid (board-controlled, common for large caps)
+        //  20-35%: moderate (diluted, may indicate past fundraising)
+        //  < 20% : weak (red flag — promoters have exited heavily, OR diversified ownership)
+        // Note: a high number isn't always best — too high (>75%) can mean SEBI's
+        // public-float rules are being stretched. We treat 35-75% as the sweet spot.
+        if (promoter === null || promoter === undefined) return "fund-na";
+        if (promoter >= 35 && promoter <= 75) return "fund-good";
+        if (promoter >= 20) return "fund-ok";
         return "fund-warn";
       };
 
@@ -797,7 +804,7 @@
         <td style="text-align:right;" class="${roeClass(s.roe_pct)}">${s.roe_pct === null || s.roe_pct === undefined ? "—" : fmt(s.roe_pct, 1) + "%"}</td>
         <td style="text-align:right;">${fmtMaybe(s.eps, 2)}</td>
         <td style="text-align:right;" class="${growthClass(s.profit_growth_3y_pct)}">${fmtPctMaybe(s.profit_growth_3y_pct)}</td>
-        <td style="text-align:right;" class="${fiiClass(s.fii_holding_pct)}">${s.fii_holding_pct === null || s.fii_holding_pct === undefined ? "—" : fmt(s.fii_holding_pct, 1) + "%"}</td>
+        <td style="text-align:right;" class="${fiiClass(s.promoter_holding_pct)}">${s.promoter_holding_pct === null || s.promoter_holding_pct === undefined ? "—" : fmt(s.promoter_holding_pct, 1) + "%"}</td>
         <td>${tvLink(s.symbol)}</td>
       </tr>`).join("");
 
@@ -815,7 +822,7 @@
               <th style="text-align:right;" title="Return on Equity">ROE</th>
               <th style="text-align:right;" title="Trailing EPS in ₹">EPS</th>
               <th style="text-align:right;" title="3-year CAGR of net income">Profit Growth (3Y)</th>
-              <th style="text-align:right;" title="Foreign Institutional Investor holding %">FII %</th>
+              <th style="text-align:right;" title="Promoter holding % (insider ownership). Sweet spot: 35-75%">Promoter %</th>
               <th>Chart</th>
             </tr></thead>
             <tbody>${rows}</tbody>
