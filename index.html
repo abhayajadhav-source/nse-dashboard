@@ -789,6 +789,147 @@
 
     /* Print-only footer hidden on screen */
     .print-footer { display: none; }
+    /* ===== Trade Plan inline panel ===== */
+    .trade-plan-form {
+      background: #fff; border: 2px solid #1d4ed8; border-radius: 8px;
+      padding: 18px; margin-top: 14px;
+    }
+    .trade-plan-form .form-title {
+      font-size: 15px; font-weight: 700; color: #1e40af; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .trade-plan-form .form-row {
+      display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .trade-plan-form .form-field {
+      display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px;
+    }
+    .trade-plan-form .form-field label {
+      font-size: 11px; font-weight: 600; color: #374151;
+      text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .trade-plan-form .form-field input {
+      padding: 9px 12px; font-size: 14px; border: 1px solid #d1d5db;
+      border-radius: 5px; font-family: ui-monospace, monospace;
+    }
+    .trade-plan-form .form-field input:focus {
+      outline: none; border-color: #1d4ed8;
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+    }
+    .tp-direction-toggle, .tp-input-toggle {
+      display: inline-flex; gap: 4px; background: #f3f4f6;
+      padding: 3px; border-radius: 6px;
+    }
+    .tp-dir-btn, .tp-mode-btn {
+      padding: 7px 14px; background: transparent; border: none;
+      border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;
+      color: #6b7280; transition: all 0.15s;
+    }
+    .tp-dir-btn.active, .tp-mode-btn.active {
+      background: #fff; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .tp-dir-btn.active.long  { color: #16a34a; }
+    .tp-dir-btn.active.short { color: #dc2626; }
+    .tp-dir-btn.active.hedged { color: #7c3aed; }
+    .tp-submit-btn {
+      padding: 10px 22px; background: #1d4ed8; color: #fff; border: none;
+      border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;
+    }
+    .tp-submit-btn:hover { background: #1e3a8a; }
+    .tp-submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+
+    /* Trade plan result cards */
+    .trade-plan-result {
+      margin-top: 16px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .tp-card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .tp-card-title {
+      font-size: 11px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .tp-card-title::before {
+      content: ''; width: 4px; height: 14px; background: #1d4ed8;
+      display: inline-block;
+    }
+    .tp-card.entry .tp-card-title::before { background: #1d4ed8; }
+    .tp-card.stop  .tp-card-title::before { background: #dc2626; }
+    .tp-card.adds  .tp-card-title::before { background: #f59e0b; }
+    .tp-card.targets .tp-card-title::before { background: #16a34a; }
+    .tp-card.hedge .tp-card-title::before { background: #7c3aed; }
+    .tp-card.econ  .tp-card-title::before { background: #6b7280; }
+    .tp-card.commentary .tp-card-title::before { background: #1d4ed8; }
+
+    .tp-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 5px 0; font-size: 13px; border-bottom: 1px dashed #f3f4f6;
+    }
+    .tp-row:last-child { border-bottom: none; }
+    .tp-row .tp-label { color: #6b7280; }
+    .tp-row .tp-value {
+      font-weight: 600; font-family: ui-monospace, monospace; color: #111827;
+    }
+    .tp-row .tp-value.long  { color: #16a34a; }
+    .tp-row .tp-value.short { color: #dc2626; }
+    .tp-row .tp-rationale {
+      font-size: 11px; color: #6b7280; font-style: italic;
+      text-align: right; max-width: 60%;
+    }
+
+    .tp-target {
+      background: #f9fafb; border-radius: 6px; padding: 10px 12px;
+      margin-bottom: 8px; border-left: 3px solid #16a34a;
+    }
+    .tp-target:last-child { margin-bottom: 0; }
+    .tp-target-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 600; font-size: 14px; margin-bottom: 4px;
+    }
+    .tp-target-header .tp-tier {
+      font-size: 11px; background: #16a34a; color: #fff;
+      padding: 2px 8px; border-radius: 99px; font-weight: 600;
+    }
+    .tp-target-rationale {
+      font-size: 12px; color: #6b7280; font-style: italic;
+      margin-bottom: 4px;
+    }
+    .tp-target-econ {
+      font-size: 12px; color: #374151; font-family: ui-monospace, monospace;
+    }
+
+    .tp-econ-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+    }
+    .tp-econ-cell {
+      background: #f9fafb; border-radius: 6px; padding: 10px;
+    }
+    .tp-econ-cell .lbl {
+      font-size: 10px; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+    }
+    .tp-econ-cell .val {
+      font-size: 15px; font-weight: 700; font-family: ui-monospace, monospace;
+    }
+    .tp-econ-cell .val.good { color: #16a34a; }
+    .tp-econ-cell .val.bad  { color: #dc2626; }
+
+    .tp-commentary {
+      font-size: 14px; line-height: 1.65; color: #111827;
+    }
+    .tp-commentary h3 {
+      font-size: 14px; margin: 16px 0 6px; color: #1e40af;
+      padding-bottom: 4px; border-bottom: 1px solid #e5e7eb;
+    }
+    .tp-commentary h3:first-child { margin-top: 0; }
+    .tp-commentary ul { margin: 6px 0 6px 22px; }
+    .tp-commentary li { margin: 3px 0; }
+    .tp-commentary p { margin: 6px 0; }
+    .tp-commentary strong { color: #1e40af; }
 
   </style>
 </head>
@@ -847,6 +988,7 @@
     const API_URL     = "https://nse-dashboard-api.onrender.com/api/snapshot";
     const ANALYZE_URL = "https://nse-dashboard-api.onrender.com/api/analyze";
     const COMPARE_URL = "https://nse-dashboard-api.onrender.com/api/compare";
+    const TRADE_PLAN_URL = "https://nse-dashboard-api.onrender.com/api/trade-plan";
     const REFRESH_MS  = 60_000;
 
     // ===== Helpers =====
@@ -1648,6 +1790,24 @@
         </div>
       `;
 
+      const tradePlanCTA = `
+        <div id="trade-plan-cta" style="margin-top:18px; padding:16px; background:#eff6ff;
+             border:1px solid #bfdbfe; border-radius:8px; text-align:center;">
+          <div style="font-size:13px; color:#1e40af; margin-bottom:10px;">
+            Want a concrete execution plan for this stock?
+          </div>
+          <button id="open-trade-plan-btn" type="button" data-symbol="${data.symbol}" style="
+            padding:10px 22px; background:#1d4ed8; color:#fff; border:none;
+            border-radius:6px; cursor:pointer; font-size:14px; font-weight:600;">
+            📋 Generate Trade Plan
+          </button>
+          <div style="font-size:11px; color:#6b7280; margin-top:8px;">
+            Algorithmic entry / stop / targets + AI commentary
+          </div>
+        </div>
+        <div id="trade-plan-panel"></div>
+      `;
+
       result.innerHTML = `
         <h1 style="font-size:20px; margin-bottom:6px;">${data.symbol}</h1>
         ${priceCard}
@@ -1655,9 +1815,375 @@
         ${analystCard}
         <div class="analysis-text">${mdToHtml(data.analysis)}</div>
         ${newsBlock}
+        ${tradePlanCTA}
         ${chartLinks}
       `;
+
+      // Wire up the "Generate Trade Plan" button — opens the inline form
+      const tpBtn = $("open-trade-plan-btn");
+      if (tpBtn) {
+        tpBtn.addEventListener("click", () => openTradePlanForm(data.symbol, data.options !== null));
+      }
     }
+
+    // ===== Trade Plan (inline within Analyze tab) =====
+    // Opens an inline form below the analysis result. User picks direction
+    // (long/short/hedged), input mode (qty/capital), and a number. Hits
+    // /api/trade-plan with the inputs. Backend returns algorithmic levels
+    // (entry zone, stop, adds, 3 targets, hedge if requested) + AI commentary.
+
+    function openTradePlanForm(symbol, hasOptions) {
+      const panel = $("trade-plan-panel");
+      // If form already open, scroll to it instead of re-rendering
+      if (panel.querySelector(".trade-plan-form")) {
+        panel.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      // Default direction: long. Hedged disabled if no F&O data.
+      const hedgedDisabled = hasOptions ? "" : "disabled title='Hedged requires F&O options data — not available for this stock'";
+
+      panel.innerHTML = `
+        <div class="trade-plan-form">
+          <div class="form-title">📋 Trade Plan Builder — ${escapeHtml(symbol)}</div>
+
+          <div class="form-row">
+            <div class="form-field" style="flex:0;">
+              <label>Direction</label>
+              <div class="tp-direction-toggle">
+                <button type="button" class="tp-dir-btn active long" data-dir="long">📈 LONG</button>
+                <button type="button" class="tp-dir-btn short" data-dir="short">📉 SHORT</button>
+                <button type="button" class="tp-dir-btn hedged" data-dir="hedged" ${hedgedDisabled}>🛡️ HEDGED</button>
+              </div>
+            </div>
+            <div class="form-field" style="flex:0;">
+              <label>Input</label>
+              <div class="tp-input-toggle">
+                <button type="button" class="tp-mode-btn active" data-mode="qty">Quantity</button>
+                <button type="button" class="tp-mode-btn" data-mode="capital">Capital ₹</button>
+              </div>
+            </div>
+            <div class="form-field" id="tp-number-field">
+              <label id="tp-number-label">Quantity (shares)</label>
+              <input type="number" id="tp-number-input" min="1" step="1" placeholder="100">
+            </div>
+            <button type="button" id="tp-submit-btn" class="tp-submit-btn">Generate Plan →</button>
+          </div>
+
+          <div id="tp-result-container"></div>
+        </div>
+      `;
+
+      // Direction toggle handler — visual only; value read on submit
+      panel.querySelectorAll(".tp-dir-btn").forEach(btn => {
+        if (btn.disabled) return;
+        btn.addEventListener("click", () => {
+          panel.querySelectorAll(".tp-dir-btn").forEach(b => {
+            b.classList.remove("active", "long", "short", "hedged");
+          });
+          btn.classList.add("active", btn.dataset.dir);
+        });
+      });
+
+      // Input mode toggle — switches between qty and capital input
+      panel.querySelectorAll(".tp-mode-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          panel.querySelectorAll(".tp-mode-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const mode = btn.dataset.mode;
+          const label = $("tp-number-label");
+          const input = $("tp-number-input");
+          if (mode === "qty") {
+            label.textContent = "Quantity (shares)";
+            input.placeholder = "100";
+            input.step = "1";
+          } else {
+            label.textContent = "Capital (₹)";
+            input.placeholder = "250000";
+            input.step = "500";
+          }
+          input.value = "";
+          input.focus();
+        });
+      });
+
+      // Submit handler
+      $("tp-submit-btn").addEventListener("click", () => submitTradePlan(symbol));
+      $("tp-number-input").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") submitTradePlan(symbol);
+      });
+      $("tp-number-input").focus();
+
+      // Smooth scroll into view
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    async function submitTradePlan(symbol) {
+      const panel = $("trade-plan-panel");
+      const dirBtn = panel.querySelector(".tp-dir-btn.active");
+      const modeBtn = panel.querySelector(".tp-mode-btn.active");
+      const direction = dirBtn ? dirBtn.dataset.dir : "long";
+      const input_mode = modeBtn ? modeBtn.dataset.mode : "qty";
+      const numberInput = $("tp-number-input");
+      const rawValue = parseFloat(numberInput.value);
+
+      if (!rawValue || rawValue <= 0) {
+        alert(input_mode === "qty"
+          ? "Enter a valid quantity"
+          : "Enter a valid capital amount in ₹");
+        numberInput.focus();
+        return;
+      }
+
+      const body = { symbol, direction, input_mode };
+      if (input_mode === "qty") body.qty = Math.floor(rawValue);
+      else body.capital = rawValue;
+
+      const submitBtn = $("tp-submit-btn");
+      const container = $("tp-result-container");
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Generating…";
+
+      container.innerHTML = `
+        <div class="loading-spinner" style="padding:30px 20px;">
+          Generating trade plan for ${escapeHtml(symbol)}…<br>
+          <span style="font-size:12px;color:#9ca3af;">
+            Fetching live data → computing levels → AI commentary (~15-25s)
+          </span>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(TRADE_PLAN_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || data.error || `HTTP ${res.status}`);
+        }
+        renderTradePlan(data);
+      } catch (err) {
+        container.innerHTML = `
+          <div class="status error" style="margin:0;">⚠️ ${escapeHtml(err.message)}</div>
+        `;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Generate Plan →";
+      }
+    }
+
+    function renderTradePlan(data) {
+      const container = $("tp-result-container");
+      const lvl  = data.levels;
+      const econ = data.economics;
+      const hedge = data.hedge;
+      const isLong = data.direction === "long" || data.direction === "hedged";
+      const dirLabel = {
+        long: "LONG", short: "SHORT", hedged: "HEDGED LONG"
+      }[data.direction];
+
+      // ---- Entry zone card ----
+      const entryCard = `
+        <div class="tp-card entry">
+          <div class="tp-card-title">Entry Zone (${escapeHtml(dirLabel)})</div>
+          <div class="tp-row">
+            <span class="tp-label">Patient entry zone</span>
+            <span class="tp-value">₹${fmt(lvl.entry_zone.low)} – ₹${fmt(lvl.entry_zone.high)}</span>
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">Midpoint (for sizing)</span>
+            <span class="tp-value">₹${fmt(lvl.entry_zone.mid)}</span>
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">Current spot</span>
+            <span class="tp-value">₹${fmt(lvl.current_price)}</span>
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">ATR(14)</span>
+            <span class="tp-value">₹${fmt(lvl.atr)}</span>
+          </div>
+        </div>
+      `;
+
+      // ---- Stop loss card ----
+      const stop = lvl.stop_loss;
+      const stopCard = `
+        <div class="tp-card stop">
+          <div class="tp-card-title">Stop Loss</div>
+          <div class="tp-row">
+            <span class="tp-label">Stop price</span>
+            <span class="tp-value short">₹${fmt(stop.price)}</span>
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">Distance from entry</span>
+            <span class="tp-value">${sign(stop.distance_pct)}${fmt(stop.distance_pct)}%</span>
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">Risk per share</span>
+            <span class="tp-value">₹${fmt(stop.risk_per_share)}</span>
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">Source</span>
+            <span class="tp-rationale">${escapeHtml(stop.source)}</span>
+          </div>
+        </div>
+      `;
+
+      // ---- Add zones card ----
+      const adds = lvl.add_zones;
+      const advLabel = isLong ? "Adverse (averaging down)" : "Adverse (averaging up)";
+      const cnfLabel = isLong ? "Confirmation (pyramiding up)" : "Confirmation (pyramiding down)";
+      const addsCard = `
+        <div class="tp-card adds">
+          <div class="tp-card-title">Position Add Zones</div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:8px;font-style:italic;">
+            ${escapeHtml(advLabel)} — use if you average into adverse moves
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">First add</span>
+            <span class="tp-value">₹${fmt(adds.adverse_1)}</span>
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">Second add</span>
+            <span class="tp-value">₹${fmt(adds.adverse_2)}</span>
+          </div>
+          <div style="font-size:12px;color:#6b7280;margin:10px 0 8px;font-style:italic;">
+            ${escapeHtml(cnfLabel)} — use if you scale on breakouts
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">First add</span>
+            <span class="tp-value">₹${fmt(adds.confirm_1)}</span>
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">Second add</span>
+            <span class="tp-value">₹${fmt(adds.confirm_2)}</span>
+          </div>
+        </div>
+      `;
+
+      // ---- Targets card (3 cards-within-card) ----
+      const t = lvl.targets;
+      const targetTier = (tier, target) => {
+        const econT = econ.targets_economics[tier];
+        return `
+          <div class="tp-target">
+            <div class="tp-target-header">
+              <span>₹${fmt(target.price)}</span>
+              <span class="tp-tier">${escapeHtml(target.label)}</span>
+            </div>
+            <div class="tp-target-rationale">${escapeHtml(target.rationale)}</div>
+            <div class="tp-target-econ">
+              ${target.r_multiple.toFixed(1)}R · ${sign(target.pct_move)}${fmt(target.pct_move)}% ·
+              ${econT.slice_qty} shares → ₹${fmt(econT.gross_reward, 0)} reward
+            </div>
+          </div>
+        `;
+      };
+      const targetsCard = `
+        <div class="tp-card targets">
+          <div class="tp-card-title">Profit Targets (33/33/34 ladder)</div>
+          ${targetTier("t1", t.t1)}
+          ${targetTier("t2", t.t2)}
+          ${targetTier("t3", t.t3)}
+        </div>
+      `;
+
+      // ---- Hedge card (only if hedged) ----
+      let hedgeCard = "";
+      if (hedge) {
+        hedgeCard = `
+          <div class="tp-card hedge">
+            <div class="tp-card-title">Protective Put Hedge</div>
+            <div class="tp-row">
+              <span class="tp-label">Strike (ATM)</span>
+              <span class="tp-value">₹${fmt(hedge.strike)}</span>
+            </div>
+            <div class="tp-row">
+              <span class="tp-label">Premium / share</span>
+              <span class="tp-value">₹${fmt(hedge.premium_per_share)}</span>
+            </div>
+            <div class="tp-row">
+              <span class="tp-label">Lots needed</span>
+              <span class="tp-value">${hedge.lots_required} (lot size: ${data.lot_size})</span>
+            </div>
+            <div class="tp-row">
+              <span class="tp-label">Total hedge cost</span>
+              <span class="tp-value short">₹${fmt(hedge.total_cost, 0)}</span>
+            </div>
+            <div class="tp-row">
+              <span class="tp-label">Expiry</span>
+              <span class="tp-value">${escapeHtml(hedge.expiry)}</span>
+            </div>
+            <div class="tp-row">
+              <span class="tp-label">Max loss / share (with hedge)</span>
+              <span class="tp-rationale">₹${fmt(hedge.max_loss_per_share)} — capped by put strike</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // ---- Economics summary card ----
+      const rrClass = econ.risk_reward_ratio >= 2 ? "good" : econ.risk_reward_ratio >= 1.5 ? "" : "bad";
+      const econCard = `
+        <div class="tp-card econ">
+          <div class="tp-card-title">Position Economics</div>
+          <div class="tp-econ-grid">
+            <div class="tp-econ-cell">
+              <div class="lbl">Quantity</div>
+              <div class="val">${econ.qty}</div>
+            </div>
+            <div class="tp-econ-cell">
+              <div class="lbl">Capital</div>
+              <div class="val">₹${fmt(econ.capital_required, 0)}</div>
+            </div>
+            <div class="tp-econ-cell">
+              <div class="lbl">Total Risk</div>
+              <div class="val bad">₹${fmt(econ.effective_risk, 0)}</div>
+            </div>
+            <div class="tp-econ-cell">
+              <div class="lbl">Max Reward</div>
+              <div class="val good">₹${fmt(econ.max_reward, 0)}</div>
+            </div>
+            <div class="tp-econ-cell">
+              <div class="lbl">Risk : Reward</div>
+              <div class="val ${rrClass}">1 : ${econ.risk_reward_ratio.toFixed(2)}</div>
+            </div>
+            ${econ.hedge_cost > 0 ? `
+              <div class="tp-econ-cell">
+                <div class="lbl">Hedge Cost</div>
+                <div class="val">₹${fmt(econ.hedge_cost, 0)}</div>
+              </div>
+            ` : ""}
+          </div>
+        </div>
+      `;
+
+      // ---- AI commentary card ----
+      const commentaryCard = `
+        <div class="tp-card commentary">
+          <div class="tp-card-title">AI Commentary & Execution Memo</div>
+          <div class="tp-commentary">${mdToHtml(data.ai_commentary)}</div>
+        </div>
+      `;
+
+      container.innerHTML = `
+        <div class="trade-plan-result">
+          ${entryCard}
+          ${stopCard}
+          ${addsCard}
+          ${targetsCard}
+          ${hedgeCard}
+          ${econCard}
+          ${commentaryCard}
+        </div>
+      `;
+
+      // Scroll to results
+      container.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
 
     // ===== Position Sizer =====
     const SIZER_STORAGE_KEY = "nse_sizer_settings";
