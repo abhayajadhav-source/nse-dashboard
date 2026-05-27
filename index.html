@@ -1026,6 +1026,120 @@
       content: ''; width: 4px; height: 14px; background: #7c3aed;
       display: inline-block;
     }
+    /* ===== Trade Plan: New/Existing position mode toggle ===== */
+    .tp-mode-row {
+      display: flex; align-items: center; gap: 16px;
+      flex-wrap: wrap; margin-bottom: 16px;
+      padding-bottom: 14px; border-bottom: 1px solid #e5e7eb;
+    }
+    .tp-position-mode-toggle {
+      display: inline-flex; gap: 4px;
+      background: #f3f4f6; padding: 3px; border-radius: 6px;
+    }
+    .tp-pos-mode-btn {
+      padding: 8px 16px; background: transparent; border: none;
+      border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;
+      color: #6b7280; transition: all 0.15s;
+    }
+    .tp-pos-mode-btn.active {
+      background: #fff; color: #1f2937; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .tp-pos-mode-btn.active[data-pos-mode="existing"] { color: #7c3aed; }
+    .tp-mode-hint {
+      font-size: 12px; color: #1e40af; font-style: italic;
+    }
+    .tp-existing-fields {
+      background: #faf5ff; border: 1px solid #ddd6fe;
+      border-radius: 6px; padding: 12px;
+      margin-top: 4px;
+    }
+
+    /* ===== Trade Plan: Existing Position banner ===== */
+    .tp-card.ep-banner {
+      border: 2px solid #7c3aed; background: #faf5ff;
+    }
+    .tp-card.ep-banner .tp-card-title::before {
+      background: #7c3aed;
+    }
+    .ep-summary-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px; margin-bottom: 14px;
+    }
+    .ep-cell {
+      background: #fff; border-radius: 6px; padding: 10px 12px;
+      border: 1px solid #e5e7eb;
+    }
+    .ep-cell.highlight { border-color: #c4b5fd; background: #f5f3ff; }
+    .ep-lbl {
+      font-size: 10px; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;
+    }
+    .ep-val {
+      font-size: 16px; font-weight: 700;
+      font-family: ui-monospace, monospace;
+    }
+    .ep-val.good { color: #16a34a; }
+    .ep-val.bad  { color: #dc2626; }
+    .ep-sublabel {
+      font-size: 11px; margin-top: 2px;
+    }
+    .ep-sublabel.good { color: #16a34a; }
+    .ep-sublabel.bad  { color: #dc2626; }
+    .ep-stop-compare {
+      background: #fff; border: 1px solid #ddd6fe;
+      border-radius: 8px; padding: 12px;
+    }
+    .ep-stop-compare-title {
+      font-size: 11px; font-weight: 700; color: #5b21b6;
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+      text-align: center;
+    }
+    .ep-stop-grid {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      gap: 10px; align-items: center; margin-bottom: 10px;
+    }
+    .ep-stop-box {
+      background: #f9fafb; border: 1px solid #e5e7eb;
+      border-radius: 6px; padding: 10px;
+      text-align: center;
+    }
+    .ep-stop-box.user { border-left: 4px solid #1d4ed8; }
+    .ep-stop-box.algo { border-left: 4px solid #7c3aed; background: #faf5ff; }
+    .ep-stop-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+      text-transform: uppercase; margin-bottom: 4px;
+    }
+    .ep-stop-box.user .ep-stop-tag { color: #1d4ed8; }
+    .ep-stop-box.algo .ep-stop-tag { color: #7c3aed; }
+    .ep-stop-price {
+      font-size: 18px; font-weight: 700; color: #dc2626;
+      font-family: ui-monospace, monospace; margin-bottom: 4px;
+    }
+    .ep-stop-meta {
+      font-size: 11px; color: #6b7280;
+    }
+    .ep-stop-source {
+      font-size: 10px; color: #5b21b6;
+      font-style: italic; margin-top: 4px;
+    }
+    .ep-stop-vs {
+      font-size: 14px; font-weight: 700; color: #6b7280;
+    }
+    .ep-stop-verdict {
+      padding: 8px 10px; border-radius: 5px; font-size: 12px;
+      text-align: center;
+    }
+    .ep-stop-verdict.ep-tighter {
+      background: #fef3c7; color: #92400e; border: 1px solid #fcd34d;
+    }
+    .ep-stop-verdict.ep-looser {
+      background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd;
+    }
+
+    @media (max-width: 640px) {
+      .ep-stop-grid { grid-template-columns: 1fr; }
+      .ep-stop-vs { display: none; }
+    }
 
   </style>
 </head>
@@ -1931,18 +2045,31 @@
 
     function openTradePlanForm(symbol, hasOptions) {
       const panel = $("trade-plan-panel");
-      // If form already open, scroll to it instead of re-rendering
       if (panel.querySelector(".trade-plan-form")) {
         panel.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
 
-      // Default direction: long. Hedged disabled if no F&O data.
       const hedgedDisabled = hasOptions ? "" : "disabled title='Hedged requires F&O options data — not available for this stock'";
 
       panel.innerHTML = `
         <div class="trade-plan-form">
           <div class="form-title">📋 Trade Plan Builder — ${escapeHtml(symbol)}</div>
+
+          <!-- Mode toggle: New trade vs Existing position -->
+          <div class="tp-mode-row">
+            <div class="tp-position-mode-toggle">
+              <button type="button" class="tp-pos-mode-btn active" data-pos-mode="new">
+                🆕 New trade
+              </button>
+              <button type="button" class="tp-pos-mode-btn" data-pos-mode="existing">
+                📊 Existing position
+              </button>
+            </div>
+            <div class="tp-mode-hint" id="tp-mode-hint">
+              Plan an entry/stop/targets for a NEW trade
+            </div>
+          </div>
 
           <div class="form-row">
             <div class="form-field" style="flex:0;">
@@ -1953,7 +2080,7 @@
                 <button type="button" class="tp-dir-btn hedged" data-dir="hedged" ${hedgedDisabled}>🛡️ HEDGED</button>
               </div>
             </div>
-            <div class="form-field" style="flex:0;">
+            <div class="form-field" style="flex:0;" id="tp-input-mode-field">
               <label>Input</label>
               <div class="tp-input-toggle">
                 <button type="button" class="tp-mode-btn active" data-mode="qty">Quantity</button>
@@ -1964,6 +2091,25 @@
               <label id="tp-number-label">Quantity (shares)</label>
               <input type="number" id="tp-number-input" min="1" step="1" placeholder="100">
             </div>
+          </div>
+
+          <!-- Existing position fields (hidden in New mode) -->
+          <div class="form-row tp-existing-fields" id="tp-existing-fields" style="display:none;">
+            <div class="form-field">
+              <label>Your Entry Price ₹</label>
+              <input type="number" id="tp-existing-entry" step="0.05" placeholder="2,450.00">
+            </div>
+            <div class="form-field">
+              <label>Current Stop ₹</label>
+              <input type="number" id="tp-existing-stop" step="0.05" placeholder="2,380.00">
+            </div>
+            <div class="form-field">
+              <label>Days Held</label>
+              <input type="number" id="tp-days-held" min="0" step="1" placeholder="12">
+            </div>
+          </div>
+
+          <div class="form-row" style="justify-content:flex-end;">
             <button type="button" id="tp-submit-btn" class="tp-submit-btn">Generate Plan →</button>
           </div>
 
@@ -1971,7 +2117,7 @@
         </div>
       `;
 
-      // Direction toggle handler — visual only; value read on submit
+      // Direction toggle handler
       panel.querySelectorAll(".tp-dir-btn").forEach(btn => {
         if (btn.disabled) return;
         btn.addEventListener("click", () => {
@@ -1982,7 +2128,7 @@
         });
       });
 
-      // Input mode toggle — switches between qty and capital input
+      // Input mode toggle (qty vs capital)
       panel.querySelectorAll(".tp-mode-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           panel.querySelectorAll(".tp-mode-btn").forEach(b => b.classList.remove("active"));
@@ -2004,6 +2150,40 @@
         });
       });
 
+      // Position mode toggle (NEW vs EXISTING) — drives field visibility
+      panel.querySelectorAll(".tp-pos-mode-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          panel.querySelectorAll(".tp-pos-mode-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const posMode = btn.dataset.posMode;
+          const existingFields = $("tp-existing-fields");
+          const inputModeField = $("tp-input-mode-field");
+          const hint = $("tp-mode-hint");
+          const numberLabel = $("tp-number-label");
+          const numberInput = $("tp-number-input");
+
+          if (posMode === "existing") {
+            existingFields.style.display = "";
+            // Existing mode requires qty (not capital) — force qty + hide toggle
+            inputModeField.style.display = "none";
+            panel.querySelector('.tp-mode-btn[data-mode="qty"]').classList.add("active");
+            panel.querySelector('.tp-mode-btn[data-mode="capital"]').classList.remove("active");
+            numberLabel.textContent = "Position Size (shares)";
+            numberInput.placeholder = "your current qty";
+            numberInput.step = "1";
+            hint.textContent = "Replan a position you ALREADY HOLD — compare your stop vs algo's, get hold/exit guidance";
+            hint.style.color = "#7c3aed";
+          } else {
+            existingFields.style.display = "none";
+            inputModeField.style.display = "";
+            numberLabel.textContent = "Quantity (shares)";
+            numberInput.placeholder = "100";
+            hint.textContent = "Plan an entry/stop/targets for a NEW trade";
+            hint.style.color = "#1e40af";
+          }
+        });
+      });
+
       // Submit handler
       $("tp-submit-btn").addEventListener("click", () => submitTradePlan(symbol));
       $("tp-number-input").addEventListener("keypress", (e) => {
@@ -2011,7 +2191,6 @@
       });
       $("tp-number-input").focus();
 
-      // Smooth scroll into view
       panel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
@@ -2019,31 +2198,57 @@
       const panel = $("trade-plan-panel");
       const dirBtn = panel.querySelector(".tp-dir-btn.active");
       const modeBtn = panel.querySelector(".tp-mode-btn.active");
+      const posBtn = panel.querySelector(".tp-pos-mode-btn.active");
       const direction = dirBtn ? dirBtn.dataset.dir : "long";
       const input_mode = modeBtn ? modeBtn.dataset.mode : "qty";
+      const pos_mode = posBtn ? posBtn.dataset.posMode : "new";
       const numberInput = $("tp-number-input");
       const rawValue = parseFloat(numberInput.value);
 
       if (!rawValue || rawValue <= 0) {
-        alert(input_mode === "qty"
-          ? "Enter a valid quantity"
-          : "Enter a valid capital amount in ₹");
+        const lbl = input_mode === "qty" ? "quantity" : "capital amount";
+        alert(`Enter a valid ${lbl}`);
         numberInput.focus();
         return;
       }
 
-      const body = { symbol, direction, input_mode };
+      const body = { symbol, direction, input_mode, mode: pos_mode };
       if (input_mode === "qty") body.qty = Math.floor(rawValue);
       else body.capital = rawValue;
+
+      // Existing-position fields (only when pos_mode === "existing")
+      if (pos_mode === "existing") {
+        const existingEntry = parseFloat($("tp-existing-entry").value);
+        const existingStop  = parseFloat($("tp-existing-stop").value);
+        const daysHeld      = parseInt($("tp-days-held").value, 10);
+
+        if (!existingEntry || existingEntry <= 0) {
+          alert("Enter your entry price"); $("tp-existing-entry").focus(); return;
+        }
+        if (!existingStop || existingStop <= 0) {
+          alert("Enter your current stop"); $("tp-existing-stop").focus(); return;
+        }
+        if (isNaN(daysHeld) || daysHeld < 0) {
+          alert("Enter days held (0 if same day)"); $("tp-days-held").focus(); return;
+        }
+
+        body.existing_entry = existingEntry;
+        body.existing_stop  = existingStop;
+        body.days_held      = daysHeld;
+      }
 
       const submitBtn = $("tp-submit-btn");
       const container = $("tp-result-container");
       submitBtn.disabled = true;
-      submitBtn.textContent = "Generating…";
+      submitBtn.textContent = pos_mode === "existing" ? "Replanning…" : "Generating…";
+
+      const ctaText = pos_mode === "existing"
+        ? `Replanning ${escapeHtml(symbol)} position…`
+        : `Generating trade plan for ${escapeHtml(symbol)}…`;
 
       container.innerHTML = `
         <div class="loading-spinner" style="padding:30px 20px;">
-          Generating trade plan for ${escapeHtml(symbol)}…<br>
+          ${ctaText}<br>
           <span style="font-size:12px;color:#9ca3af;">
             Fetching live data → computing levels → AI commentary (~15-25s)
           </span>
@@ -2081,10 +2286,90 @@
         long: "LONG", short: "SHORT", hedged: "HEDGED LONG"
       }[data.direction];
 
-      // ---- Entry zone card ----
-      const entryCard = `
+      const isExisting = data.mode === "existing";
+      const ep = data.existing_position;
+
+      // ---- Existing position banner (only in existing mode) ----
+      let existingBanner = "";
+      if (isExisting && ep) {
+        const pnlClass = ep.is_in_profit ? "good" : "bad";
+        const pnlIcon = ep.is_in_profit ? "📈" : "📉";
+        const tighterLabel = ep.algo_is_tighter ? "TIGHTER (algo wants you to risk less)" : "LOOSER (algo allows more room)";
+        const tighterClass = ep.algo_is_tighter ? "ep-tighter" : "ep-looser";
+        existingBanner = `
+          <div class="tp-card ep-banner">
+            <div class="tp-card-title">📊 Existing Position — ${escapeHtml(dirLabel)}</div>
+            <div class="ep-summary-grid">
+              <div class="ep-cell">
+                <div class="ep-lbl">Your Entry</div>
+                <div class="ep-val">₹${fmt(ep.entry_price)}</div>
+              </div>
+              <div class="ep-cell">
+                <div class="ep-lbl">Quantity</div>
+                <div class="ep-val">${ep.qty}</div>
+              </div>
+              <div class="ep-cell">
+                <div class="ep-lbl">Days Held</div>
+                <div class="ep-val">${ep.days_held}</div>
+              </div>
+              <div class="ep-cell">
+                <div class="ep-lbl">Current Spot</div>
+                <div class="ep-val">₹${fmt(lvl.current_price)}</div>
+              </div>
+              <div class="ep-cell highlight">
+                <div class="ep-lbl">Unrealized P&L</div>
+                <div class="ep-val ${pnlClass}">${pnlIcon} ${ep.unrealized_per_share >= 0 ? "+" : ""}₹${fmt(Math.abs(ep.unrealized_total), 0)}</div>
+                <div class="ep-sublabel ${pnlClass}">${ep.unrealized_per_share >= 0 ? "+" : ""}${fmt(ep.unrealized_per_share)}/share · ${ep.unrealized_pct >= 0 ? "+" : ""}${fmt(ep.unrealized_pct)}%</div>
+              </div>
+            </div>
+
+            <div class="ep-stop-compare">
+              <div class="ep-stop-compare-title">Stop Loss Comparison</div>
+              <div class="ep-stop-grid">
+                <div class="ep-stop-box user">
+                  <div class="ep-stop-tag">YOUR STOP</div>
+                  <div class="ep-stop-price">₹${fmt(ep.current_stop)}</div>
+                  <div class="ep-stop-meta">${ep.user_distance_pct >= 0 ? "+" : ""}${fmt(ep.user_distance_pct)}% from entry</div>
+                  <div class="ep-stop-meta">Loss if hit: ₹${fmt(ep.user_stop_loss_total, 0)}</div>
+                </div>
+                <div class="ep-stop-vs">vs</div>
+                <div class="ep-stop-box algo">
+                  <div class="ep-stop-tag">ALGO RECOMMENDS</div>
+                  <div class="ep-stop-price">₹${fmt(ep.algo_stop_price)}</div>
+                  <div class="ep-stop-meta">${ep.algo_distance_pct >= 0 ? "+" : ""}${fmt(ep.algo_distance_pct)}% from entry</div>
+                  <div class="ep-stop-meta">Loss if hit: ₹${fmt(ep.algo_stop_loss_total, 0)}</div>
+                  <div class="ep-stop-source">${escapeHtml(ep.algo_stop_source)}</div>
+                </div>
+              </div>
+              <div class="ep-stop-verdict ${tighterClass}">
+                Algo's stop is <strong>${tighterLabel}</strong> than your current stop — see AI commentary below for recommendation
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // ---- Entry zone card (label depends on mode) ----
+      const entryCardTitle = isExisting ? "Your Fixed Entry" : `Entry Zone (${escapeHtml(dirLabel)})`;
+      const entryCard = isExisting ? `
         <div class="tp-card entry">
-          <div class="tp-card-title">Entry Zone (${escapeHtml(dirLabel)})</div>
+          <div class="tp-card-title">${entryCardTitle}</div>
+          <div class="tp-row">
+            <span class="tp-label">Your entry (fixed)</span>
+            <span class="tp-value">₹${fmt(lvl.entry_zone.mid)}</span>
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">Current spot</span>
+            <span class="tp-value">₹${fmt(lvl.current_price)}</span>
+          </div>
+          <div class="tp-row">
+            <span class="tp-label">ATR(14)</span>
+            <span class="tp-value">₹${fmt(lvl.atr)}</span>
+          </div>
+        </div>
+      ` : `
+        <div class="tp-card entry">
+          <div class="tp-card-title">${entryCardTitle}</div>
           <div class="tp-row">
             <span class="tp-label">Patient entry zone</span>
             <span class="tp-value">₹${fmt(lvl.entry_zone.low)} – ₹${fmt(lvl.entry_zone.high)}</span>
@@ -2105,16 +2390,18 @@
       `;
 
       // ---- Stop loss card ----
+      // In existing mode, this shows the ALGO stop (since user's stop is already
+      // displayed in the existing-position banner above). Label is clarified.
       const stop = lvl.stop_loss;
       const stopCard = `
         <div class="tp-card stop">
-          <div class="tp-card-title">Stop Loss</div>
+          <div class="tp-card-title">${isExisting ? "Algo-Recommended Stop" : "Stop Loss"}</div>
           <div class="tp-row">
             <span class="tp-label">Stop price</span>
             <span class="tp-value short">₹${fmt(stop.price)}</span>
           </div>
           <div class="tp-row">
-            <span class="tp-label">Distance from entry</span>
+            <span class="tp-label">Distance from ${isExisting ? "your" : ""} entry</span>
             <span class="tp-value">${sign(stop.distance_pct)}${fmt(stop.distance_pct)}%</span>
           </div>
           <div class="tp-row">
@@ -2290,6 +2577,7 @@
 
       container.innerHTML = `
         <div class="trade-plan-result">
+          ${existingBanner}
           ${entryCard}
           ${stopCard}
           ${addsCard}
