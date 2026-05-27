@@ -930,6 +930,102 @@
     .tp-commentary li { margin: 3px 0; }
     .tp-commentary p { margin: 6px 0; }
     .tp-commentary strong { color: #1e40af; }
+    /* ===== Peer Comparison ("Find Better Alternatives") ===== */
+    .pc-result {
+      margin-top: 14px; padding: 18px; background: #faf5ff;
+      border: 2px solid #7c3aed; border-radius: 8px;
+    }
+    .pc-header { margin-bottom: 14px; }
+    .pc-verdict-banner {
+      padding: 12px 16px; border-radius: 6px; font-size: 14px;
+      margin-bottom: 16px; font-weight: 500;
+    }
+    .pc-verdict-banner.target-wins {
+      background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7;
+    }
+    .pc-verdict-banner.peer-wins {
+      background: #fef3c7; color: #92400e; border: 1px solid #fcd34d;
+    }
+    .pc-stocks-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px; margin-bottom: 16px;
+    }
+    .pc-stock-card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+      padding: 14px;
+    }
+    .pc-stock-card.winner {
+      border-color: #16a34a; border-width: 2px; background: #f0fdf4;
+      box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
+    }
+    .pc-stock-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .pc-stock-title {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .pc-symbol {
+      font-weight: 700; font-family: ui-monospace, monospace; font-size: 16px;
+    }
+    .pc-target-mark {
+      font-size: 9px; background: #1d4ed8; color: #fff;
+      padding: 2px 6px; border-radius: 99px; font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .pc-rank-badge {
+      font-size: 10px; background: #e5e7eb; color: #374151;
+      padding: 3px 8px; border-radius: 99px; font-weight: 600;
+    }
+    .pc-rank-badge.winner {
+      background: #16a34a; color: #fff;
+    }
+    .pc-score-bar {
+      display: grid; grid-template-columns: 60px 1fr 40px;
+      gap: 8px; align-items: center; padding: 6px 0;
+      border-bottom: 1px solid #f3f4f6; margin-bottom: 6px;
+    }
+    .pc-score-label {
+      font-size: 10px; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .pc-score-track {
+      background: #f3f4f6; border-radius: 99px;
+      height: 8px; overflow: hidden;
+    }
+    .pc-score-fill { height: 100%; border-radius: 99px; }
+    .pc-score-fill.good { background: #16a34a; }
+    .pc-score-fill.ok   { background: #f59e0b; }
+    .pc-score-fill.bad  { background: #dc2626; }
+    .pc-score-value {
+      font-weight: 700; font-family: ui-monospace, monospace;
+      font-size: 13px; text-align: right;
+    }
+    .pc-score-value.good { color: #16a34a; }
+    .pc-score-value.ok   { color: #92400e; }
+    .pc-score-value.bad  { color: #dc2626; }
+    .pc-stock-body { font-size: 12px; }
+    .pc-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 0;
+    }
+    .pc-row .pc-label { color: #6b7280; }
+    .pc-row .pc-value {
+      font-weight: 600; font-family: ui-monospace, monospace;
+    }
+    .pc-ai-verdict {
+      background: #fff; border-radius: 8px; padding: 14px 16px;
+      border: 1px solid #ddd6fe;
+    }
+    .pc-card-title {
+      font-size: 11px; font-weight: 700; color: #5b21b6;
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pc-card-title::before {
+      content: ''; width: 4px; height: 14px; background: #7c3aed;
+      display: inline-block;
+    }
 
   </style>
 </head>
@@ -989,6 +1085,7 @@
     const ANALYZE_URL = "https://nse-dashboard-api.onrender.com/api/analyze";
     const COMPARE_URL = "https://nse-dashboard-api.onrender.com/api/compare";
     const TRADE_PLAN_URL = "https://nse-dashboard-api.onrender.com/api/trade-plan";
+    const PEER_COMPARISON_URL = "https://nse-dashboard-api.onrender.com/api/peer-comparison";
     const REFRESH_MS  = 60_000;
 
     // ===== Helpers =====
@@ -2168,6 +2265,29 @@
         </div>
       `;
 
+      // ---- Peer comparison CTA (separate two-click flow per design) ----
+      // Carries the symbol + direction so renderPeerComparison knows what to ask the API
+      const peerCTA = `
+        <div id="peer-comparison-cta" style="margin-top:6px; padding:14px;
+             background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px;
+             text-align:center;">
+          <div style="font-size:13px; color:#5b21b6; margin-bottom:10px;">
+            Is ${escapeHtml(data.symbol)} actually the best ${escapeHtml(data.direction.toUpperCase())} setup right now?
+          </div>
+          <button id="open-peer-comparison-btn" type="button"
+                  data-symbol="${escapeHtml(data.symbol)}"
+                  data-direction="${escapeHtml(data.direction)}"
+                  style="padding:10px 22px; background:#7c3aed; color:#fff; border:none;
+                         border-radius:6px; cursor:pointer; font-size:14px; font-weight:600;">
+            🔍 Find Better Alternatives
+          </button>
+          <div style="font-size:11px; color:#6b7280; margin-top:8px;">
+            Compares against 3 closest peers using same data depth · ~40s
+          </div>
+        </div>
+        <div id="peer-comparison-panel"></div>
+      `;
+
       container.innerHTML = `
         <div class="trade-plan-result">
           ${entryCard}
@@ -2177,11 +2297,228 @@
           ${hedgeCard}
           ${econCard}
           ${commentaryCard}
+          ${peerCTA}
         </div>
       `;
 
+      // Wire up the peer comparison button
+      const pcBtn = $("open-peer-comparison-btn");
+      if (pcBtn) {
+        pcBtn.addEventListener("click", () => runPeerComparison(
+          pcBtn.dataset.symbol, pcBtn.dataset.direction
+        ));
+      }
+
       // Scroll to results
       container.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    // ===== Peer Comparison ("Find Better Alternatives") =====
+    // Compares the trade plan's target stock against 3 peers head-to-head.
+    // Backend resolves peers via hardcoded map first, then Yahoo sector
+    // fallback. Each peer is fetched with FULL data (price + options +
+    // analyst + news), same as the main analyze flow. AI ranks all 4 stocks
+    // and gives a verdict on whether to switch.
+
+    async function runPeerComparison(symbol, direction) {
+      const panel = $("peer-comparison-panel");
+      const btn = $("open-peer-comparison-btn");
+      if (!panel) return;
+
+      // Disable button + show loading
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "Comparing…";
+      }
+      panel.innerHTML = `
+        <div class="loading-spinner" style="padding:30px 20px; margin-top:14px;">
+          Finding better alternatives for ${escapeHtml(symbol)} (${escapeHtml(direction.toUpperCase())})…<br>
+          <span style="font-size:12px;color:#9ca3af;">
+            Resolving peers → fetching data → AI verdict (~40s — fetching 4 stocks in parallel)
+          </span>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(PEER_COMPARISON_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ symbol, direction }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || data.error || `HTTP ${res.status}`);
+        }
+        renderPeerComparison(data);
+      } catch (err) {
+        panel.innerHTML = `
+          <div class="status error" style="margin:14px 0 0;">
+            ⚠️ ${escapeHtml(err.message)}
+          </div>
+        `;
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "🔍 Find Better Alternatives";
+        }
+      }
+    }
+
+    function renderPeerComparison(data) {
+      const panel = $("peer-comparison-panel");
+      const target = data.target_bundle;
+      const peers = data.peer_bundles || [];
+      const dirLabel = {
+        long: "LONG", short: "SHORT", hedged: "HEDGED LONG"
+      }[data.direction];
+
+      // Rank all stocks by alignment_score (descending)
+      const ranked = [target, ...peers].sort((a, b) => b.alignment_score - a.alignment_score);
+      const winner = ranked[0];
+      const targetIsWinner = winner.symbol === target.symbol;
+
+      // Build summary cards for each stock
+      const stockCards = ranked.map((s, idx) => {
+        const isTarget = s.symbol === target.symbol;
+        const isWinner = idx === 0;
+        const rankBadge = isWinner
+          ? `<span class="pc-rank-badge winner">👑 #1 BEST FIT</span>`
+          : `<span class="pc-rank-badge">#${idx + 1}</span>`;
+        const targetMark = isTarget
+          ? `<span class="pc-target-mark">YOUR PICK</span>`
+          : "";
+        const scoreClass = s.alignment_score >= 7 ? "good"
+                         : s.alignment_score >= 5 ? "ok" : "bad";
+
+        // Options metrics (if available)
+        const opt = s.options;
+        const optBlock = opt ? `
+          <div class="pc-row">
+            <span class="pc-label">Options PCR</span>
+            <span class="pc-value">${fmt(opt.pcr_oi)}</span>
+          </div>
+          <div class="pc-row">
+            <span class="pc-label">Composite</span>
+            <span class="pc-value" style="font-size:12px;">${escapeHtml(opt.composite_signal)}</span>
+          </div>
+        ` : `
+          <div class="pc-row">
+            <span class="pc-label">Options</span>
+            <span class="pc-value" style="color:#9ca3af; font-style:italic; font-size:12px;">Not in F&O</span>
+          </div>
+        `;
+
+        // Analyst block
+        const at = s.price_target?.mean;
+        const cons = s.consensus;
+        const analystBlock = (at || cons) ? `
+          <div class="pc-row">
+            <span class="pc-label">Analyst target</span>
+            <span class="pc-value">${at ? `₹${fmt(at)}` : "—"}</span>
+          </div>
+          ${cons ? `
+            <div class="pc-row">
+              <span class="pc-label">Consensus</span>
+              <span class="pc-value" style="font-size:12px;">${escapeHtml(cons)}</span>
+            </div>
+          ` : ""}
+        ` : `
+          <div class="pc-row">
+            <span class="pc-label">Analyst</span>
+            <span class="pc-value" style="color:#9ca3af; font-style:italic; font-size:12px;">—</span>
+          </div>
+        `;
+
+        const smaPct = s.sma_50 ? ((s.current_price - s.sma_50) / s.sma_50 * 100) : 0;
+
+        return `
+          <div class="pc-stock-card ${isWinner ? 'winner' : ''}">
+            <div class="pc-stock-header">
+              <div class="pc-stock-title">
+                <span class="pc-symbol">${escapeHtml(s.symbol)}</span>
+                ${targetMark}
+              </div>
+              ${rankBadge}
+            </div>
+            <div class="pc-score-bar">
+              <span class="pc-score-label">Alignment</span>
+              <div class="pc-score-track">
+                <div class="pc-score-fill ${scoreClass}" style="width:${s.alignment_score * 10}%"></div>
+              </div>
+              <span class="pc-score-value ${scoreClass}">${s.alignment_score.toFixed(1)}</span>
+            </div>
+            <div class="pc-stock-body">
+              <div class="pc-row">
+                <span class="pc-label">Price</span>
+                <span class="pc-value">₹${fmt(s.current_price)}</span>
+              </div>
+              <div class="pc-row">
+                <span class="pc-label">1D / 30D</span>
+                <span class="pc-value">
+                  <span class="${cls(s.pct_change_1d)}">${sign(s.pct_change_1d)}${fmt(s.pct_change_1d)}%</span>
+                  ·
+                  <span class="${cls(s.pct_change_30d)}">${sign(s.pct_change_30d)}${fmt(s.pct_change_30d)}%</span>
+                </span>
+              </div>
+              <div class="pc-row">
+                <span class="pc-label">RSI(14)</span>
+                <span class="pc-value">${fmt(s.rsi_14, 1)}
+                  ${s.rsi_14 > 70 ? '<span class="badge badge-red">OB</span>'
+                    : s.rsi_14 < 30 ? '<span class="badge badge-green">OS</span>' : ''}
+                </span>
+              </div>
+              <div class="pc-row">
+                <span class="pc-label">vs SMA50</span>
+                <span class="pc-value ${cls(smaPct)}">${sign(smaPct)}${fmt(smaPct)}%</span>
+              </div>
+              <div class="pc-row">
+                <span class="pc-label">Volume</span>
+                <span class="pc-value">${fmt(s.volume_ratio, 1)}x avg</span>
+              </div>
+              ${optBlock}
+              ${analystBlock}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // Verdict banner — green if target wins, amber if peer wins
+      const verdictBanner = targetIsWinner ? `
+        <div class="pc-verdict-banner target-wins">
+          ✓ Your selection <strong>${escapeHtml(target.symbol)}</strong> is the strongest ${escapeHtml(dirLabel)} setup
+          (score ${target.alignment_score.toFixed(1)} vs peers ${ranked.slice(1).map(p => p.alignment_score.toFixed(1)).join(", ")})
+        </div>
+      ` : `
+        <div class="pc-verdict-banner peer-wins">
+          ⚠ <strong>${escapeHtml(winner.symbol)}</strong> scores higher than your selection
+          <strong>${escapeHtml(target.symbol)}</strong> for ${escapeHtml(dirLabel)}
+          (${winner.alignment_score.toFixed(1)} vs ${target.alignment_score.toFixed(1)})
+        </div>
+      `;
+
+      panel.innerHTML = `
+        <div class="pc-result">
+          <div class="pc-header">
+            <h3 style="margin:0; font-size:16px; color:#5b21b6;">
+              🔍 Peer Comparison · ${escapeHtml(dirLabel)} Setup
+            </h3>
+            <div style="font-size:11px; color:#6b7280; margin-top:4px;">
+              Compared ${ranked.length} stocks · peer source: ${escapeHtml(data.peer_source)} ·
+              Analyzed ${timeAgo(data.analyzed_at)}
+            </div>
+          </div>
+          ${verdictBanner}
+          <div class="pc-stocks-grid">
+            ${stockCards}
+          </div>
+          <div class="pc-ai-verdict">
+            <div class="pc-card-title">AI Verdict & Switching Analysis</div>
+            <div class="tp-commentary">${mdToHtml(data.ai_verdict)}</div>
+          </div>
+        </div>
+      `;
+
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
 
