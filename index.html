@@ -1140,6 +1140,314 @@
       .ep-stop-grid { grid-template-columns: 1fr; }
       .ep-stop-vs { display: none; }
     }
+    /* ============================================================ */
+    /* ===== Trading Journal ====================================== */
+    /* ============================================================ */
+
+    /* --- Sub-view toggle (Active / History) --- */
+    .journal-subview-row {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 10px; margin-bottom: 18px;
+    }
+    .journal-subview-toggle {
+      display: inline-flex; gap: 4px;
+      background: #f3f4f6; padding: 4px; border-radius: 7px;
+    }
+    .journal-subview-btn {
+      padding: 9px 18px; background: transparent; border: none;
+      border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 600;
+      color: #6b7280; transition: all 0.15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .journal-subview-btn.active {
+      background: #fff; color: #111827;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .journal-subview-btn .count-badge {
+      background: #e5e7eb; color: #374151;
+      font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 700;
+    }
+    .journal-subview-btn.active .count-badge {
+      background: #2563eb; color: #fff;
+    }
+    .add-trade-btn {
+      padding: 10px 18px; background: #16a34a; color: #fff;
+      border: none; border-radius: 6px; cursor: pointer;
+      font-size: 13px; font-weight: 600;
+    }
+    .add-trade-btn:hover { background: #15803d; }
+
+    /* --- Stats summary widget (only at 5+ closed trades) --- */
+    .journal-stats {
+      background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+      border: 1px solid #bfdbfe; border-radius: 10px; padding: 16px;
+      margin-bottom: 16px;
+    }
+    .journal-stats-title {
+      font-size: 11px; font-weight: 700; color: #1e40af;
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;
+    }
+    .journal-stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+    }
+    .js-cell {
+      background: #fff; border-radius: 8px; padding: 10px 12px;
+      border: 1px solid #e5e7eb;
+    }
+    .js-cell .js-lbl {
+      font-size: 10px; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;
+    }
+    .js-cell .js-val {
+      font-size: 18px; font-weight: 700;
+      font-family: ui-monospace, monospace;
+    }
+    .js-cell .js-val.good { color: #16a34a; }
+    .js-cell .js-val.bad  { color: #dc2626; }
+    .js-cell .js-sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+
+    /* --- Trade list: cards (mobile) + table (desktop) --- */
+    .trade-list-empty {
+      padding: 40px 20px; text-align: center; color: #6b7280;
+      background: #f9fafb; border-radius: 8px; border: 1px dashed #d1d5db;
+    }
+    .trade-list-empty .empty-icon {
+      font-size: 28px; margin-bottom: 10px;
+    }
+    .trade-list-empty .empty-cta {
+      margin-top: 14px;
+    }
+
+    /* Desktop: table view (>= 768px) */
+    .trade-list-table {
+      width: 100%; border-collapse: collapse;
+      background: #fff; border-radius: 8px; overflow: hidden;
+      border: 1px solid #e5e7eb;
+    }
+    .trade-list-table thead { background: #f9fafb; }
+    .trade-list-table th {
+      padding: 10px 12px; font-size: 11px; font-weight: 600;
+      color: #374151; text-align: left;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .trade-list-table td {
+      padding: 11px 12px; font-size: 13px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .trade-row { cursor: pointer; transition: background 0.1s; }
+    .trade-row:hover { background: #f9fafb; }
+    .trade-row.expanded { background: #f0f9ff; }
+    .trade-row td:first-child { font-weight: 700; font-family: ui-monospace, monospace; }
+    .trade-dir-pill {
+      display: inline-block; padding: 2px 8px; border-radius: 99px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+    }
+    .trade-dir-pill.long  { background: #d1fae5; color: #065f46; }
+    .trade-dir-pill.short { background: #fee2e2; color: #991b1b; }
+    .trade-dir-pill.hedged { background: #ede9fe; color: #5b21b6; }
+
+    /* Mobile cards (< 768px) */
+    .trade-list-cards { display: none; flex-direction: column; gap: 10px; }
+    .trade-card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+      padding: 12px; cursor: pointer; transition: all 0.1s;
+    }
+    .trade-card.expanded {
+      border-color: #2563eb; background: #f0f9ff;
+    }
+    .trade-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px;
+    }
+    .trade-card-title {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .trade-card-symbol {
+      font-size: 15px; font-weight: 700;
+      font-family: ui-monospace, monospace;
+    }
+    .trade-card-pnl {
+      text-align: right; font-family: ui-monospace, monospace;
+      font-weight: 700;
+    }
+    .trade-card-pnl .pnl-main {
+      font-size: 15px;
+    }
+    .trade-card-pnl .pnl-sub {
+      font-size: 11px; opacity: 0.85;
+    }
+    .trade-card-meta {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 6px; font-size: 12px; color: #6b7280;
+    }
+    .trade-card-meta-row {
+      display: flex; justify-content: space-between;
+    }
+    .trade-card-meta-row span:last-child {
+      font-family: ui-monospace, monospace; color: #111827;
+    }
+
+    /* Inline expansion (both card and table row) */
+    .trade-detail-row {
+      background: #f0f9ff; border-top: 2px solid #2563eb;
+    }
+    .trade-detail-row td {
+      padding: 16px 20px;
+    }
+    .trade-detail-content {
+      background: #fff; border: 1px solid #bfdbfe; border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .td-section {
+      margin-bottom: 12px;
+    }
+    .td-section:last-child { margin-bottom: 0; }
+    .td-section-title {
+      font-size: 10px; font-weight: 700; color: #2563eb;
+      text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px;
+    }
+    .td-section-content {
+      font-size: 13px; color: #374151; line-height: 1.5;
+      white-space: pre-wrap; word-wrap: break-word;
+    }
+    .td-section-content.muted {
+      color: #9ca3af; font-style: italic;
+    }
+    .td-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px; margin-bottom: 4px;
+    }
+    .td-cell {
+      background: #f9fafb; border-radius: 5px; padding: 7px 10px;
+      font-size: 12px;
+    }
+    .td-cell .lbl {
+      font-size: 10px; color: #6b7280; text-transform: uppercase;
+      letter-spacing: 0.3px; margin-bottom: 2px;
+    }
+    .td-cell .val {
+      font-weight: 600; font-family: ui-monospace, monospace; color: #111827;
+    }
+    .td-actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .td-btn {
+      padding: 7px 14px; border: 1px solid; border-radius: 5px;
+      cursor: pointer; font-size: 12px; font-weight: 600;
+      background: #fff;
+    }
+    .td-btn.close-btn {
+      color: #dc2626; border-color: #fca5a5;
+    }
+    .td-btn.close-btn:hover { background: #fee2e2; }
+    .td-btn.edit-btn {
+      color: #1e40af; border-color: #93c5fd;
+    }
+    .td-btn.edit-btn:hover { background: #dbeafe; }
+    .td-btn.delete-btn {
+      color: #991b1b; border-color: #f87171;
+    }
+    .td-btn.delete-btn:hover { background: #fecaca; }
+
+    /* --- Add / Edit / Close form --- */
+    .journal-form {
+      background: #fff; border: 2px solid #16a34a; border-radius: 8px;
+      padding: 16px; margin-bottom: 18px;
+    }
+    .journal-form.editing {
+      border-color: #1e40af;
+    }
+    .journal-form.closing {
+      border-color: #dc2626;
+    }
+    .journal-form-title {
+      font-size: 14px; font-weight: 700; color: #16a34a;
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .journal-form.editing .journal-form-title { color: #1e40af; }
+    .journal-form.closing .journal-form-title { color: #dc2626; }
+    .jf-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px; margin-bottom: 12px;
+    }
+    .jf-field { display: flex; flex-direction: column; gap: 4px; }
+    .jf-field label {
+      font-size: 11px; font-weight: 600; color: #374151;
+      text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .jf-field label .req { color: #dc2626; }
+    .jf-field input, .jf-field select, .jf-field textarea {
+      padding: 8px 10px; font-size: 13px; border: 1px solid #d1d5db;
+      border-radius: 5px; font-family: inherit;
+    }
+    .jf-field input:focus, .jf-field select:focus, .jf-field textarea:focus {
+      outline: none; border-color: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    }
+    .jf-field.full-width { grid-column: 1 / -1; }
+    .jf-field textarea {
+      min-height: 70px; resize: vertical; font-family: inherit;
+    }
+    .jf-direction-toggle {
+      display: inline-flex; gap: 4px; background: #f3f4f6;
+      padding: 3px; border-radius: 6px;
+    }
+    .jf-dir-btn {
+      padding: 7px 14px; background: transparent; border: none;
+      border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;
+      color: #6b7280;
+    }
+    .jf-dir-btn.active.long  { background: #fff; color: #16a34a; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .jf-dir-btn.active.short { background: #fff; color: #dc2626; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .jf-dir-btn.active.hedged { background: #fff; color: #7c3aed; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .jf-actions {
+      display: flex; gap: 10px; justify-content: flex-end;
+      padding-top: 10px; border-top: 1px solid #f3f4f6; margin-top: 6px;
+    }
+    .jf-save-btn {
+      padding: 9px 20px; background: #16a34a; color: #fff;
+      border: none; border-radius: 5px; cursor: pointer;
+      font-size: 13px; font-weight: 600;
+    }
+    .jf-save-btn:hover { background: #15803d; }
+    .journal-form.editing .jf-save-btn { background: #1e40af; }
+    .journal-form.editing .jf-save-btn:hover { background: #1e3a8a; }
+    .journal-form.closing .jf-save-btn { background: #dc2626; }
+    .journal-form.closing .jf-save-btn:hover { background: #b91c1c; }
+    .jf-cancel-btn {
+      padding: 9px 18px; background: #fff; color: #6b7280;
+      border: 1px solid #d1d5db; border-radius: 5px; cursor: pointer;
+      font-size: 13px; font-weight: 500;
+    }
+    .jf-cancel-btn:hover { background: #f3f4f6; }
+
+    /* Pnl coloring on table cells */
+    .pnl-positive { color: #16a34a; font-weight: 600; }
+    .pnl-negative { color: #dc2626; font-weight: 600; }
+    .pnl-neutral { color: #6b7280; }
+
+    /* Responsive: cards on mobile, table on desktop */
+    @media (max-width: 767px) {
+      .trade-list-table { display: none; }
+      .trade-list-cards { display: flex; }
+      .journal-subview-row { flex-direction: column; align-items: stretch; }
+      .journal-subview-toggle { justify-content: center; }
+      .add-trade-btn { width: 100%; }
+    }
+    @media (min-width: 768px) {
+      .trade-list-cards { display: none; }
+    }
+
+    /* Retention notice */
+    .retention-notice {
+      font-size: 11px; color: #6b7280; font-style: italic;
+      margin-top: 12px; text-align: center;
+    }
 
   </style>
 </head>
@@ -1182,6 +1490,9 @@
       <button class="tab" data-tab="compare">
         📊 Compare
       </button>
+      <button class="tab" data-tab="journal">
+        📒 Journal
+      </button>
     </div>
 
     <div id="panel-intraday" class="panel"></div>
@@ -1191,6 +1502,7 @@
     <div id="panel-analyze"  class="panel" style="display:none;"></div>
     <div id="panel-sizer"    class="panel" style="display:none;"></div>
     <div id="panel-compare"  class="panel" style="display:none;"></div>
+    <div id="panel-journal"  class="panel" style="display:none;"></div>
   </div>
 
   <script>
@@ -1200,6 +1512,7 @@
     const COMPARE_URL = "https://nse-dashboard-api.onrender.com/api/compare";
     const TRADE_PLAN_URL = "https://nse-dashboard-api.onrender.com/api/trade-plan";
     const PEER_COMPARISON_URL = "https://nse-dashboard-api.onrender.com/api/peer-comparison";
+    const JOURNAL_URL = "https://nse-dashboard-api.onrender.com/api/journal";
     const REFRESH_MS  = 60_000;
 
     // ===== Helpers =====
@@ -2552,6 +2865,35 @@
         </div>
       `;
 
+      // ---- Save to Journal CTA (Part 3 — pre-fills journal entry from this trade plan) ----
+      const lvl_entry = lvl.entry_zone.mid;
+      const lvl_stop  = lvl.stop_loss.price;
+      const lvl_target = lvl.targets.t1.price;
+      const saveJournalCTA = `
+        <div id="save-journal-cta" style="margin-top:6px; padding:14px;
+             background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;
+             text-align:center;">
+          <div style="font-size:13px; color:#065f46; margin-bottom:10px;">
+            ${isExisting ? "Update your journal entry with this replanned setup?"
+                         : "Took this trade? Save the plan to your journal for review later."}
+          </div>
+          <button id="save-to-journal-btn" type="button"
+                  data-symbol="${escapeHtml(data.symbol)}"
+                  data-direction="${escapeHtml(data.direction)}"
+                  data-qty="${econ.qty}"
+                  data-entry="${lvl_entry}"
+                  data-stop="${lvl_stop}"
+                  data-target="${lvl_target}"
+                  style="padding:10px 22px; background:#16a34a; color:#fff; border:none;
+                         border-radius:6px; cursor:pointer; font-size:14px; font-weight:600;">
+            📒 Save to Journal
+          </button>
+          <div style="font-size:11px; color:#6b7280; margin-top:8px;">
+            Opens Journal tab with this trade pre-filled — add your notes and save
+          </div>
+        </div>
+      `;
+
       // ---- Peer comparison CTA (separate two-click flow per design) ----
       // Carries the symbol + direction so renderPeerComparison knows what to ask the API
       const peerCTA = `
@@ -2585,6 +2927,7 @@
           ${hedgeCard}
           ${econCard}
           ${commentaryCard}
+          ${saveJournalCTA}
           ${peerCTA}
         </div>
       `;
@@ -2595,6 +2938,12 @@
         pcBtn.addEventListener("click", () => runPeerComparison(
           pcBtn.dataset.symbol, pcBtn.dataset.direction
         ));
+      }
+
+      // Wire up Save to Journal button
+      const sjBtn = $("save-to-journal-btn");
+      if (sjBtn) {
+        sjBtn.addEventListener("click", () => prefillJournalFromTradePlan(sjBtn.dataset));
       }
 
       // Scroll to results
@@ -2807,6 +3156,775 @@
       `;
 
       panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+
+    // ============================================================
+    // ===== Trading Journal ======================================
+    // ============================================================
+    // State: current sub-view, expanded trade id, active form (add/edit/close)
+    let journalState = {
+      subview:        "active",   // "active" | "history"
+      expandedId:     null,        // currently expanded trade id (for inline detail)
+      activeForm:     null,        // null | "add" | { type: "edit", id } | { type: "close", id }
+      cachedTrades:   [],
+      cachedStats:    null,
+      lastFetchedAt:  null,
+    };
+
+    function renderJournalPanel() {
+      const panel = $("panel-journal");
+      // Render outer shell synchronously, then fetch data
+      panel.innerHTML = `
+        <div class="panel-header">
+          <span>📒 Trading Journal</span>
+          <span id="journal-freshness" class="freshness">Loading…</span>
+        </div>
+        <div id="journal-body">
+          <div class="loading-spinner" style="padding:30px;">Loading your trades…</div>
+        </div>
+      `;
+      loadJournal();
+    }
+
+    async function loadJournal() {
+      try {
+        const res = await fetch(JOURNAL_URL, { method: "GET" });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+        journalState.cachedTrades  = data.trades || [];
+        journalState.cachedStats   = data.stats;
+        journalState.lastFetchedAt = data.fetched_at;
+        $("journal-freshness").textContent = `${journalState.cachedTrades.length} trades · ${data.open_count} open · ${data.closed_count} closed · ${data.retention_days}d retention`;
+        renderJournalBody();
+      } catch (err) {
+        $("journal-body").innerHTML = `
+          <div class="status error" style="margin:0;">⚠️ ${escapeHtml(err.message)}</div>
+        `;
+      }
+    }
+
+    function renderJournalBody() {
+      const body = $("journal-body");
+      const trades = journalState.cachedTrades;
+      const stats  = journalState.cachedStats;
+
+      const activeTrades = trades.filter(t => t.status === "open");
+      const closedTrades = trades.filter(t => t.status === "closed");
+      const currentList = journalState.subview === "active" ? activeTrades : closedTrades;
+
+      // Sub-view toggle row
+      const subviewRow = `
+        <div class="journal-subview-row">
+          <div class="journal-subview-toggle">
+            <button type="button" class="journal-subview-btn ${journalState.subview === 'active' ? 'active' : ''}"
+                    data-subview="active">
+              🟢 Active Trades
+              <span class="count-badge">${activeTrades.length}</span>
+            </button>
+            <button type="button" class="journal-subview-btn ${journalState.subview === 'history' ? 'active' : ''}"
+                    data-subview="history">
+              📋 History
+              <span class="count-badge">${closedTrades.length}</span>
+            </button>
+          </div>
+          <button type="button" class="add-trade-btn" id="add-trade-btn">
+            ➕ Add New Trade
+          </button>
+        </div>
+      `;
+
+      // Stats widget (only on History view, only at 5+ closed trades)
+      let statsWidget = "";
+      if (journalState.subview === "history" && stats && stats.total_trades >= 5) {
+        const winRateClass = stats.win_rate >= 50 ? "good" : "bad";
+        const avgRClass    = (stats.avg_r_multiple || 0) >= 1 ? "good" : "bad";
+        const totalPnlClass = stats.total_pnl >= 0 ? "good" : "bad";
+        statsWidget = `
+          <div class="journal-stats">
+            <div class="journal-stats-title">📊 Performance Summary (${stats.total_trades} closed trades)</div>
+            <div class="journal-stats-grid">
+              <div class="js-cell">
+                <div class="js-lbl">Win Rate</div>
+                <div class="js-val ${winRateClass}">${stats.win_rate}%</div>
+                <div class="js-sub">${stats.winners}W / ${stats.losers}L</div>
+              </div>
+              <div class="js-cell">
+                <div class="js-lbl">Avg R-multiple</div>
+                <div class="js-val ${avgRClass}">${stats.avg_r_multiple !== null ? stats.avg_r_multiple.toFixed(2) + 'R' : '—'}</div>
+                <div class="js-sub">Per trade</div>
+              </div>
+              <div class="js-cell">
+                <div class="js-lbl">Total P&L</div>
+                <div class="js-val ${totalPnlClass}">${stats.total_pnl >= 0 ? '+' : ''}₹${fmt(Math.abs(stats.total_pnl), 0)}</div>
+                <div class="js-sub">All closed</div>
+              </div>
+              <div class="js-cell">
+                <div class="js-lbl">Avg Hold</div>
+                <div class="js-val">${stats.avg_days_held !== null ? stats.avg_days_held + 'd' : '—'}</div>
+                <div class="js-sub">Days</div>
+              </div>
+              ${stats.best_trade ? `
+                <div class="js-cell">
+                  <div class="js-lbl">Best Trade</div>
+                  <div class="js-val good">+₹${fmt(stats.best_trade.pnl, 0)}</div>
+                  <div class="js-sub">${escapeHtml(stats.best_trade.symbol)}${stats.best_trade.r !== null ? ' · ' + stats.best_trade.r.toFixed(1) + 'R' : ''}</div>
+                </div>
+              ` : ''}
+              ${stats.worst_trade ? `
+                <div class="js-cell">
+                  <div class="js-lbl">Worst Trade</div>
+                  <div class="js-val bad">₹${fmt(stats.worst_trade.pnl, 0)}</div>
+                  <div class="js-sub">${escapeHtml(stats.worst_trade.symbol)}${stats.worst_trade.r !== null ? ' · ' + stats.worst_trade.r.toFixed(1) + 'R' : ''}</div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      // Form (add/edit/close, conditional)
+      const formHtml = renderJournalForm();
+
+      // Trade list (table on desktop, cards on mobile)
+      const listHtml = currentList.length === 0
+        ? renderEmptyState(journalState.subview)
+        : renderTradeList(currentList, journalState.subview);
+
+      const retentionNotice = `
+        <div class="retention-notice">
+          Closed trades older than 30 days are auto-purged. Open trades are never purged.
+        </div>
+      `;
+
+      body.innerHTML = subviewRow + statsWidget + formHtml + listHtml + retentionNotice;
+
+      // Attach event handlers
+      attachJournalHandlers();
+    }
+
+    function renderEmptyState(subview) {
+      if (subview === "active") {
+        return `
+          <div class="trade-list-empty">
+            <div class="empty-icon">📈</div>
+            <div><strong>No active trades yet</strong></div>
+            <div style="margin-top:6px; font-size:13px;">
+              Add a trade manually or generate a trade plan and click "Save to Journal"
+            </div>
+            <div class="empty-cta">
+              <button type="button" class="add-trade-btn" id="empty-add-trade-btn">
+                ➕ Add Your First Trade
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      return `
+        <div class="trade-list-empty">
+          <div class="empty-icon">📋</div>
+          <div><strong>No closed trades yet</strong></div>
+          <div style="margin-top:6px; font-size:13px;">
+            Once you close trades, they'll appear here with full P&L and R-multiple analysis
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTradeList(trades, subview) {
+      const headers = subview === "active"
+        ? ["Symbol", "Dir", "Qty", "Entry", "Current", "Unrealized P&L", "Days", "Stop"]
+        : ["Symbol", "Dir", "Qty", "Entry", "Exit", "Realized P&L", "R", "Days"];
+
+      const tableRows = trades.map(t => renderTradeRow(t, subview)).join("");
+      const cardRows = trades.map(t => renderTradeCard(t, subview)).join("");
+
+      return `
+        <table class="trade-list-table">
+          <thead>
+            <tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+        <div class="trade-list-cards">${cardRows}</div>
+      `;
+    }
+
+    function renderTradeRow(t, subview) {
+      const isExpanded = journalState.expandedId === t.id;
+      const dirPill = `<span class="trade-dir-pill ${t.direction}">${t.direction.toUpperCase()}</span>`;
+      const detailRow = isExpanded ? renderTradeDetail(t) : "";
+
+      let mainRow;
+      if (subview === "active") {
+        const currentDisplay = t.current_price !== undefined ? `₹${fmt(t.current_price)}` : "—";
+        const pnlValue = t.unrealized_pnl;
+        const pnlClass = pnlValue === undefined ? "pnl-neutral"
+                       : pnlValue >= 0 ? "pnl-positive" : "pnl-negative";
+        const pnlText = pnlValue === undefined
+          ? "—"
+          : `${pnlValue >= 0 ? '+' : ''}₹${fmt(Math.abs(pnlValue), 0)}${t.unrealized_pct !== undefined ? ` (${t.unrealized_pct >= 0 ? '+' : ''}${fmt(t.unrealized_pct)}%)` : ''}`;
+        mainRow = `
+          <tr class="trade-row ${isExpanded ? 'expanded' : ''}" data-trade-id="${t.id}">
+            <td>${escapeHtml(t.symbol)}</td>
+            <td>${dirPill}</td>
+            <td>${t.qty}</td>
+            <td>₹${fmt(t.entry_price)}</td>
+            <td>${currentDisplay}</td>
+            <td class="${pnlClass}">${pnlText}</td>
+            <td>${t.days_held}d</td>
+            <td>${t.stop_loss ? '₹' + fmt(t.stop_loss) : '—'}</td>
+          </tr>
+        `;
+      } else {
+        const pnlClass = t.realized_pnl >= 0 ? "pnl-positive" : "pnl-negative";
+        mainRow = `
+          <tr class="trade-row ${isExpanded ? 'expanded' : ''}" data-trade-id="${t.id}">
+            <td>${escapeHtml(t.symbol)}</td>
+            <td>${dirPill}</td>
+            <td>${t.qty}</td>
+            <td>₹${fmt(t.entry_price)}</td>
+            <td>${t.exit_price ? '₹' + fmt(t.exit_price) : '—'}</td>
+            <td class="${pnlClass}">${t.realized_pnl >= 0 ? '+' : ''}₹${fmt(Math.abs(t.realized_pnl), 0)} (${t.pct_return >= 0 ? '+' : ''}${fmt(t.pct_return)}%)</td>
+            <td class="${pnlClass}">${t.r_multiple !== null ? t.r_multiple.toFixed(2) + 'R' : '—'}</td>
+            <td>${t.days_held}d</td>
+          </tr>
+        `;
+      }
+      return mainRow + (detailRow ? `<tr class="trade-detail-row"><td colspan="8">${detailRow}</td></tr>` : '');
+    }
+
+    function renderTradeCard(t, subview) {
+      const isExpanded = journalState.expandedId === t.id;
+      const dirPill = `<span class="trade-dir-pill ${t.direction}">${t.direction.toUpperCase()}</span>`;
+      let pnlBlock, metaBlock;
+      if (subview === "active") {
+        const pnlValue = t.unrealized_pnl;
+        const pnlClass = pnlValue === undefined ? "pnl-neutral"
+                       : pnlValue >= 0 ? "pnl-positive" : "pnl-negative";
+        pnlBlock = `
+          <div class="trade-card-pnl ${pnlClass}">
+            <div class="pnl-main">${pnlValue === undefined ? "—" : (pnlValue >= 0 ? '+' : '') + '₹' + fmt(Math.abs(pnlValue), 0)}</div>
+            <div class="pnl-sub">${t.unrealized_pct !== undefined ? (t.unrealized_pct >= 0 ? '+' : '') + fmt(t.unrealized_pct) + '%' : ''}</div>
+          </div>
+        `;
+        metaBlock = `
+          <div class="trade-card-meta">
+            <div class="trade-card-meta-row"><span>Entry</span><span>₹${fmt(t.entry_price)}</span></div>
+            <div class="trade-card-meta-row"><span>Current</span><span>${t.current_price !== undefined ? '₹' + fmt(t.current_price) : '—'}</span></div>
+            <div class="trade-card-meta-row"><span>Qty</span><span>${t.qty}</span></div>
+            <div class="trade-card-meta-row"><span>Days</span><span>${t.days_held}d</span></div>
+          </div>
+        `;
+      } else {
+        const pnlClass = t.realized_pnl >= 0 ? "pnl-positive" : "pnl-negative";
+        pnlBlock = `
+          <div class="trade-card-pnl ${pnlClass}">
+            <div class="pnl-main">${t.realized_pnl >= 0 ? '+' : ''}₹${fmt(Math.abs(t.realized_pnl), 0)}</div>
+            <div class="pnl-sub">${t.r_multiple !== null ? t.r_multiple.toFixed(2) + 'R' : ''} · ${t.pct_return >= 0 ? '+' : ''}${fmt(t.pct_return)}%</div>
+          </div>
+        `;
+        metaBlock = `
+          <div class="trade-card-meta">
+            <div class="trade-card-meta-row"><span>Entry</span><span>₹${fmt(t.entry_price)}</span></div>
+            <div class="trade-card-meta-row"><span>Exit</span><span>${t.exit_price ? '₹' + fmt(t.exit_price) : '—'}</span></div>
+            <div class="trade-card-meta-row"><span>Qty</span><span>${t.qty}</span></div>
+            <div class="trade-card-meta-row"><span>Days</span><span>${t.days_held}d</span></div>
+          </div>
+        `;
+      }
+      const detailHtml = isExpanded ? `<div style="margin-top:12px;">${renderTradeDetail(t)}</div>` : '';
+      return `
+        <div class="trade-card ${isExpanded ? 'expanded' : ''}" data-trade-id="${t.id}">
+          <div class="trade-card-header">
+            <div class="trade-card-title">
+              <span class="trade-card-symbol">${escapeHtml(t.symbol)}</span>
+              ${dirPill}
+            </div>
+            ${pnlBlock}
+          </div>
+          ${metaBlock}
+          ${detailHtml}
+        </div>
+      `;
+    }
+
+    function renderTradeDetail(t) {
+      const isOpen = t.status === "open";
+      // Plan section: stop, target, setup_type, why_taken
+      const planFields = `
+        <div class="td-grid">
+          <div class="td-cell"><div class="lbl">Entry Date</div><div class="val">${t.entry_date}</div></div>
+          <div class="td-cell"><div class="lbl">Stop Loss</div><div class="val">${t.stop_loss ? '₹' + fmt(t.stop_loss) : '—'}</div></div>
+          <div class="td-cell"><div class="lbl">Target</div><div class="val">${t.target_price ? '₹' + fmt(t.target_price) : '—'}</div></div>
+          <div class="td-cell"><div class="lbl">Setup</div><div class="val">${t.setup_type ? escapeHtml(t.setup_type.replace(/_/g, ' ')) : '—'}</div></div>
+        </div>
+      `;
+
+      const whyTaken = t.why_taken ? `
+        <div class="td-section">
+          <div class="td-section-title">Why I Took This Trade</div>
+          <div class="td-section-content">${escapeHtml(t.why_taken)}</div>
+        </div>
+      ` : `
+        <div class="td-section">
+          <div class="td-section-title">Why I Took This Trade</div>
+          <div class="td-section-content muted">(no notes — click Edit to add)</div>
+        </div>
+      `;
+
+      // Review section (closed trades only)
+      let reviewBlock = "";
+      if (!isOpen) {
+        const reviewParts = [];
+        if (t.went_well) {
+          reviewParts.push(`<div class="td-section">
+            <div class="td-section-title">✅ What Went Well</div>
+            <div class="td-section-content">${escapeHtml(t.went_well)}</div>
+          </div>`);
+        }
+        if (t.went_wrong) {
+          reviewParts.push(`<div class="td-section">
+            <div class="td-section-title">❌ What Went Wrong</div>
+            <div class="td-section-content">${escapeHtml(t.went_wrong)}</div>
+          </div>`);
+        }
+        if (t.emotional_state) {
+          reviewParts.push(`<div class="td-section">
+            <div class="td-section-title">Emotional State</div>
+            <div class="td-section-content">${escapeHtml(t.emotional_state.replace(/_/g, ' '))}</div>
+          </div>`);
+        }
+        if (t.lesson_learned) {
+          reviewParts.push(`<div class="td-section">
+            <div class="td-section-title">💡 Lesson Learned</div>
+            <div class="td-section-content">${escapeHtml(t.lesson_learned)}</div>
+          </div>`);
+        }
+        if (reviewParts.length === 0) {
+          reviewParts.push(`<div class="td-section">
+            <div class="td-section-title">Post-Trade Review</div>
+            <div class="td-section-content muted">(no review notes — click Edit to add)</div>
+          </div>`);
+        }
+        reviewBlock = reviewParts.join("");
+      }
+
+      // Actions
+      const actions = `
+        <div class="td-actions">
+          ${isOpen ? `<button type="button" class="td-btn close-btn" data-action="close" data-trade-id="${t.id}">🔒 Close Trade</button>` : ''}
+          <button type="button" class="td-btn edit-btn" data-action="edit" data-trade-id="${t.id}">✏️ Edit</button>
+          <button type="button" class="td-btn delete-btn" data-action="delete" data-trade-id="${t.id}">🗑️ Delete</button>
+        </div>
+      `;
+
+      return `
+        <div class="trade-detail-content">
+          <div class="td-section">
+            <div class="td-section-title">Trade Setup</div>
+            ${planFields}
+          </div>
+          ${whyTaken}
+          ${reviewBlock}
+          ${actions}
+        </div>
+      `;
+    }
+
+    function renderJournalForm() {
+      const af = journalState.activeForm;
+      if (!af) return "";
+
+      // Resolve the trade being edited/closed (if any)
+      let trade = null;
+      let formType = "add";
+      if (af === "add") {
+        formType = "add";
+      } else if (af.type === "edit") {
+        formType = "edit";
+        trade = journalState.cachedTrades.find(t => t.id === af.id);
+        if (!trade) return "";
+      } else if (af.type === "close") {
+        formType = "close";
+        trade = journalState.cachedTrades.find(t => t.id === af.id);
+        if (!trade) return "";
+      }
+
+      if (formType === "close") {
+        return renderCloseForm(trade);
+      }
+      return renderAddEditForm(formType, trade);
+    }
+
+    function renderAddEditForm(formType, trade) {
+      const isEdit = formType === "edit";
+      const t = trade || {};
+      const today = new Date().toISOString().slice(0, 10);
+      const direction = t.direction || "long";
+      return `
+        <div class="journal-form ${isEdit ? 'editing' : ''}">
+          <div class="journal-form-title">
+            ${isEdit ? '✏️ Edit Trade #' + t.id : '➕ Add New Trade'}
+          </div>
+          <div class="jf-grid">
+            <div class="jf-field">
+              <label>Symbol <span class="req">*</span></label>
+              <input type="text" id="jf-symbol" placeholder="RELIANCE" value="${escapeHtml(t.symbol || '')}" ${isEdit ? 'disabled' : ''}>
+            </div>
+            <div class="jf-field">
+              <label>Direction <span class="req">*</span></label>
+              <div class="jf-direction-toggle">
+                <button type="button" class="jf-dir-btn ${direction === 'long' ? 'active long' : ''}" data-dir="long">📈 LONG</button>
+                <button type="button" class="jf-dir-btn ${direction === 'short' ? 'active short' : ''}" data-dir="short">📉 SHORT</button>
+                <button type="button" class="jf-dir-btn ${direction === 'hedged' ? 'active hedged' : ''}" data-dir="hedged">🛡️ HEDGED</button>
+              </div>
+            </div>
+            <div class="jf-field">
+              <label>Quantity <span class="req">*</span></label>
+              <input type="number" id="jf-qty" min="1" step="1" placeholder="100" value="${t.qty || ''}">
+            </div>
+            <div class="jf-field">
+              <label>Entry Price ₹ <span class="req">*</span></label>
+              <input type="number" id="jf-entry-price" step="0.05" placeholder="2450.00" value="${t.entry_price || ''}">
+            </div>
+            <div class="jf-field">
+              <label>Entry Date</label>
+              <input type="date" id="jf-entry-date" value="${t.entry_date || today}">
+            </div>
+            <div class="jf-field">
+              <label>Stop Loss ₹</label>
+              <input type="number" id="jf-stop-loss" step="0.05" placeholder="2380.00" value="${t.stop_loss || ''}">
+            </div>
+            <div class="jf-field">
+              <label>Target Price ₹</label>
+              <input type="number" id="jf-target-price" step="0.05" placeholder="2600.00" value="${t.target_price || ''}">
+            </div>
+            <div class="jf-field">
+              <label>Setup Type</label>
+              <select id="jf-setup-type">
+                <option value="">— pick a setup —</option>
+                <option value="breakout"       ${t.setup_type === 'breakout' ? 'selected' : ''}>Breakout</option>
+                <option value="reversal"       ${t.setup_type === 'reversal' ? 'selected' : ''}>Reversal</option>
+                <option value="momentum"       ${t.setup_type === 'momentum' ? 'selected' : ''}>Momentum</option>
+                <option value="mean_reversion" ${t.setup_type === 'mean_reversion' ? 'selected' : ''}>Mean Reversion</option>
+                <option value="earnings"       ${t.setup_type === 'earnings' ? 'selected' : ''}>Earnings Play</option>
+                <option value="news_based"     ${t.setup_type === 'news_based' ? 'selected' : ''}>News-based</option>
+                <option value="swing"          ${t.setup_type === 'swing' ? 'selected' : ''}>Swing</option>
+                <option value="other"          ${t.setup_type === 'other' ? 'selected' : ''}>Other</option>
+              </select>
+            </div>
+            <div class="jf-field full-width">
+              <label>Why I Took This Trade</label>
+              <textarea id="jf-why-taken" placeholder="What's the setup? Why now? What's the thesis?">${escapeHtml(t.why_taken || '')}</textarea>
+            </div>
+          </div>
+          <div class="jf-actions">
+            <button type="button" class="jf-cancel-btn" id="jf-cancel-btn">Cancel</button>
+            <button type="button" class="jf-save-btn" id="jf-save-btn">${isEdit ? 'Save Changes' : 'Add Trade'}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCloseForm(trade) {
+      const today = new Date().toISOString().slice(0, 10);
+      const t = trade;
+      const isLong = t.direction === "long" || t.direction === "hedged";
+      return `
+        <div class="journal-form closing">
+          <div class="journal-form-title">
+            🔒 Close Trade #${t.id} — ${escapeHtml(t.symbol)} (${t.direction.toUpperCase()}, ${t.qty} shares @ ₹${fmt(t.entry_price)})
+          </div>
+          <div class="jf-grid">
+            <div class="jf-field">
+              <label>Exit Price ₹ <span class="req">*</span></label>
+              <input type="number" id="jf-exit-price" step="0.05" placeholder="${isLong ? 'higher than entry = win' : 'lower than entry = win'}">
+            </div>
+            <div class="jf-field">
+              <label>Exit Date</label>
+              <input type="date" id="jf-exit-date" value="${today}">
+            </div>
+            <div class="jf-field">
+              <label>Emotional State on Exit</label>
+              <select id="jf-emotional-state">
+                <option value="">— pick one —</option>
+                <option value="disciplined">Disciplined (followed plan)</option>
+                <option value="fomo_exit">FOMO Exit (took too late)</option>
+                <option value="panic_exit">Panic Exit (fear-driven)</option>
+                <option value="took_early">Took Profit Early (didn't hold)</option>
+                <option value="held_too_long">Held Too Long (gave back gains)</option>
+                <option value="stopped_out">Stopped Out (mechanical)</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="jf-field full-width">
+              <label>✅ What Went Well</label>
+              <textarea id="jf-went-well" placeholder="What did you do right on this trade?"></textarea>
+            </div>
+            <div class="jf-field full-width">
+              <label>❌ What Went Wrong</label>
+              <textarea id="jf-went-wrong" placeholder="What would you change?"></textarea>
+            </div>
+            <div class="jf-field full-width">
+              <label>💡 Lesson Learned</label>
+              <textarea id="jf-lesson-learned" placeholder="The single most important takeaway?"></textarea>
+            </div>
+          </div>
+          <div class="jf-actions">
+            <button type="button" class="jf-cancel-btn" id="jf-cancel-btn">Cancel</button>
+            <button type="button" class="jf-save-btn" id="jf-save-btn">🔒 Close Trade</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function attachJournalHandlers() {
+      // Sub-view toggle
+      document.querySelectorAll(".journal-subview-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          journalState.subview = btn.dataset.subview;
+          journalState.expandedId = null;
+          renderJournalBody();
+        });
+      });
+
+      // Add Trade buttons (both header CTA and empty-state CTA)
+      const addBtns = ["add-trade-btn", "empty-add-trade-btn"];
+      addBtns.forEach(id => {
+        const b = $(id);
+        if (b) b.addEventListener("click", () => {
+          journalState.activeForm = "add";
+          renderJournalBody();
+        });
+      });
+
+      // Direction pill toggles in form (if form is open)
+      document.querySelectorAll(".jf-dir-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".jf-dir-btn").forEach(b => b.classList.remove("active", "long", "short", "hedged"));
+          btn.classList.add("active", btn.dataset.dir);
+        });
+      });
+
+      // Save / Cancel buttons in form
+      const saveBtn = $("jf-save-btn");
+      const cancelBtn = $("jf-cancel-btn");
+      if (saveBtn) saveBtn.addEventListener("click", submitJournalForm);
+      if (cancelBtn) cancelBtn.addEventListener("click", () => {
+        journalState.activeForm = null;
+        renderJournalBody();
+      });
+
+      // Trade row clicks → expand/collapse
+      document.querySelectorAll(".trade-row, .trade-card").forEach(el => {
+        el.addEventListener("click", (e) => {
+          // Don't toggle if user clicked an action button inside the expansion
+          if (e.target.closest(".td-btn")) return;
+          const id = parseInt(el.dataset.tradeId, 10);
+          journalState.expandedId = (journalState.expandedId === id) ? null : id;
+          renderJournalBody();
+        });
+      });
+
+      // Action buttons inside expanded detail
+      document.querySelectorAll(".td-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const action = btn.dataset.action;
+          const id = parseInt(btn.dataset.tradeId, 10);
+          if (action === "edit") {
+            journalState.activeForm = { type: "edit", id };
+            renderJournalBody();
+            // Scroll to form
+            setTimeout(() => $("journal-body").querySelector(".journal-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+          } else if (action === "close") {
+            journalState.activeForm = { type: "close", id };
+            renderJournalBody();
+            setTimeout(() => $("journal-body").querySelector(".journal-form")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+          } else if (action === "delete") {
+            confirmAndDelete(id);
+          }
+        });
+      });
+    }
+
+    async function submitJournalForm() {
+      const af = journalState.activeForm;
+      const formType = af === "add" ? "add" : af.type;
+
+      if (formType === "close") {
+        await submitCloseForm(af.id);
+      } else {
+        await submitAddOrEditForm(formType, formType === "edit" ? af.id : null);
+      }
+    }
+
+    async function submitAddOrEditForm(formType, tradeId) {
+      const symbol = ($("jf-symbol").value || "").trim().toUpperCase();
+      const direction = document.querySelector(".jf-dir-btn.active")?.dataset.dir || "long";
+      const qty = parseInt($("jf-qty").value, 10);
+      const entryPrice = parseFloat($("jf-entry-price").value);
+      const entryDate = $("jf-entry-date").value;
+      const stopLossRaw = $("jf-stop-loss").value;
+      const targetPriceRaw = $("jf-target-price").value;
+      const setupType = $("jf-setup-type").value || null;
+      const whyTaken = $("jf-why-taken").value.trim() || null;
+
+      // Validation
+      if (formType === "add" && !symbol) { alert("Symbol is required"); return; }
+      if (!qty || qty <= 0) { alert("Quantity must be > 0"); return; }
+      if (!entryPrice || entryPrice <= 0) { alert("Entry price must be > 0"); return; }
+
+      const body = {
+        direction,
+        qty,
+        entry_price: entryPrice,
+        entry_date: entryDate,
+        stop_loss: stopLossRaw ? parseFloat(stopLossRaw) : null,
+        target_price: targetPriceRaw ? parseFloat(targetPriceRaw) : null,
+        setup_type: setupType,
+        why_taken: whyTaken,
+      };
+      if (formType === "add") body.symbol = symbol;
+
+      const saveBtn = $("jf-save-btn");
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving…";
+
+      try {
+        const url = formType === "add" ? JOURNAL_URL : `${JOURNAL_URL}/${tradeId}`;
+        const method = formType === "add" ? "POST" : "PATCH";
+        const res = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+        journalState.activeForm = null;
+        if (formType === "add") {
+          journalState.subview = "active";
+          journalState.expandedId = data.id;   // auto-expand the new trade
+        }
+        await loadJournal();
+      } catch (err) {
+        alert(`Save failed: ${err.message}`);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = formType === "add" ? "Add Trade" : "Save Changes";
+      }
+    }
+
+    async function submitCloseForm(tradeId) {
+      const exitPrice = parseFloat($("jf-exit-price").value);
+      const exitDate = $("jf-exit-date").value;
+      const wentWell = $("jf-went-well").value.trim() || null;
+      const wentWrong = $("jf-went-wrong").value.trim() || null;
+      const emotionalState = $("jf-emotional-state").value || null;
+      const lessonLearned = $("jf-lesson-learned").value.trim() || null;
+
+      if (!exitPrice || exitPrice <= 0) { alert("Exit price must be > 0"); return; }
+
+      const saveBtn = $("jf-save-btn");
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Closing…";
+
+      try {
+        const res = await fetch(`${JOURNAL_URL}/${tradeId}/close`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            exit_price: exitPrice,
+            exit_date: exitDate,
+            went_well: wentWell,
+            went_wrong: wentWrong,
+            emotional_state: emotionalState,
+            lesson_learned: lessonLearned,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+        journalState.activeForm = null;
+        journalState.subview = "history";   // jump to History after closing
+        journalState.expandedId = tradeId;
+        await loadJournal();
+      } catch (err) {
+        alert(`Close failed: ${err.message}`);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = "🔒 Close Trade";
+      }
+    }
+
+    async function confirmAndDelete(tradeId) {
+      const trade = journalState.cachedTrades.find(t => t.id === tradeId);
+      const label = trade ? `${trade.symbol} (${trade.direction.toUpperCase()}, ${trade.qty} shares)` : `trade #${tradeId}`;
+      if (!confirm(`Permanently delete ${label}?\n\nThis cannot be undone.`)) return;
+
+      try {
+        const res = await fetch(`${JOURNAL_URL}/${tradeId}`, { method: "DELETE" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        journalState.expandedId = null;
+        await loadJournal();
+      } catch (err) {
+        alert(`Delete failed: ${err.message}`);
+      }
+    }
+
+    // ===== Pre-fill journal from a trade plan ("Save to Journal" button) =====
+    // Reads the trade plan's symbol/direction/qty/entry/stop/target from the
+    // button's data-* attributes, jumps to the Journal tab, opens the Add form,
+    // and pre-populates the inputs. User just adds their notes and saves.
+    function prefillJournalFromTradePlan(ds) {
+      // 1. Switch to Journal tab
+      document.querySelectorAll(".tab").forEach(b =>
+        b.classList.toggle("active", b.dataset.tab === "journal"));
+      document.querySelectorAll('[id^="panel-"]').forEach(p =>
+        p.style.display = p.id === "panel-journal" ? "block" : "none");
+
+      // 2. Set state to show the Add form and switch to Active sub-view
+      journalState.subview = "active";
+      journalState.activeForm = "add";
+      journalState.expandedId = null;
+
+      // 3. Render the journal panel (which renders the form)
+      renderJournalPanel();
+
+      // 4. After render completes, populate form fields from the trade plan
+      // Small delay to let the form DOM materialize after loadJournal's fetch
+      const populate = () => {
+        const symbolInput = $("jf-symbol");
+        if (!symbolInput) {
+          // Form not in DOM yet — retry
+          setTimeout(populate, 100);
+          return;
+        }
+        symbolInput.value = ds.symbol || "";
+        $("jf-qty").value = ds.qty || "";
+        $("jf-entry-price").value = parseFloat(ds.entry).toFixed(2);
+        $("jf-stop-loss").value = parseFloat(ds.stop).toFixed(2);
+        $("jf-target-price").value = parseFloat(ds.target).toFixed(2);
+
+        // Set direction pill
+        document.querySelectorAll(".jf-dir-btn").forEach(b => {
+          b.classList.remove("active", "long", "short", "hedged");
+          if (b.dataset.dir === ds.direction) b.classList.add("active", ds.direction);
+        });
+
+        // Focus the notes field so user can immediately start typing
+        const whyTakenInput = $("jf-why-taken");
+        if (whyTakenInput) {
+          whyTakenInput.focus();
+          whyTakenInput.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      };
+      setTimeout(populate, 300);   // initial delay covers loadJournal fetch
     }
 
 
@@ -3877,6 +4995,10 @@
         if (tab === "compare" && !$("panel-compare").innerHTML.trim()) {
           renderComparePanel();
         }
+        if (tab === "journal") {
+          // Always re-render journal on tab click (so live spot prices refresh)
+          renderJournalPanel();
+        }
       });
     });
 
@@ -3935,6 +5057,7 @@
       "analyze":      "AI Technical Analysis",
       "sizer":        "Position Sizer",
       "compare":      "Stock Comparison",
+      "journal":      "Trading Journal",
     };
 
     function getActiveTab() {
