@@ -1448,6 +1448,117 @@
       font-size: 11px; color: #6b7280; font-style: italic;
       margin-top: 12px; text-align: center;
     }
+    /* ===== Factor Scoreboard ===== */
+    .tp-card.scoreboard {
+      border: 1px solid #cbd5e1;
+    }
+    .tp-card.scoreboard .tp-card-title::before {
+      background: #475569;
+    }
+
+    .sb-summary-ribbon {
+      display: flex; flex-wrap: wrap; justify-content: space-between;
+      align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: 7px; margin-bottom: 14px;
+      border: 1px solid;
+    }
+    .sb-summary-ribbon.good {
+      background: #d1fae5; color: #065f46; border-color: #6ee7b7;
+    }
+    .sb-summary-ribbon.neutral {
+      background: #fef3c7; color: #92400e; border-color: #fcd34d;
+    }
+    .sb-summary-ribbon.bad {
+      background: #fee2e2; color: #991b1b; border-color: #f87171;
+    }
+    .sb-summary-main {
+      font-size: 14px;
+    }
+    .sb-summary-counts {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      font-size: 12px;
+    }
+    .sb-count {
+      padding: 3px 8px; border-radius: 4px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+    .sb-count.fav strong     { color: #15803d; }
+    .sb-count.against strong { color: #b91c1c; }
+    .sb-count.neutral strong { color: #92400e; }
+    .sb-count.net strong     { color: #1f2937; }
+
+    .sb-bucket {
+      margin-bottom: 12px;
+    }
+    .sb-bucket:last-of-type { margin-bottom: 0; }
+    .sb-bucket-title {
+      font-size: 12px; font-weight: 700; color: #475569;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      padding-bottom: 4px; border-bottom: 1px solid #e5e7eb;
+    }
+
+    .sb-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 12px;
+    }
+    .sb-table thead { background: #f9fafb; }
+    .sb-table th {
+      text-align: left; padding: 6px 10px; font-size: 10px;
+      color: #6b7280; text-transform: uppercase; letter-spacing: 0.4px;
+      font-weight: 600; border-bottom: 1px solid #e5e7eb;
+    }
+    .sb-table td {
+      padding: 7px 10px; border-bottom: 1px solid #f3f4f6;
+      vertical-align: top;
+    }
+    .sb-table tbody tr:last-child td { border-bottom: none; }
+    .sb-factor { font-weight: 600; color: #1f2937; }
+    .sb-value  { font-family: ui-monospace, monospace; color: #374151; }
+    .sb-reason { color: #4b5563; font-size: 11px; line-height: 1.45; }
+
+    .sb-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 99px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .sb-badge.fav     { background: #d1fae5; color: #065f46; }
+    .sb-badge.against { background: #fee2e2; color: #991b1b; }
+    .sb-badge.neutral { background: #f3f4f6; color: #6b7280; }
+
+    /* Mobile cards (< 640px) — hide table rows, show stacked cards */
+    .sb-mobile-card { display: none; }
+    @media (max-width: 640px) {
+      .sb-table thead { display: none; }
+      .sb-table tbody tr:not(.sb-mobile-card) { display: none; }
+      .sb-mobile-card { display: table-row; }
+      .sb-mobile-card td {
+        padding: 10px; background: #f9fafb; border-radius: 6px;
+        border-bottom: 1px solid #fff !important;
+      }
+      .sb-mobile-fav td      { background: #ecfdf5; }
+      .sb-mobile-against td  { background: #fef2f2; }
+      .sb-mobile-neutral td  { background: #f9fafb; }
+      .sb-mobile-row {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 4px;
+      }
+      .sb-mobile-factor { font-weight: 700; font-size: 12px; color: #1f2937; }
+      .sb-mobile-verdict-row {
+        display: flex; gap: 8px; align-items: center;
+      }
+      .sb-mobile-value {
+        font-family: ui-monospace, monospace; font-size: 11px; color: #4b5563;
+      }
+      .sb-mobile-reason {
+        font-size: 11px; color: #4b5563; line-height: 1.45;
+        font-style: italic; padding-top: 4px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+      }
+      .sb-summary-ribbon {
+        flex-direction: column; align-items: flex-start; gap: 8px;
+      }
+    }
 
   </style>
 </head>
@@ -2857,6 +2968,95 @@
         </div>
       `;
 
+      // ---- Scoreboard card (algorithm verdicts + AI one-line reasons) ----
+      // Shows BEFORE AI commentary so the user sees the data verdict table first,
+      // then reads the prose explanation. Groups factors by bucket.
+      let scoreboardCard = "";
+      if (data.scoreboard && data.scoreboard.length > 0) {
+        const summary = data.scoreboard_summary || {};
+        const buckets = {};
+        data.scoreboard.forEach(row => {
+          if (!buckets[row.bucket]) buckets[row.bucket] = [];
+          buckets[row.bucket].push(row);
+        });
+
+        const verdictBadge = (v) => {
+          if (v === "favorable") return '<span class="sb-badge fav">✓ FOR</span>';
+          if (v === "against")   return '<span class="sb-badge against">✗ AGAINST</span>';
+          return '<span class="sb-badge neutral">~ NEUTRAL</span>';
+        };
+
+        const bucketRows = Object.entries(buckets).map(([bucket, rows]) => {
+          const tableRows = rows.map(r => `
+            <tr>
+              <td class="sb-factor">${escapeHtml(r.factor)}</td>
+              <td class="sb-value">${escapeHtml(r.value)}</td>
+              <td class="sb-verdict">${verdictBadge(r.verdict)}</td>
+              <td class="sb-reason">${r.reason ? escapeHtml(r.reason) : '<span style="color:#9ca3af;font-style:italic;">—</span>'}</td>
+            </tr>
+            <tr class="sb-mobile-card sb-mobile-${r.verdict}">
+              <td colspan="4">
+                <div class="sb-mobile-row">
+                  <div class="sb-mobile-factor">${escapeHtml(r.factor)}</div>
+                  <div class="sb-mobile-verdict-row">
+                    <span class="sb-mobile-value">${escapeHtml(r.value)}</span>
+                    ${verdictBadge(r.verdict)}
+                  </div>
+                </div>
+                ${r.reason ? `<div class="sb-mobile-reason">${escapeHtml(r.reason)}</div>` : ''}
+              </td>
+            </tr>
+          `).join("");
+          return `
+            <div class="sb-bucket">
+              <div class="sb-bucket-title">${escapeHtml(bucket)}</div>
+              <table class="sb-table">
+                <thead>
+                  <tr>
+                    <th style="width:30%;">Factor</th>
+                    <th style="width:22%;">Value</th>
+                    <th style="width:18%;">Verdict</th>
+                    <th style="width:30%;">Why</th>
+                  </tr>
+                </thead>
+                <tbody>${tableRows}</tbody>
+              </table>
+            </div>
+          `;
+        }).join("");
+
+        // Summary ribbon
+        const verdictLabel = summary.verdict_label || "—";
+        const netColor = summary.net_score >= 3 ? "good"
+                       : summary.net_score >= -2 ? "neutral" : "bad";
+        const directionLabel = data.direction.toUpperCase();
+        const summaryRibbon = `
+          <div class="sb-summary-ribbon ${netColor}">
+            <div class="sb-summary-main">
+              <strong>${escapeHtml(verdictLabel)}</strong> for ${escapeHtml(directionLabel)}
+            </div>
+            <div class="sb-summary-counts">
+              <span class="sb-count fav"><strong>${summary.favorable}</strong> FOR</span>
+              <span class="sb-count against"><strong>${summary.against}</strong> AGAINST</span>
+              <span class="sb-count neutral"><strong>${summary.neutral}</strong> NEUTRAL</span>
+              <span class="sb-count net">Net: <strong>${summary.net_score >= 0 ? '+' : ''}${summary.net_score}</strong></span>
+            </div>
+          </div>
+        `;
+
+        scoreboardCard = `
+          <div class="tp-card scoreboard">
+            <div class="tp-card-title">📊 Factor Scoreboard — Signals For / Against ${escapeHtml(directionLabel)}</div>
+            ${summaryRibbon}
+            ${bucketRows}
+            <div style="font-size:11px; color:#6b7280; margin-top:10px; font-style:italic;">
+              Verdicts are computed algorithmically from current data. Reasons are written by AI.
+              FOR/AGAINST relative to your chosen ${escapeHtml(directionLabel)} direction.
+            </div>
+          </div>
+        `;
+      }
+
       // ---- AI commentary card ----
       const commentaryCard = `
         <div class="tp-card commentary">
@@ -2926,6 +3126,7 @@
           ${targetsCard}
           ${hedgeCard}
           ${econCard}
+          ${scoreboardCard}
           ${commentaryCard}
           ${saveJournalCTA}
           ${peerCTA}
