@@ -3213,9 +3213,23 @@
       const add2 = lvl.add_zones.adverse_2;
       const rr  = econ.risk_reward_ratio;
 
-      // Option-derived S/R (may be null for non-F&O)
-      const resistance = ref.nearest_resistance;
-      const support    = ref.nearest_support;
+      // Option-derived S/R — top 2 Call OI strikes (resistance) and top 2 Put OI
+      // strikes (support). Backend returns these in ref.top_call_oi_strikes /
+      // ref.top_put_oi_strikes (sorted by OI desc). If those arrays aren't
+      // present (older backend), fall back to the single nearest_resistance /
+      // nearest_support so the script still works.
+      let callOiStrikes = ref.top_call_oi_strikes || [];
+      let putOiStrikes  = ref.top_put_oi_strikes  || [];
+      // Backward-compat fallback: if backend hasn't been updated yet
+      if (callOiStrikes.length === 0 && ref.nearest_resistance) {
+        callOiStrikes = [{ strike: ref.nearest_resistance, oi: null }];
+      }
+      if (putOiStrikes.length === 0 && ref.nearest_support) {
+        putOiStrikes = [{ strike: ref.nearest_support, oi: null }];
+      }
+      // Format OI in lakhs for the label (Indian convention; 1 lakh = 100,000)
+      const fmtOiLakh = (oi) => oi === null || oi === undefined ? "" : ` [${(oi / 100000).toFixed(1)}L OI]`;
+
       const sma50  = ref.sma_50;
       const sma200 = ref.sma_200;
 
@@ -3243,15 +3257,28 @@ add1_px    = input.price(${add1},      "Add Zone 1")
 add2_px    = input.price(${add2},      "Add Zone 2")
 `;
 
-      // Add optional S/R inputs only if present
-      if (resistance) script += `resist_px  = input.price(${resistance}, "Option Resistance (Call OI)")\n`;
-      if (support)    script += `support_px = input.price(${support},    "Option Support (Put OI)")\n`;
+      // Add the top-2 Call OI strikes as resistance inputs
+      callOiStrikes.forEach((s, i) => {
+        const labelSuffix = i === 0 ? "#1 (Strongest)" : "#2";
+        script += `call_oi_${i + 1}_px = input.price(${s.strike}, "Call OI Resistance ${labelSuffix}")\n`;
+      });
+      // Add the top-2 Put OI strikes as support inputs
+      putOiStrikes.forEach((s, i) => {
+        const labelSuffix = i === 0 ? "#1 (Strongest)" : "#2";
+        script += `put_oi_${i + 1}_px = input.price(${s.strike}, "Put OI Support ${labelSuffix}")\n`;
+      });
 
       script += `
 // --- Helper to draw a horizontal level line + label ---
 draw_level(price, col, style, width, txt) =>
     ln = line.new(bar_index - 100, price, bar_index + 20, price, color=col, style=style, width=width, extend=extend.right)
     label.new(bar_index + 20, price, txt + "  " + str.tostring(price), style=label.style_label_left, color=color.new(col, 70), textcolor=color.white, size=size.small)
+
+// Helper to draw a shaded zone (thicker visual presence than a line)
+// Used for option OI walls — these act as "zones" where price often reacts
+draw_zone(price, zone_width, col_top, col_bg, txt) =>
+    box.new(bar_index - 100, price + zone_width, bar_index + 20, price - zone_width, border_color=col_top, bgcolor=col_bg, extend=extend.right)
+    label.new(bar_index + 20, price, txt + "  " + str.tostring(price), style=label.style_label_left, color=col_top, textcolor=color.white, size=size.small)
 
 // Only draw on the last bar to avoid clutter
 if barstate.islast
@@ -3272,18 +3299,49 @@ if barstate.islast
     draw_level(add2_px, color.orange, line.style_dotted, 1, "➕ Add 2")
 `;
 
-      if (resistance) {
-        script += `
-    // --- Option resistance zone (Call OI) ---
-    draw_level(resist_px, color.maroon, line.style_solid, 1, "⬆ Resistance")
+      // Compute ATR-based zone width for the OI walls (visual thickness).
+      // Width = 25% of ATR — keeps the zone visible without overlapping other levels.
+      const zoneWidth = (lvl.atr * 0.25).toFixed(2);
+
+      // Draw top-2 Call OI walls — strongest one gets bold/wide visual, second one lighter
+      callOiStrikes.forEach((s, i) => {
+        const isFirst = i === 0;
+        const oiLabel = fmtOiLakh(s.oi);
+        const label = `⬆ Call OI #${i + 1}${oiLabel}`;
+        if (isFirst) {
+          // Strongest: thick shaded zone (maroon) — the dominant resistance wall
+          script += `
+    // --- Top Call OI strike #${i + 1} (strongest resistance wall) ---
+    draw_zone(call_oi_${i + 1}_px, ${zoneWidth}, color.new(color.maroon, 0), color.new(color.maroon, 80), "${label}")
 `;
-      }
-      if (support) {
-        script += `
-    // --- Option support zone (Put OI) ---
-    draw_level(support_px, color.teal, line.style_solid, 1, "⬇ Support")
+        } else {
+          // Secondary: solid line, thinner — secondary resistance
+          script += `
+    // --- Top Call OI strike #${i + 1} (secondary resistance) ---
+    draw_level(call_oi_${i + 1}_px, color.maroon, line.style_solid, 2, "${label}")
 `;
-      }
+        }
+      });
+
+      // Draw top-2 Put OI walls — strongest gets bold/wide visual, second lighter
+      putOiStrikes.forEach((s, i) => {
+        const isFirst = i === 0;
+        const oiLabel = fmtOiLakh(s.oi);
+        const label = `⬇ Put OI #${i + 1}${oiLabel}`;
+        if (isFirst) {
+          // Strongest: thick shaded zone (teal) — the dominant support wall
+          script += `
+    // --- Top Put OI strike #${i + 1} (strongest support wall) ---
+    draw_zone(put_oi_${i + 1}_px, ${zoneWidth}, color.new(color.teal, 0), color.new(color.teal, 80), "${label}")
+`;
+        } else {
+          // Secondary: solid line, thinner — secondary support
+          script += `
+    // --- Top Put OI strike #${i + 1} (secondary support) ---
+    draw_level(put_oi_${i + 1}_px, color.teal, line.style_solid, 2, "${label}")
+`;
+        }
+      });
 
       // Info table
       script += `
