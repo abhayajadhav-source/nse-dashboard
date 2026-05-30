@@ -274,6 +274,226 @@
       background: var(--tp-surface); border-color: var(--tp-accent); color: var(--tp-accent);
     }
 
+    /* ============================================================
+       RISK DASHBOARD (Tier-1 institutional pattern)
+       Portfolio-level view: exposure, concentration, stress test.
+       ============================================================ */
+    .risk-wrapper { padding: 18px; }
+    .risk-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+    }
+    .risk-title { font-size: 18px; font-weight: 700; }
+    .risk-subtitle { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    [data-theme="dark"] .risk-subtitle { color: var(--tp-fg-muted); }
+
+    /* Portfolio size settings strip */
+    .risk-portfolio-settings {
+      background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;
+      padding: 12px 16px; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    [data-theme="dark"] .risk-portfolio-settings {
+      background: var(--tp-surface-alt); border-color: var(--tp-border);
+    }
+    .risk-portfolio-settings label {
+      font-size: 12px; font-weight: 600; color: #374151;
+    }
+    [data-theme="dark"] .risk-portfolio-settings label { color: var(--tp-fg); }
+    .risk-portfolio-settings input {
+      padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px;
+      font-size: 14px; width: 160px;
+    }
+    .risk-portfolio-settings button {
+      padding: 8px 14px; background: #1d4ed8; color: #fff; border: none;
+      border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;
+    }
+    .risk-portfolio-settings button:hover { background: #1e40af; }
+    .risk-portfolio-hint {
+      font-size: 11px; color: #6b7280; margin-left: auto;
+    }
+
+    /* Warnings banner */
+    .risk-warnings { margin-bottom: 16px; }
+    .risk-warning {
+      padding: 12px 16px; border-radius: 8px; margin-bottom: 8px;
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; line-height: 1.5;
+    }
+    .risk-warning.warning {
+      background: #fef3c7; border-left: 4px solid #f59e0b; color: #78350f;
+    }
+    .risk-warning.danger {
+      background: #fee2e2; border-left: 4px solid #dc2626; color: #7f1d1d;
+    }
+    [data-theme="dark"] .risk-warning.warning {
+      background: rgba(245,158,11,0.15); color: #fde68a;
+    }
+    [data-theme="dark"] .risk-warning.danger {
+      background: rgba(220,38,38,0.15); color: #fca5a5;
+    }
+
+    /* Section headers within risk panel */
+    .risk-section {
+      margin-bottom: 24px;
+    }
+    .risk-section-title {
+      font-size: 11px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 12px; padding-bottom: 6px;
+      border-bottom: 2px solid #1d4ed8;
+    }
+    [data-theme="dark"] .risk-section-title {
+      color: var(--tp-fg-muted); border-color: var(--tp-accent);
+    }
+
+    /* Top-line metrics grid (Exposure section) */
+    .risk-metrics-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px; margin-bottom: 16px;
+    }
+    .risk-metric-card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
+      padding: 14px 16px;
+    }
+    [data-theme="dark"] .risk-metric-card {
+      background: var(--tp-surface); border-color: var(--tp-border);
+    }
+    .risk-metric-label {
+      font-size: 11px; font-weight: 600; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    [data-theme="dark"] .risk-metric-label { color: var(--tp-fg-muted); }
+    .risk-metric-value {
+      font-size: 22px; font-weight: 700; margin-top: 6px;
+      font-family: ui-monospace, monospace;
+    }
+    .risk-metric-sub {
+      font-size: 12px; color: #6b7280; margin-top: 4px;
+    }
+    [data-theme="dark"] .risk-metric-sub { color: var(--tp-fg-muted); }
+    .risk-metric-value.gain { color: #16a34a; }
+    .risk-metric-value.loss { color: #dc2626; }
+
+    /* Long/Short bar visualization */
+    .risk-direction-bar {
+      display: flex; height: 30px; border-radius: 6px; overflow: hidden;
+      background: #e5e7eb; margin-top: 8px;
+    }
+    [data-theme="dark"] .risk-direction-bar { background: var(--tp-border); }
+    .risk-direction-segment {
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 12px; font-weight: 600; padding: 0 8px;
+      transition: width 0.3s;
+    }
+    .risk-direction-segment.long    { background: #16a34a; }
+    .risk-direction-segment.short   { background: #dc2626; }
+    .risk-direction-segment.hedged  { background: #ca8a04; }
+
+    /* Concentration tables */
+    .risk-conc-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid #f3f4f6;
+      font-size: 13px;
+    }
+    [data-theme="dark"] .risk-conc-row { border-color: var(--tp-border-soft); }
+    .risk-conc-label {
+      flex: 0 0 130px; font-weight: 600;
+    }
+    .risk-conc-bar-track {
+      flex: 1; height: 18px; background: #f3f4f6; border-radius: 4px; overflow: hidden;
+      position: relative;
+    }
+    [data-theme="dark"] .risk-conc-bar-track { background: var(--tp-border); }
+    .risk-conc-bar-fill {
+      height: 100%; background: #3b82f6;
+      transition: width 0.4s;
+    }
+    .risk-conc-bar-fill.warning { background: #f59e0b; }
+    .risk-conc-bar-fill.danger  { background: #dc2626; }
+    .risk-conc-value {
+      flex: 0 0 130px; text-align: right;
+      font-family: ui-monospace, monospace; font-size: 12px;
+    }
+
+    /* Stress test table */
+    .risk-stress-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13px;
+    }
+    .risk-stress-table th,
+    .risk-stress-table td {
+      padding: 10px 12px; text-align: right; border-bottom: 1px solid #f3f4f6;
+    }
+    .risk-stress-table th:first-child,
+    .risk-stress-table td:first-child { text-align: left; }
+    .risk-stress-table th {
+      font-size: 11px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      background: #f9fafb;
+    }
+    [data-theme="dark"] .risk-stress-table th {
+      background: var(--tp-surface-alt); color: var(--tp-fg-muted);
+    }
+    [data-theme="dark"] .risk-stress-table td { border-color: var(--tp-border-soft); }
+    .risk-stress-table .scenario-label {
+      font-weight: 700; font-family: ui-monospace, monospace;
+    }
+    .risk-stress-table .scenario-positive { color: #16a34a; font-weight: 600; }
+    .risk-stress-table .scenario-negative { color: #dc2626; font-weight: 600; }
+    .risk-stress-table .scenario-flat     { color: #6b7280; }
+    .risk-stress-table tr.highlighted     { background: #fef3c7; }
+    [data-theme="dark"] .risk-stress-table tr.highlighted {
+      background: rgba(245,158,11,0.1);
+    }
+
+    /* Position list (compact table) */
+    .risk-position-table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    .risk-position-table th,
+    .risk-position-table td {
+      padding: 8px 10px; border-bottom: 1px solid #f3f4f6;
+    }
+    .risk-position-table th {
+      background: #f9fafb; font-size: 11px; font-weight: 700;
+      color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;
+      text-align: left;
+    }
+    [data-theme="dark"] .risk-position-table th {
+      background: var(--tp-surface-alt); color: var(--tp-fg-muted);
+    }
+    [data-theme="dark"] .risk-position-table td { border-color: var(--tp-border-soft); }
+    .risk-position-table td.num {
+      text-align: right; font-family: ui-monospace, monospace;
+    }
+
+    /* Empty state when no open positions */
+    .risk-empty {
+      text-align: center; padding: 60px 20px;
+    }
+    .risk-empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .risk-empty-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .risk-empty-sub { font-size: 13px; color: #6b7280; }
+    [data-theme="dark"] .risk-empty-sub { color: var(--tp-fg-muted); }
+
+    /* Refresh button */
+    .risk-refresh-btn {
+      padding: 6px 14px; background: #fff; border: 1px solid #d1d5db;
+      border-radius: 6px; cursor: pointer; font-size: 13px;
+    }
+    .risk-refresh-btn:hover { background: #f9fafb; }
+    [data-theme="dark"] .risk-refresh-btn {
+      background: var(--tp-surface); border-color: var(--tp-border); color: var(--tp-fg);
+    }
+    [data-theme="dark"] .risk-refresh-btn:hover { background: var(--tp-surface-alt); }
+
+    /* Loading state */
+    .risk-loading {
+      padding: 60px 20px; text-align: center; color: #6b7280; font-size: 14px;
+    }
+    [data-theme="dark"] .risk-loading { color: var(--tp-fg-muted); }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -1896,6 +2116,9 @@
       <button class="tab" data-tab="journal">
         📒 Journal
       </button>
+      <button class="tab" data-tab="risk">
+        🛡️ Risk
+      </button>
     </div>
 
     <div id="panel-intraday" class="panel"></div>
@@ -1906,6 +2129,7 @@
     <div id="panel-sizer"    class="panel" style="display:none;"></div>
     <div id="panel-compare"  class="panel" style="display:none;"></div>
     <div id="panel-journal"  class="panel" style="display:none;"></div>
+    <div id="panel-risk"     class="panel" style="display:none;"></div>
   </div>
 
   <script>
@@ -2212,7 +2436,7 @@
         const tabMap = {
           a: "analyze",      j: "journal",     s: "strategy",
           c: "compare",      p: "sizer",       i: "intraday",
-          r: "reversal",     m: "momentum",
+          r: "reversal",     m: "momentum",    k: "risk",
         };
         if (tabMap[k]) {
           e.preventDefault();
@@ -2437,6 +2661,404 @@
     }
     // Stash the latest analyze response so the research-note CTA can use it
     window._latestAnalyzeData = null;
+
+
+    // =================================================================
+    // RISK DASHBOARD (Tier-1 institutional pattern)
+    // =================================================================
+    // Reads /api/risk-dashboard which aggregates open journal positions.
+    // Renders 4 sections: warnings, exposure, concentration, stress test.
+    // Portfolio size is user-supplied (localStorage) for % calculations.
+    //
+    // No auto-refresh — Yahoo Finance calls are slow (5-10s for many
+    // symbols) and the data doesn't change second-to-second.
+    // =================================================================
+    const RISK_URL = "https://nse-dashboard-api.onrender.com/api/risk-dashboard";
+    const PORTFOLIO_SIZE_KEY = "nseDashboardPortfolioSize";
+
+    function getPortfolioSize() {
+      try {
+        const v = localStorage.getItem(PORTFOLIO_SIZE_KEY);
+        if (!v) return null;
+        const n = parseFloat(v);
+        return isNaN(n) || n <= 0 ? null : n;
+      } catch (e) { return null; }
+    }
+    function setPortfolioSize(n) {
+      try {
+        localStorage.setItem(PORTFOLIO_SIZE_KEY, String(n));
+      } catch (e) { /* ignore */ }
+    }
+
+    let _riskDashboardLoaded = false;
+
+    async function loadRiskDashboard(force = false) {
+      const panel = $("panel-risk");
+      if (!panel) return;
+      // Reuse the panel skeleton — only refetch data section
+      if (_riskDashboardLoaded && !force) {
+        // Already rendered, just refresh data
+        await fetchAndRenderRiskData();
+        return;
+      }
+      renderRiskSkeleton();
+      _riskDashboardLoaded = true;
+      await fetchAndRenderRiskData();
+    }
+
+    function renderRiskSkeleton() {
+      // Build the panel scaffold: header, portfolio settings, data container
+      const panel = $("panel-risk");
+      const savedPortfolio = getPortfolioSize();
+      panel.innerHTML = `
+        <div class="risk-wrapper">
+          <div class="risk-header">
+            <div>
+              <div class="risk-title">🛡️ Risk Dashboard</div>
+              <div class="risk-subtitle">Portfolio-level view of open positions, concentration, and stress scenarios</div>
+            </div>
+            <button id="risk-refresh-btn" class="risk-refresh-btn" type="button">↻ Refresh</button>
+          </div>
+
+          <!-- Portfolio size settings: required for % calculations.
+               Stored in localStorage. -->
+          <div class="risk-portfolio-settings">
+            <label for="risk-portfolio-input">Portfolio size:</label>
+            <input id="risk-portfolio-input" type="number" min="0" step="1000"
+                   placeholder="e.g. 500000"
+                   value="${savedPortfolio !== null ? savedPortfolio : ""}"
+                   inputmode="numeric">
+            <button id="risk-portfolio-save" type="button">Save</button>
+            <span class="risk-portfolio-hint">
+              Used to compute deployment %. Stored locally on this device only.
+            </span>
+          </div>
+
+          <!-- Data sections render here -->
+          <div id="risk-data-container">
+            <div class="risk-loading">Loading open positions and live market data… (this can take 5-10s on first load)</div>
+          </div>
+        </div>
+      `;
+
+      // Wire up the refresh + portfolio-save buttons
+      $("risk-refresh-btn").addEventListener("click", () => fetchAndRenderRiskData());
+      $("risk-portfolio-save").addEventListener("click", () => {
+        const v = parseFloat($("risk-portfolio-input").value);
+        if (isNaN(v) || v <= 0) {
+          alert("Enter a positive portfolio size (e.g. 500000 for ₹5,00,000).");
+          return;
+        }
+        setPortfolioSize(v);
+        // Re-render to reflect the new % deployment
+        if (window._lastRiskData) renderRiskData(window._lastRiskData);
+      });
+      // Save on Enter key
+      $("risk-portfolio-input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") $("risk-portfolio-save").click();
+      });
+    }
+
+    async function fetchAndRenderRiskData() {
+      const container = $("risk-data-container");
+      container.innerHTML = `<div class="risk-loading">Loading open positions and live market data… (this can take 5-10s on first load)</div>`;
+      try {
+        const resp = await fetch(RISK_URL);
+        if (!resp.ok) {
+          const errText = await resp.text();
+          container.innerHTML = `
+            <div class="risk-warning danger">
+              <span>⚠️</span>
+              <div>
+                <strong>Failed to load risk data:</strong> ${escapeHtml(errText.slice(0, 200))}
+              </div>
+            </div>
+          `;
+          return;
+        }
+        const data = await resp.json();
+        window._lastRiskData = data;
+        renderRiskData(data);
+      } catch (e) {
+        container.innerHTML = `
+          <div class="risk-warning danger">
+            <span>⚠️</span>
+            <div><strong>Network error:</strong> ${escapeHtml(String(e))}</div>
+          </div>
+        `;
+      }
+    }
+
+    function renderRiskData(data) {
+      const container = $("risk-data-container");
+      const portfolioSize = getPortfolioSize();
+
+      // Empty state: no open positions
+      if (!data.positions || data.positions.length === 0) {
+        container.innerHTML = `
+          <div class="risk-empty">
+            <div class="risk-empty-icon">📭</div>
+            <div class="risk-empty-title">No open positions</div>
+            <div class="risk-empty-sub">
+              Open positions from your journal will show up here.
+              Use the Journal tab to log a trade, or generate a trade plan in Analyze.
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Render all 4 sections in order
+      container.innerHTML = `
+        ${renderRiskWarnings(data.warnings, data.summary, portfolioSize)}
+        ${renderRiskExposure(data.summary, data.concentration.by_direction, portfolioSize)}
+        ${renderRiskConcentration(data.concentration)}
+        ${renderRiskStressTest(data.stress_test, data.summary)}
+        ${renderRiskPositions(data.positions)}
+      `;
+    }
+
+    function renderRiskWarnings(warnings, summary, portfolioSize) {
+      const out = [];
+      // Auto-warning: over-deployment vs portfolio size
+      if (portfolioSize && summary.capital_at_entry > portfolioSize) {
+        const overPct = ((summary.capital_at_entry / portfolioSize - 1) * 100).toFixed(0);
+        out.push(`
+          <div class="risk-warning danger">
+            <span>🚨</span>
+            <div>
+              <strong>Over-deployed:</strong> Capital at entry (${fmtRupeesCompact(summary.capital_at_entry)})
+              exceeds your portfolio size (${fmtRupeesCompact(portfolioSize)}) by ${overPct}%.
+              You're trading on leverage — verify this is intentional.
+            </div>
+          </div>
+        `);
+      } else if (portfolioSize && summary.capital_at_entry > portfolioSize * 0.8) {
+        const pct = ((summary.capital_at_entry / portfolioSize) * 100).toFixed(0);
+        out.push(`
+          <div class="risk-warning warning">
+            <span>⚠️</span>
+            <div>
+              <strong>High deployment:</strong> ${pct}% of portfolio is in open positions.
+              Limited dry powder for new opportunities or hedges.
+            </div>
+          </div>
+        `);
+      }
+      // Backend-computed warnings
+      for (const w of (warnings || [])) {
+        out.push(`
+          <div class="risk-warning ${escapeHtml(w.level)}">
+            <span>${w.level === "danger" ? "🚨" : "⚠️"}</span>
+            <div>${escapeHtml(w.message)}</div>
+          </div>
+        `);
+      }
+      if (out.length === 0) return "";
+      return `<div class="risk-warnings">${out.join("")}</div>`;
+    }
+
+    function renderRiskExposure(summary, byDirection, portfolioSize) {
+      const pnlClass = summary.total_unrealized_pnl >= 0 ? "gain" : "loss";
+      const pnlSign  = summary.total_unrealized_pnl >= 0 ? "+" : "";
+      const deploymentPct = portfolioSize
+        ? ((summary.capital_at_entry / portfolioSize) * 100).toFixed(1) + "%"
+        : "(set portfolio size to compute)";
+
+      // Long/short/hedged bar segments
+      const segments = [];
+      if (byDirection.long_pct > 0) {
+        segments.push(`<div class="risk-direction-segment long" style="width:${byDirection.long_pct}%;" title="Long: ${byDirection.long_pct.toFixed(1)}%">Long ${byDirection.long_pct.toFixed(0)}%</div>`);
+      }
+      if (byDirection.hedged_pct > 0) {
+        segments.push(`<div class="risk-direction-segment hedged" style="width:${byDirection.hedged_pct}%;" title="Hedged: ${byDirection.hedged_pct.toFixed(1)}%">Hedged ${byDirection.hedged_pct.toFixed(0)}%</div>`);
+      }
+      if (byDirection.short_pct > 0) {
+        segments.push(`<div class="risk-direction-segment short" style="width:${byDirection.short_pct}%;" title="Short: ${byDirection.short_pct.toFixed(1)}%">Short ${byDirection.short_pct.toFixed(0)}%</div>`);
+      }
+
+      const skewLabel = {
+        long_heavy:   "Heavily long-biased",
+        short_heavy:  "Heavily short-biased",
+        long_tilted:  "Long-tilted",
+        short_tilted: "Short-tilted",
+        balanced:     "Balanced direction",
+        empty:        "—",
+      }[byDirection.skew] || byDirection.skew;
+
+      return `
+        <div class="risk-section">
+          <div class="risk-section-title">Exposure</div>
+          <div class="risk-metrics-grid">
+            <div class="risk-metric-card">
+              <div class="risk-metric-label">Open Positions</div>
+              <div class="risk-metric-value">${summary.total_positions}</div>
+              <div class="risk-metric-sub">${summary.long_positions}L · ${summary.short_positions}S · ${summary.hedged_positions}H</div>
+            </div>
+            <div class="risk-metric-card">
+              <div class="risk-metric-label">Capital at Entry</div>
+              <div class="risk-metric-value">${fmtRupeesCompact(summary.capital_at_entry)}</div>
+              <div class="risk-metric-sub">${deploymentPct} of portfolio</div>
+            </div>
+            <div class="risk-metric-card">
+              <div class="risk-metric-label">Current Value (MTM)</div>
+              <div class="risk-metric-value">${fmtRupeesCompact(summary.current_value)}</div>
+              <div class="risk-metric-sub">Live mark-to-market</div>
+            </div>
+            <div class="risk-metric-card">
+              <div class="risk-metric-label">Unrealized P&L</div>
+              <div class="risk-metric-value ${pnlClass}">${pnlSign}${fmtRupeesCompact(summary.total_unrealized_pnl)}</div>
+              <div class="risk-metric-sub ${pnlClass}">${pnlSign}${fmt(summary.total_unrealized_pct)}%</div>
+            </div>
+          </div>
+          <div style="margin-top: 16px;">
+            <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 4px;">
+              Direction split (${escapeHtml(skewLabel)})
+            </div>
+            <div class="risk-direction-bar">${segments.join("")}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRiskConcentration(conc) {
+      const symbolRows = conc.by_symbol.slice(0, 10).map(s => {
+        const fillClass = s.warning ? s.warning : "";
+        return `
+          <div class="risk-conc-row">
+            <div class="risk-conc-label">${escapeHtml(s.symbol)}</div>
+            <div class="risk-conc-bar-track">
+              <div class="risk-conc-bar-fill ${fillClass}" style="width:${Math.min(s.pct_of_book, 100)}%;"></div>
+            </div>
+            <div class="risk-conc-value">${fmtRupeesCompact(s.capital)} · ${s.pct_of_book.toFixed(1)}%</div>
+          </div>
+        `;
+      }).join("");
+
+      const sectorRows = conc.by_sector.slice(0, 10).map(s => {
+        const fillClass = s.warning ? s.warning : "";
+        return `
+          <div class="risk-conc-row">
+            <div class="risk-conc-label">${escapeHtml(s.sector)}</div>
+            <div class="risk-conc-bar-track">
+              <div class="risk-conc-bar-fill ${fillClass}" style="width:${Math.min(s.pct_of_book, 100)}%;"></div>
+            </div>
+            <div class="risk-conc-value">${fmtRupeesCompact(s.capital)} · ${s.pct_of_book.toFixed(1)}%</div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="risk-section">
+          <div class="risk-section-title">Concentration</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px;" class="risk-concentration-grid">
+            <div>
+              <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">By Symbol (Top 10)</div>
+              ${symbolRows || '<div style="color:#9ca3af;font-size:13px;">No positions</div>'}
+            </div>
+            <div>
+              <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">By Sector (Top 10)</div>
+              ${sectorRows || '<div style="color:#9ca3af;font-size:13px;">No positions</div>'}
+            </div>
+          </div>
+        </div>
+        <style>
+          @media (max-width: 700px) {
+            .risk-concentration-grid {
+              grid-template-columns: 1fr !important; gap: 16px !important;
+            }
+          }
+        </style>
+      `;
+    }
+
+    function renderRiskStressTest(stress, summary) {
+      // Highlight the -5% scenario as the "typical bad day" focus row
+      const rows = stress.scenarios.map(s => {
+        const cls = s.portfolio_change > 0 ? "scenario-positive"
+                  : s.portfolio_change < 0 ? "scenario-negative"
+                  : "scenario-flat";
+        const sign = s.portfolio_change >= 0 ? "+" : "";
+        const sign2 = s.portfolio_change_pct >= 0 ? "+" : "";
+        const highlight = s.nifty_pct === -5 ? "highlighted" : "";
+        return `
+          <tr class="${highlight}">
+            <td class="scenario-label">${s.nifty_pct >= 0 ? "+" : ""}${s.nifty_pct}%</td>
+            <td class="${cls}">${sign}${fmtRupeesCompact(s.portfolio_change)}</td>
+            <td class="${cls}">${sign2}${fmt(s.portfolio_change_pct)}%</td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        <div class="risk-section">
+          <div class="risk-section-title">Stress Test — NIFTY Scenarios</div>
+          <div style="font-size: 12px; color: #6b7280; margin-bottom: 10px;">
+            Beta-weighted impact of NIFTY moves on your open book.
+            Assumes correlation holds (historical betas may not reflect current regime).
+          </div>
+          <table class="risk-stress-table">
+            <thead>
+              <tr>
+                <th>NIFTY Move</th>
+                <th style="text-align:right;">Portfolio Impact</th>
+                <th style="text-align:right;">% of Book</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderRiskPositions(positions) {
+      const rows = positions.map(p => {
+        const dirBadge = {
+          long:   '<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">LONG</span>',
+          short:  '<span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">SHORT</span>',
+          hedged: '<span style="background:#fef3c7;color:#854d0e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;">HEDGED</span>',
+        }[p.direction] || p.direction;
+        const pnlCls = p.unrealized_pnl >= 0 ? "gain" : "loss";
+        const pnlSign = p.unrealized_pnl >= 0 ? "+" : "";
+        return `
+          <tr>
+            <td><strong>${escapeHtml(p.symbol)}</strong></td>
+            <td>${dirBadge}</td>
+            <td class="num">${p.qty}</td>
+            <td class="num">${fmtRupees(p.entry_price)}</td>
+            <td class="num">${fmtRupees(p.current_price)}</td>
+            <td class="num"><span class="${pnlCls}">${pnlSign}${fmtRupeesCompact(p.unrealized_pnl)}</span></td>
+            <td class="num"><span class="${pnlCls}">${pnlSign}${fmt(p.unrealized_pnl_pct)}%</span></td>
+            <td class="num">${fmt(p.beta, 2)}</td>
+            <td>${escapeHtml(p.sector || "Unknown")}</td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        <div class="risk-section">
+          <div class="risk-section-title">Positions</div>
+          <div style="overflow-x: auto;">
+            <table class="risk-position-table">
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Side</th>
+                  <th style="text-align:right;">Qty</th>
+                  <th style="text-align:right;">Entry</th>
+                  <th style="text-align:right;">Spot</th>
+                  <th style="text-align:right;">P&amp;L</th>
+                  <th style="text-align:right;">%</th>
+                  <th style="text-align:right;">Beta</th>
+                  <th>Sector</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
 
 
     // Simple Markdown → HTML for AI analysis output
@@ -6277,6 +6899,10 @@ if barstate.islast
           // Always re-render journal on tab click (so live spot prices refresh)
           renderJournalPanel();
         }
+        if (tab === "risk") {
+          // Load on first visit; on subsequent visits just refresh data
+          loadRiskDashboard();
+        }
       });
     });
 
@@ -6553,6 +7179,8 @@ if barstate.islast
         <span><span class="kbd-key">g</span> <span class="kbd-key">r</span></span></div>
       <div class="kbd-row"><span>Go to Momentum scan</span>
         <span><span class="kbd-key">g</span> <span class="kbd-key">m</span></span></div>
+      <div class="kbd-row"><span>Go to Risk Dashboard</span>
+        <span><span class="kbd-key">g</span> <span class="kbd-key">k</span></span></div>
       <div class="kbd-section">UI</div>
       <div class="kbd-row"><span>Toggle dark mode</span>
         <span><span class="kbd-key">d</span></span></div>
