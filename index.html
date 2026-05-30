@@ -494,6 +494,150 @@
     }
     [data-theme="dark"] .risk-loading { color: var(--tp-fg-muted); }
 
+    /* ============================================================
+       HEDGE SUGGESTIONS — concrete hedging plays for the open book
+       ============================================================ */
+    .hedge-cta-box {
+      background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px;
+      padding: 16px 18px; text-align: center;
+    }
+    [data-theme="dark"] .hedge-cta-box {
+      background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.3);
+    }
+    .hedge-cta-btn {
+      padding: 10px 20px; background: #1d4ed8; color: #fff; border: none;
+      border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px;
+    }
+    .hedge-cta-btn:hover { background: #1e40af; }
+
+    .hedge-loading {
+      padding: 40px 20px; text-align: center; color: #6b7280;
+    }
+    .hedge-spinner {
+      display: inline-block; width: 32px; height: 32px;
+      border: 3px solid #e5e7eb; border-top-color: #1d4ed8;
+      border-radius: 50%; animation: hedge-spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes hedge-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hedge-narrative {
+      background: #f9fafb; border-left: 4px solid #1d4ed8;
+      padding: 14px 18px; margin-bottom: 16px;
+      font-size: 14px; line-height: 1.6; border-radius: 0 6px 6px 0;
+    }
+    [data-theme="dark"] .hedge-narrative {
+      background: var(--tp-surface-alt); border-color: var(--tp-accent);
+    }
+    .hedge-narrative p { margin-bottom: 10px; }
+    .hedge-narrative p:last-child { margin-bottom: 0; }
+
+    .hedge-cards {
+      display: grid; gap: 14px;
+    }
+
+    .hedge-card {
+      background: #fff; border: 1px solid #e5e7eb; border-left-width: 4px;
+      border-radius: 8px; padding: 14px 16px;
+    }
+    [data-theme="dark"] .hedge-card {
+      background: var(--tp-surface); border-color: var(--tp-border);
+    }
+
+    .hedge-card-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 10px; gap: 12px;
+    }
+    .hedge-card-category {
+      font-size: 10px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    [data-theme="dark"] .hedge-card-category { color: var(--tp-fg-muted); }
+    .hedge-card-title {
+      font-size: 15px; font-weight: 700; margin-top: 2px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .hedge-icon { font-size: 16px; }
+
+    .hedge-priority {
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .hedge-priority-top {
+      background: #1d4ed8; color: #fff;
+    }
+    .hedge-priority-low {
+      background: #f3f4f6; color: #6b7280;
+    }
+    [data-theme="dark"] .hedge-priority-low {
+      background: var(--tp-border); color: var(--tp-fg-muted);
+    }
+
+    .hedge-instrument {
+      background: #1f2937; color: #fff; padding: 10px 14px; border-radius: 6px;
+      font-family: ui-monospace, monospace; font-size: 13px; font-weight: 600;
+      margin: 8px 0 12px;
+    }
+    [data-theme="dark"] .hedge-instrument { background: #000; }
+
+    .hedge-row-label {
+      font-size: 11px; font-weight: 600; color: #6b7280; margin-right: 4px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    [data-theme="dark"] .hedge-row-label { color: var(--tp-fg-muted); }
+    .hedge-risk-line { font-size: 13px; margin-bottom: 10px; line-height: 1.5; }
+
+    .hedge-rationale {
+      background: #fef9c3; padding: 10px 12px; border-radius: 6px;
+      font-size: 13px; line-height: 1.5; margin-bottom: 12px;
+      border-left: 3px solid #ca8a04;
+    }
+    [data-theme="dark"] .hedge-rationale {
+      background: rgba(202,138,4,0.12); color: #fde68a;
+    }
+
+    .hedge-detail-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 600px) {
+      .hedge-detail-grid { grid-template-columns: 1fr; }
+    }
+    .hedge-detail-label {
+      font-size: 10px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    [data-theme="dark"] .hedge-detail-label { color: var(--tp-fg-muted); }
+    .hedge-detail-value {
+      font-size: 12px; line-height: 1.5; margin-top: 2px;
+    }
+
+    .hedge-exit {
+      background: #f9fafb; padding: 10px 12px; border-radius: 6px;
+      font-size: 12px; line-height: 1.5; border-top: 1px solid #e5e7eb;
+      margin-top: 8px;
+    }
+    [data-theme="dark"] .hedge-exit {
+      background: var(--tp-surface-alt); border-color: var(--tp-border);
+    }
+    .hedge-exit strong { color: #1d4ed8; }
+    [data-theme="dark"] .hedge-exit strong { color: var(--tp-accent); }
+
+    .hedge-general-advice {
+      background: #ecfdf5; border: 1px solid #6ee7b7; border-radius: 8px;
+      padding: 14px 16px; margin-top: 14px;
+      font-size: 13px; line-height: 1.6;
+    }
+    [data-theme="dark"] .hedge-general-advice {
+      background: rgba(16,185,129,0.10); border-color: rgba(16,185,129,0.4);
+      color: #6ee7b7;
+    }
+    .hedge-general-advice strong { color: #065f46; }
+    [data-theme="dark"] .hedge-general-advice strong { color: #6ee7b7; }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -2815,7 +2959,12 @@
         ${renderRiskConcentration(data.concentration)}
         ${renderRiskStressTest(data.stress_test, data.summary)}
         ${renderRiskPositions(data.positions)}
+        ${renderHedgeSection(data)}
       `;
+
+      // Wire up the hedge button after the section renders
+      const hedgeBtn = $("hedge-generate-btn");
+      if (hedgeBtn) hedgeBtn.addEventListener("click", () => generateHedgeSuggestions(data));
     }
 
     function renderRiskWarnings(warnings, summary, portfolioSize) {
@@ -3055,6 +3204,218 @@
               </thead>
               <tbody>${rows}</tbody>
             </table>
+          </div>
+        </div>
+      `;
+    }
+
+
+    // =================================================================
+    // HEDGE SUGGESTIONS — AI-powered hedging plays for the open book
+    // =================================================================
+    // Renders a section at the bottom of the Risk tab with:
+    //   - Initial state: "Generate" button (AI call costs money, so opt-in)
+    //   - Loading state: spinner + estimated wait
+    //   - Result state: narrative + ranked hedge cards + general advice
+    //
+    // Each hedge card covers ONE category (options/futures/pair/index/trim)
+    // with concrete instrument, sizing, cost, trade-off, exit signal.
+    // =================================================================
+    const HEDGE_URL = "https://nse-dashboard-api.onrender.com/api/hedge-suggestions";
+
+    function renderHedgeSection(riskData) {
+      // No open positions = no hedges needed
+      if (!riskData.positions || riskData.positions.length === 0) {
+        return "";
+      }
+      return `
+        <div class="risk-section">
+          <div class="risk-section-title">🛡️ Hedge Suggestions</div>
+          <div id="hedge-content">
+            <div class="hedge-cta-box">
+              <div style="font-weight:600; margin-bottom: 6px;">Generate hedging plays for your current book</div>
+              <div style="font-size:13px; color:#6b7280; margin-bottom: 12px;">
+                Analyzes concentration, sector exposure, and direction skew, then suggests specific options
+                (protective puts, covered calls, collars), futures hedges (single-stock or NIFTY), and
+                sector pair trades. Uses AI to prioritize what's worth acting on for THIS book.
+              </div>
+              <button id="hedge-generate-btn" class="hedge-cta-btn" type="button">
+                ⚙️ Generate Hedge Suggestions
+              </button>
+              <div style="font-size:11px; color:#9ca3af; margin-top: 8px;">
+                Takes 10-20s · Uses 1 AI call (~₹0.20)
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function generateHedgeSuggestions(riskData) {
+      const content = $("hedge-content");
+      content.innerHTML = `
+        <div class="hedge-loading">
+          <div class="hedge-spinner"></div>
+          <div>Analyzing book and generating hedge plan…</div>
+          <div style="font-size:12px; color:#9ca3af; margin-top: 6px;">10-20 seconds</div>
+        </div>
+      `;
+
+      try {
+        const resp = await fetch(HEDGE_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            positions:     riskData.positions,
+            summary:       riskData.summary,
+            concentration: riskData.concentration,
+            warnings:      riskData.warnings,
+          }),
+        });
+        if (!resp.ok) {
+          const errText = await resp.text();
+          throw new Error(errText.slice(0, 200));
+        }
+        const data = await resp.json();
+        renderHedgeResult(data);
+      } catch (e) {
+        content.innerHTML = `
+          <div class="risk-warning danger">
+            <span>⚠️</span>
+            <div>
+              <strong>Failed to generate hedge suggestions:</strong>
+              ${escapeHtml(String(e.message || e))}
+              <br><br>
+              <button id="hedge-retry-btn" class="hedge-cta-btn" style="margin-top: 8px;">Retry</button>
+            </div>
+          </div>
+        `;
+        const retryBtn = $("hedge-retry-btn");
+        if (retryBtn) retryBtn.addEventListener("click", () => generateHedgeSuggestions(riskData));
+      }
+    }
+
+    function renderHedgeResult(data) {
+      const content = $("hedge-content");
+      const hedges  = data.hedges || [];
+
+      if (hedges.length === 0) {
+        content.innerHTML = `
+          <div class="hedge-narrative">
+            ${escapeHtml(data.narrative || "No specific hedges suggested.")}
+          </div>
+          ${data.general_advice ? `
+            <div class="hedge-general-advice">
+              <strong>General advice:</strong> ${escapeHtml(data.general_advice)}
+            </div>
+          ` : ""}
+        `;
+        return;
+      }
+
+      // Group hedges by category for visual organization
+      const categoryLabels = {
+        symbol_concentration: "Single-Name Risk",
+        sector_concentration: "Sector Risk",
+        direction_skew:       "Market Direction Risk",
+        stress_protection:    "Stress / Tail Risk",
+        diversification:      "Structural Diversification",
+      };
+
+      const hedgeCards = hedges.map(h => renderHedgeCard(h, categoryLabels)).join("");
+
+      content.innerHTML = `
+        <div class="hedge-narrative">
+          ${escapeHtml(data.narrative || "").replace(/\n+/g, "</p><p>") || "Hedge plan generated."}
+        </div>
+        <div style="font-size:12px; color:#6b7280; margin: 12px 0;">
+          Below: ranked hedges with concrete instruments, sizing, costs, and trade-offs.
+        </div>
+        <div class="hedge-cards">
+          ${hedgeCards}
+        </div>
+        ${data.general_advice ? `
+          <div class="hedge-general-advice">
+            <strong>💡 General advice:</strong> ${escapeHtml(data.general_advice)}
+          </div>
+        ` : ""}
+        <div style="margin-top: 16px; text-align: center;">
+          <button id="hedge-regenerate-btn" class="risk-refresh-btn" type="button">↻ Regenerate</button>
+        </div>
+      `;
+      const rgBtn = $("hedge-regenerate-btn");
+      if (rgBtn) rgBtn.addEventListener("click", () => generateHedgeSuggestions(window._lastRiskData));
+    }
+
+    function renderHedgeCard(h, categoryLabels) {
+      // Instrument-type → icon + accent color
+      const typeMeta = {
+        protective_put:      { icon: "🛡️", accent: "#1d4ed8", label: "Protective Put" },
+        protective_call:     { icon: "🛡️", accent: "#1d4ed8", label: "Protective Call" },
+        covered_call:        { icon: "💰", accent: "#ca8a04", label: "Covered Call" },
+        collar:              { icon: "🔒", accent: "#7c3aed", label: "Collar (Zero-Cost)" },
+        short_futures:       { icon: "📉", accent: "#dc2626", label: "Short Futures" },
+        pair_trade:          { icon: "⚖️", accent: "#0891b2", label: "Sector Pair Trade" },
+        index_put:           { icon: "📊", accent: "#dc2626", label: "Index Put" },
+        index_call:          { icon: "📊", accent: "#16a34a", label: "Index Call" },
+        index_short_futures: { icon: "📉", accent: "#dc2626", label: "Short Index Futures" },
+        trim_position:       { icon: "✂️", accent: "#6b7280", label: "Trim Position" },
+      };
+      const meta = typeMeta[h.instrument_type] || { icon: "•", accent: "#6b7280", label: h.instrument_type };
+      const catLabel = categoryLabels[h.category] || h.category;
+
+      // Priority badge (top-3 are highlighted; rest are subdued)
+      const priorityBadge = h.priority <= 3
+        ? `<span class="hedge-priority hedge-priority-top">PRIORITY ${h.priority}</span>`
+        : `<span class="hedge-priority hedge-priority-low">P${h.priority}</span>`;
+
+      return `
+        <div class="hedge-card" style="border-left-color: ${meta.accent};">
+          <div class="hedge-card-header">
+            <div>
+              <div class="hedge-card-category">${escapeHtml(catLabel)}</div>
+              <div class="hedge-card-title">
+                <span class="hedge-icon">${meta.icon}</span>
+                ${escapeHtml(meta.label)}
+              </div>
+            </div>
+            ${priorityBadge}
+          </div>
+
+          <div class="hedge-instrument">${escapeHtml(h.instrument_label)}</div>
+
+          <div class="hedge-risk-line">
+            <span class="hedge-row-label">Risk addressed:</span>
+            <span>${escapeHtml(h.risk_addressed)}</span>
+          </div>
+
+          ${h.rationale ? `
+            <div class="hedge-rationale">
+              <strong>Why this hedge:</strong> ${escapeHtml(h.rationale)}
+            </div>
+          ` : ""}
+
+          <div class="hedge-detail-grid">
+            <div>
+              <div class="hedge-detail-label">Sizing</div>
+              <div class="hedge-detail-value">${escapeHtml(h.sizing_hint)}</div>
+            </div>
+            <div>
+              <div class="hedge-detail-label">Cost / Premium</div>
+              <div class="hedge-detail-value">${escapeHtml(h.cost_estimate)}</div>
+            </div>
+            <div>
+              <div class="hedge-detail-label">Protection</div>
+              <div class="hedge-detail-value">${escapeHtml(h.max_loss_capped)}</div>
+            </div>
+            <div>
+              <div class="hedge-detail-label">Trade-off</div>
+              <div class="hedge-detail-value">${escapeHtml(h.tradeoff)}</div>
+            </div>
+          </div>
+
+          <div class="hedge-exit">
+            <strong>Exit signal:</strong> ${escapeHtml(h.exit_signal)}
           </div>
         </div>
       `;
