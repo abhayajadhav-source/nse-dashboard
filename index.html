@@ -17,6 +17,263 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 
   <style>
+    /* ============================================================
+       THEME SYSTEM — Light (default) + Dark (Bloomberg-style)
+       ============================================================
+       Strategy: existing CSS uses hardcoded colors. To avoid a risky
+       global refactor of 5000+ lines, dark mode is implemented as
+       targeted overrides under [data-theme="dark"]. Toggle on <html>.
+       Saved to localStorage; respects prefers-color-scheme on first
+       visit. Green/red gain/loss colors are kept as-is (semantic). */
+    :root {
+      --tp-bg:            #f9fafb;
+      --tp-fg:            #111827;
+      --tp-fg-muted:      #6b7280;
+      --tp-surface:       #ffffff;
+      --tp-surface-alt:   #f9fafb;
+      --tp-border:        #e5e7eb;
+      --tp-border-soft:   #f3f4f6;
+      --tp-accent:        #1d4ed8;
+      --tp-good:          #16a34a;
+      --tp-bad:           #dc2626;
+      --tp-warn:          #ca8a04;
+    }
+    [data-theme="dark"] {
+      --tp-bg:            #0a0a0a;
+      --tp-fg:            #e5e7eb;
+      --tp-fg-muted:      #9ca3af;
+      --tp-surface:       #171717;
+      --tp-surface-alt:   #1f1f1f;
+      --tp-border:        #2d2d2d;
+      --tp-border-soft:   #262626;
+      --tp-accent:        #3b82f6;
+      --tp-good:          #22c55e;
+      --tp-bad:           #ef4444;
+      --tp-warn:          #eab308;
+    }
+    /* Dark mode overrides: only the parts that need it to feel right.
+       Hardcoded colors elsewhere (badges, callouts) stay — they tend
+       to be semantic (success/danger/warning) and read fine on dark. */
+    [data-theme="dark"] body { background: var(--tp-bg); color: var(--tp-fg); }
+    [data-theme="dark"] .panel,
+    [data-theme="dark"] .tp-card,
+    [data-theme="dark"] .tab,
+    [data-theme="dark"] .journal-table-wrapper,
+    [data-theme="dark"] .journal-card,
+    [data-theme="dark"] input,
+    [data-theme="dark"] select,
+    [data-theme="dark"] textarea {
+      background: var(--tp-surface);
+      color: var(--tp-fg);
+      border-color: var(--tp-border);
+    }
+    [data-theme="dark"] .panel-header,
+    [data-theme="dark"] th,
+    [data-theme="dark"] tr:hover td {
+      background: var(--tp-surface-alt) !important;
+      color: var(--tp-fg) !important;
+      border-color: var(--tp-border) !important;
+    }
+    [data-theme="dark"] td {
+      border-color: var(--tp-border-soft) !important;
+      color: var(--tp-fg);
+    }
+    [data-theme="dark"] .tab:hover { background: var(--tp-surface-alt); }
+    [data-theme="dark"] .tab.active {
+      background: var(--tp-accent); color: #fff; border-color: var(--tp-accent);
+    }
+    [data-theme="dark"] header { background: #1a1a1a; }
+    [data-theme="dark"] .tp-card-title,
+    [data-theme="dark"] .ep-lbl,
+    [data-theme="dark"] .meta-label,
+    [data-theme="dark"] .muted,
+    [data-theme="dark"] small { color: var(--tp-fg-muted); }
+    [data-theme="dark"] hr { border-color: var(--tp-border); }
+    /* Theme toggle button — sits in the header next to the brand */
+    .theme-toggle {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; width: 36px; height: 36px; border-radius: 8px;
+      cursor: pointer; font-size: 16px; display: flex; align-items: center;
+      justify-content: center; transition: all 0.15s; flex-shrink: 0;
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,0.2); }
+
+    /* ============================================================
+       STICKY MARKET CONTEXT BAR (below header, above tabs)
+       Persistent across all tabs. Shows current analyzed symbol +
+       NIFTY 50 + BANK NIFTY + India VIX with regime tag.
+       ============================================================ */
+    .market-ctx-bar {
+      position: sticky; top: 0; z-index: 50;
+      background: #0f172a; color: #e5e7eb;
+      border-radius: 8px; padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex; gap: 16px; flex-wrap: wrap;
+      align-items: center; font-size: 13px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    [data-theme="dark"] .market-ctx-bar {
+      background: #1a1a1a; border: 1px solid var(--tp-border);
+    }
+    .mc-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      white-space: nowrap;
+    }
+    .mc-pill .mc-label {
+      font-size: 10px; font-weight: 700; opacity: 0.7;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .mc-pill .mc-val { font-weight: 600; font-family: ui-monospace, monospace; }
+    .mc-pill .mc-chg { font-size: 12px; font-weight: 600; }
+    .mc-pill .mc-chg.up   { color: #4ade80; }
+    .mc-pill .mc-chg.down { color: #f87171; }
+    .mc-pill.mc-symbol { background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.4); }
+    .mc-pill.mc-vix-low      { background: rgba(34,197,94,0.15); }
+    .mc-pill.mc-vix-normal   { background: rgba(59,130,246,0.15); }
+    .mc-pill.mc-vix-elevated { background: rgba(234,179,8,0.20); }
+    .mc-pill.mc-vix-spiked   { background: rgba(239,68,68,0.20); }
+    .mc-bar-empty {
+      opacity: 0.6; font-size: 12px;
+      font-style: italic;
+    }
+    @media (max-width: 600px) {
+      .market-ctx-bar { font-size: 12px; gap: 8px; padding: 8px 10px; }
+      .mc-pill { padding: 3px 8px; }
+    }
+
+    /* ============================================================
+       KEYBOARD SHORTCUT HELP MODAL ( ? to open )
+       ============================================================ */
+    .kbd-modal-overlay {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6); z-index: 9999;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .kbd-modal-overlay.open { display: flex; }
+    .kbd-modal {
+      background: #fff; border-radius: 12px;
+      max-width: 520px; width: 100%; max-height: 80vh; overflow-y: auto;
+      padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    [data-theme="dark"] .kbd-modal { background: var(--tp-surface); color: var(--tp-fg); }
+    .kbd-modal h2 {
+      font-size: 18px; margin-bottom: 16px; display: flex;
+      justify-content: space-between; align-items: center;
+    }
+    .kbd-modal h2 .close {
+      cursor: pointer; opacity: 0.6; font-size: 20px;
+      padding: 4px 10px; border-radius: 6px;
+    }
+    .kbd-modal h2 .close:hover { opacity: 1; background: var(--tp-surface-alt); }
+    .kbd-modal .kbd-section { font-size: 11px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 8px; }
+    .kbd-modal .kbd-row {
+      display: flex; justify-content: space-between; padding: 8px 0;
+      border-bottom: 1px solid var(--tp-border-soft); font-size: 14px;
+    }
+    .kbd-modal .kbd-row:last-child { border-bottom: none; }
+    .kbd-key {
+      background: var(--tp-surface-alt); border: 1px solid var(--tp-border);
+      padding: 2px 8px; border-radius: 4px; font-family: ui-monospace, monospace;
+      font-size: 12px; font-weight: 600; margin-left: 4px;
+    }
+
+    /* ============================================================
+       RESEARCH NOTE PDF — Goldman-style 2-page print layout
+       Triggered by setting body class "print-research-note" and
+       calling window.print(). Restored to normal afterward.
+       ============================================================ */
+    @media print {
+      body.print-research-note { background: #fff; padding: 0; }
+      body.print-research-note > *:not(.research-note-print) { display: none !important; }
+      body.print-research-note .research-note-print { display: block !important; }
+    }
+    .research-note-print { display: none; }
+    .research-note-print .rn-page {
+      page-break-after: always;
+      padding: 30px 36px;
+      font-family: Georgia, "Times New Roman", serif;
+      color: #111827;
+    }
+    .research-note-print .rn-page:last-child { page-break-after: auto; }
+    .research-note-print .rn-header {
+      border-bottom: 3px solid #1d4ed8; padding-bottom: 14px; margin-bottom: 20px;
+      display: flex; justify-content: space-between; align-items: flex-end;
+    }
+    .research-note-print .rn-brand {
+      font-size: 18px; font-weight: 700; color: #1d4ed8;
+      letter-spacing: 0.5px;
+    }
+    .research-note-print .rn-brand-sub {
+      font-size: 11px; color: #6b7280; font-style: italic; margin-top: 2px;
+    }
+    .research-note-print .rn-date {
+      font-size: 11px; color: #6b7280; text-align: right;
+    }
+    .research-note-print h1.rn-title {
+      font-size: 26px; margin-bottom: 6px; font-weight: 700;
+    }
+    .research-note-print .rn-subtitle {
+      font-size: 14px; color: #4b5563; margin-bottom: 18px;
+    }
+    .research-note-print .rn-call-box {
+      background: #f3f4f6; border-left: 4px solid #1d4ed8;
+      padding: 14px 18px; margin: 18px 0;
+    }
+    .research-note-print .rn-call-box .rn-call-label {
+      font-size: 10px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .research-note-print .rn-call-box .rn-call-value {
+      font-size: 22px; font-weight: 700; color: #1d4ed8; margin-top: 4px;
+    }
+    .research-note-print .rn-metrics-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+      margin: 20px 0;
+    }
+    .research-note-print .rn-metric {
+      border: 1px solid #e5e7eb; padding: 10px;
+    }
+    .research-note-print .rn-metric .lbl {
+      font-size: 9px; color: #6b7280; text-transform: uppercase;
+      letter-spacing: 0.5px; margin-bottom: 4px;
+    }
+    .research-note-print .rn-metric .val {
+      font-size: 16px; font-weight: 700;
+    }
+    .research-note-print .rn-section-title {
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; border-bottom: 1px solid #1d4ed8;
+      padding-bottom: 4px; margin: 18px 0 10px; color: #1d4ed8;
+    }
+    .research-note-print .rn-body p {
+      font-size: 12px; line-height: 1.6; margin-bottom: 8px;
+    }
+    .research-note-print .rn-disclaimer {
+      font-size: 9px; color: #6b7280; line-height: 1.5;
+      border-top: 1px solid #d1d5db; padding-top: 10px; margin-top: 20px;
+      font-style: italic;
+    }
+    .research-note-print .rn-footer {
+      position: fixed; bottom: 14px; left: 36px; right: 36px;
+      font-size: 9px; color: #9ca3af; display: flex; justify-content: space-between;
+    }
+
+    /* Research-note CTA button — sits in Analyze tab actions */
+    .research-note-cta {
+      background: #fff; color: #1d4ed8; border: 2px solid #1d4ed8;
+      padding: 10px 18px; border-radius: 8px; cursor: pointer;
+      font-weight: 600; font-size: 14px; display: inline-flex;
+      align-items: center; gap: 8px; transition: all 0.15s;
+    }
+    .research-note-cta:hover { background: #1d4ed8; color: #fff; }
+    [data-theme="dark"] .research-note-cta {
+      background: var(--tp-surface); border-color: var(--tp-accent); color: var(--tp-accent);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -843,6 +1100,22 @@
     .trade-plan-result {
       margin-top: 16px; display: flex; flex-direction: column; gap: 14px;
     }
+    /* Small badge shown at the top of the trade plan when the response
+       came from the 10-min Postgres cache instead of a fresh AI call.
+       Unobtrusive but clearly visible — user should know it's not fresh. */
+    .tp-cache-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      align-self: flex-start;
+      background: #fef3c7; color: #92400e;
+      border: 1px solid #fcd34d;
+      padding: 4px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .tp-cache-badge .tp-cache-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #f59e0b;
+    }
     .tp-card {
       background: #fff; border: 1px solid #e5e7eb; border-radius: 8px;
       padding: 14px 16px;
@@ -1569,13 +1842,32 @@
         <h1>📊 NSE Stock Dashboard</h1>
         <div class="meta">Auto-refresh every 60s · Data from Yahoo Finance + Google News + NSE F&O</div>
       </div>
-      <div>
+      <div style="display:flex;align-items:center;gap:10px;">
         <div id="last-refresh" class="meta">Loading…</div>
+        <button id="theme-toggle-btn" class="theme-toggle" type="button"
+                title="Toggle light/dark theme (press D)" aria-label="Toggle theme">
+          <span id="theme-icon">🌙</span>
+        </button>
+        <button id="kbd-help-btn" class="theme-toggle" type="button"
+                title="Keyboard shortcuts (press ?)" aria-label="Show keyboard shortcuts">
+          ⌨
+        </button>
         <button id="print-pdf-btn" type="button" title="Save current tab as PDF">
           🖨️ Save PDF
         </button>
       </div>
     </header>
+
+    <!-- Sticky market context bar: persistent across all tabs.
+         Shows current symbol (if analyzed) + NIFTY + BANK NIFTY + India VIX.
+         Hidden until /api/market-context returns data. -->
+    <div id="market-context-bar" class="market-ctx-bar" style="display:none;">
+      <span id="mc-symbol-slot" style="display:none;"></span>
+      <span id="mc-nifty-slot"></span>
+      <span id="mc-banknifty-slot"></span>
+      <span id="mc-vix-slot"></span>
+      <span id="mc-empty" class="mc-bar-empty">Loading market context…</span>
+    </div>
 
     <div id="status" class="status loading">Fetching latest data…</div>
 
@@ -1624,7 +1916,9 @@
     const TRADE_PLAN_URL = "https://nse-dashboard-api.onrender.com/api/trade-plan";
     const PEER_COMPARISON_URL = "https://nse-dashboard-api.onrender.com/api/peer-comparison";
     const JOURNAL_URL = "https://nse-dashboard-api.onrender.com/api/journal";
+    const MARKET_CTX_URL = "https://nse-dashboard-api.onrender.com/api/market-context";
     const REFRESH_MS  = 60_000;
+    const MARKET_CTX_REFRESH_MS = 60_000;   // refresh sticky bar every 60s
 
     // ===== Helpers =====
     const $ = (id) => document.getElementById(id);
@@ -1632,6 +1926,40 @@
       n.toLocaleString("en-IN", { minimumFractionDigits: places, maximumFractionDigits: places });
     const cls = (val) => (val >= 0 ? "gain" : "loss");
     const sign = (val) => (val >= 0 ? "+" : "");
+
+    // -----------------------------------------------------------------
+    // Indian number formatting utilities (Tier-3 polish)
+    // -----------------------------------------------------------------
+    // Indian convention: ₹1,23,456 (lakh-comma) instead of Western ₹123,456.
+    // For big numbers, compact lakh/crore: ₹12.5L, ₹1.2Cr, ₹85.3K.
+    // toLocaleString("en-IN") already does lakh-comma; these helpers add
+    // currency prefix and compact-mode handling.
+    //
+    // Why this matters: every Indian retail app gets this wrong in subtle
+    // ways. Getting it right is a "professional polish" tell.
+    function fmtRupees(n, places = 2) {
+      // Standard rupee display: ₹1,23,456.78
+      if (n === null || n === undefined || isNaN(n)) return "—";
+      return "₹" + Number(n).toLocaleString("en-IN", {
+        minimumFractionDigits: places, maximumFractionDigits: places,
+      });
+    }
+    function fmtRupeesCompact(n) {
+      // Compact display: ₹85.3K / ₹12.5L / ₹1.2Cr
+      // Used for journal P&L, position sizer outputs, big numbers
+      if (n === null || n === undefined || isNaN(n)) return "—";
+      const abs = Math.abs(n);
+      const sign = n < 0 ? "-" : "";
+      if (abs >= 1e7)  return `${sign}₹${(abs / 1e7).toFixed(2)}Cr`;
+      if (abs >= 1e5)  return `${sign}₹${(abs / 1e5).toFixed(2)}L`;
+      if (abs >= 1e3)  return `${sign}₹${(abs / 1e3).toFixed(1)}K`;
+      return `${sign}₹${abs.toFixed(0)}`;
+    }
+    function fmtChange(absChange, pctChange) {
+      // Pair: "+12.50 (+0.85%)" for index changes — used in market context bar
+      const s = absChange >= 0 ? "+" : "";
+      return `${s}${fmt(absChange)} (${s}${fmt(pctChange)}%)`;
+    }
 
     function tvLink(symbol) {
       return `<a class="ext-link" target="_blank" href="https://in.tradingview.com/chart/?symbol=NSE:${symbol}">📈 TV</a>`;
@@ -1650,6 +1978,466 @@
       if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
       return `${Math.floor(sec / 86400)}d ago`;
     }
+
+    // =================================================================
+    // THEME SYSTEM (Tier-3 polish)
+    // =================================================================
+    // Persists user choice to localStorage. Respects prefers-color-scheme
+    // on first visit. Apply theme as early as possible (avoid FOUC).
+    const THEME_KEY = "nseDashboardTheme";
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      const icon = $("theme-icon");
+      if (icon) icon.textContent = theme === "dark" ? "☀️" : "🌙";
+    }
+    function getCurrentTheme() {
+      return document.documentElement.getAttribute("data-theme") || "light";
+    }
+    function toggleTheme() {
+      const current = getCurrentTheme();
+      const next = current === "dark" ? "light" : "dark";
+      applyTheme(next);
+      try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* ignore */ }
+    }
+    // Initialize theme before render — runs synchronously
+    (function initTheme() {
+      let saved = null;
+      try { saved = localStorage.getItem(THEME_KEY); } catch (e) { /* ignore */ }
+      if (saved === "dark" || saved === "light") {
+        applyTheme(saved);
+      } else {
+        // Respect system preference on first visit
+        const prefersDark = window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        applyTheme(prefersDark ? "dark" : "light");
+      }
+    })();
+
+    // =================================================================
+    // STICKY MARKET CONTEXT BAR (Tier-3 polish)
+    // =================================================================
+    // State: tracks the currently-analyzed symbol so the bar can show it
+    // even after the user navigates to another tab.
+    let currentSymbolContext = null;   // { symbol, price, change_pct }
+
+    function setSymbolContext(symbol, price, changePct) {
+      currentSymbolContext = { symbol, price, change_pct: changePct };
+      renderMarketContextBar();
+    }
+    function clearSymbolContext() {
+      currentSymbolContext = null;
+      renderMarketContextBar();
+    }
+
+    let lastMarketContext = null;   // last response from /api/market-context
+
+    async function fetchMarketContext() {
+      // Best-effort: failures are silent (bar just won't update)
+      try {
+        const resp = await fetch(MARKET_CTX_URL);
+        if (!resp.ok) return;
+        lastMarketContext = await resp.json();
+        renderMarketContextBar();
+      } catch (e) {
+        console.warn("Market context fetch failed:", e);
+      }
+    }
+
+    function renderMarketContextBar() {
+      const bar = $("market-context-bar");
+      if (!bar) return;
+      const emptyEl = $("mc-empty");
+      const symSlot = $("mc-symbol-slot");
+      const nfSlot  = $("mc-nifty-slot");
+      const bnSlot  = $("mc-banknifty-slot");
+      const vxSlot  = $("mc-vix-slot");
+
+      // Show the bar if we have any data to display
+      const hasMarket = lastMarketContext &&
+        (lastMarketContext.nifty || lastMarketContext.bank_nifty || lastMarketContext.india_vix);
+      const hasSymbol = currentSymbolContext !== null;
+      if (!hasMarket && !hasSymbol) {
+        bar.style.display = "none";
+        return;
+      }
+      bar.style.display = "flex";
+      if (emptyEl) emptyEl.style.display = "none";
+
+      // Current symbol context (left)
+      if (hasSymbol) {
+        const c = currentSymbolContext;
+        const chgCls = c.change_pct >= 0 ? "up" : "down";
+        const arrow = c.change_pct >= 0 ? "▲" : "▼";
+        symSlot.style.display = "inline-flex";
+        symSlot.className = "mc-pill mc-symbol";
+        symSlot.innerHTML = `
+          <span class="mc-label">${escapeHtml(c.symbol)}</span>
+          <span class="mc-val">${fmtRupees(c.price)}</span>
+          <span class="mc-chg ${chgCls}">${arrow} ${sign(c.change_pct)}${fmt(c.change_pct)}%</span>
+        `;
+      } else {
+        symSlot.style.display = "none";
+      }
+
+      // NIFTY 50 (center-left)
+      const nf = lastMarketContext && lastMarketContext.nifty;
+      if (nf) {
+        const chgCls = nf.change_pct >= 0 ? "up" : "down";
+        nfSlot.style.display = "inline-flex";
+        nfSlot.className = "mc-pill";
+        nfSlot.innerHTML = `
+          <span class="mc-label">NIFTY</span>
+          <span class="mc-val">${fmt(nf.value)}</span>
+          <span class="mc-chg ${chgCls}">${sign(nf.change_pct)}${fmt(nf.change_pct)}%</span>
+        `;
+      } else {
+        nfSlot.style.display = "none";
+      }
+
+      // BANK NIFTY (center-right)
+      const bn = lastMarketContext && lastMarketContext.bank_nifty;
+      if (bn) {
+        const chgCls = bn.change_pct >= 0 ? "up" : "down";
+        bnSlot.style.display = "inline-flex";
+        bnSlot.className = "mc-pill";
+        bnSlot.innerHTML = `
+          <span class="mc-label">BANKNIFTY</span>
+          <span class="mc-val">${fmt(bn.value)}</span>
+          <span class="mc-chg ${chgCls}">${sign(bn.change_pct)}${fmt(bn.change_pct)}%</span>
+        `;
+      } else {
+        bnSlot.style.display = "none";
+      }
+
+      // India VIX with regime tag (right) — color-coded by volatility regime
+      const vx = lastMarketContext && lastMarketContext.india_vix;
+      const regime = lastMarketContext ? lastMarketContext.vix_regime : "unknown";
+      if (vx) {
+        const regimeClass = `mc-vix-${regime}`;
+        vxSlot.style.display = "inline-flex";
+        vxSlot.className = `mc-pill ${regimeClass}`;
+        vxSlot.innerHTML = `
+          <span class="mc-label">INDIA VIX</span>
+          <span class="mc-val">${fmt(vx.value)}</span>
+          <span class="mc-chg" style="opacity:0.85;text-transform:uppercase;font-size:10px;">${regime}</span>
+        `;
+      } else {
+        vxSlot.style.display = "none";
+      }
+    }
+
+    // =================================================================
+    // KEYBOARD SHORTCUTS (Tier-3 polish)
+    // =================================================================
+    // Supports:
+    //   Ctrl+K / Cmd+K  → focus symbol search (in Analyze tab)
+    //   g then a/j/s/c/p/i/r/m  → tab navigation (Vim-style leader key)
+    //   d  → toggle theme
+    //   ?  → show shortcut help
+    //   Esc → close any open modal
+    let gPrefixActive = false;
+    let gPrefixTimer = null;
+
+    function isTypingInInput() {
+      const el = document.activeElement;
+      if (!el) return false;
+      const tag = el.tagName;
+      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" ||
+             el.isContentEditable;
+    }
+
+    function switchToTab(tabName) {
+      // Programmatically click the tab button to leverage existing logic
+      const btn = document.querySelector(`.tab[data-tab="${tabName}"]`);
+      if (btn) btn.click();
+    }
+
+    function showKbdHelp() {
+      $("kbd-modal-overlay").classList.add("open");
+    }
+    function closeKbdHelp() {
+      $("kbd-modal-overlay").classList.remove("open");
+    }
+
+    function handleGlobalKeydown(e) {
+      // Always-on: Escape closes modals
+      if (e.key === "Escape") {
+        closeKbdHelp();
+        gPrefixActive = false;
+        return;
+      }
+
+      // Ctrl+K / Cmd+K → focus symbol search (works even when typing)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        // Switch to Analyze tab and focus its input
+        switchToTab("analyze");
+        setTimeout(() => {
+          const inp = $("symbol-input");
+          if (inp) { inp.focus(); inp.select(); }
+        }, 50);
+        return;
+      }
+
+      // Skip everything else if user is typing in an input
+      if (isTypingInInput()) return;
+
+      // ? → help (Shift+/ on US layouts)
+      if (e.key === "?") {
+        e.preventDefault();
+        showKbdHelp();
+        return;
+      }
+
+      // d → toggle theme
+      if (e.key === "d" || e.key === "D") {
+        if (!gPrefixActive) {
+          e.preventDefault();
+          toggleTheme();
+          return;
+        }
+      }
+
+      // g → start prefix; second key navigates
+      if (e.key === "g" && !gPrefixActive) {
+        gPrefixActive = true;
+        clearTimeout(gPrefixTimer);
+        // Cancel prefix after 1.5s of inactivity
+        gPrefixTimer = setTimeout(() => { gPrefixActive = false; }, 1500);
+        return;
+      }
+
+      if (gPrefixActive) {
+        const k = e.key.toLowerCase();
+        const tabMap = {
+          a: "analyze",      j: "journal",     s: "strategy",
+          c: "compare",      p: "sizer",       i: "intraday",
+          r: "reversal",     m: "momentum",
+        };
+        if (tabMap[k]) {
+          e.preventDefault();
+          switchToTab(tabMap[k]);
+        }
+        gPrefixActive = false;
+        clearTimeout(gPrefixTimer);
+      }
+    }
+
+    document.addEventListener("keydown", handleGlobalKeydown);
+
+    // Wire up the help modal close button + overlay click-to-close
+    document.addEventListener("DOMContentLoaded", () => {
+      const closeBtn = $("kbd-modal-close");
+      if (closeBtn) closeBtn.addEventListener("click", closeKbdHelp);
+      const overlay = $("kbd-modal-overlay");
+      if (overlay) overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeKbdHelp();
+      });
+      const helpBtn = $("kbd-help-btn");
+      if (helpBtn) helpBtn.addEventListener("click", showKbdHelp);
+      const themeBtn = $("theme-toggle-btn");
+      if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
+
+      // Kick off market context bar
+      fetchMarketContext();
+      setInterval(fetchMarketContext, MARKET_CTX_REFRESH_MS);
+    });
+
+    // =================================================================
+    // RESEARCH NOTE PDF (Tier-3 polish)
+    // =================================================================
+    // Generates a Goldman-style 2-page printable research report from
+    // the currently-loaded /api/analyze data.
+    function generateResearchNote(analyzeData) {
+      if (!analyzeData) {
+        alert("Please analyze a stock first.");
+        return;
+      }
+      const d = analyzeData;
+      const date = new Date().toLocaleDateString("en-IN", {
+        day: "2-digit", month: "long", year: "numeric"
+      });
+      const sym = d.symbol || "UNKNOWN";
+      const price = d.current_price || 0;
+      const change = d.daily_change_pct || 0;
+
+      // Pull key metrics with safe defaults
+      const tech     = d.technicals || {};
+      const opts     = d.options || {};
+      const ratings  = d.analyst_ratings || {};
+      const fund     = d.fundamentals || {};
+      const ai       = (d.ai_commentary || "").trim();
+      // Trim AI commentary to first 1500 chars for the report (it's prose)
+      const aiTrimmed = ai.length > 1500 ? ai.slice(0, 1500) + "…" : ai;
+
+      const direction = ratings.consensus_rating
+        ? ratings.consensus_rating.toUpperCase()
+        : (change >= 0 ? "POSITIVE BIAS" : "NEGATIVE BIAS");
+      const target = ratings.mean_price_target || (price * 1.10);
+
+      // Helper to safely format with fallback
+      const sf = (v, fn) => (v !== null && v !== undefined && !isNaN(v)) ? fn(v) : "—";
+
+      const html = `
+        <div class="rn-page">
+          <div class="rn-header">
+            <div>
+              <div class="rn-brand">NSE DASHBOARD RESEARCH</div>
+              <div class="rn-brand-sub">Single-trader analysis · For personal use only</div>
+            </div>
+            <div class="rn-date">${date}</div>
+          </div>
+
+          <h1 class="rn-title">${escapeHtml(sym)}</h1>
+          <div class="rn-subtitle">
+            ${sf(price, fmtRupees)} ·
+            <span style="color: ${change >= 0 ? "#16a34a" : "#dc2626"};">
+              ${sign(change)}${sf(change, (v) => fmt(v) + "%")}
+            </span>
+            ${ratings.coverage_count ? `· ${ratings.coverage_count} analysts covering` : ""}
+          </div>
+
+          <div class="rn-call-box">
+            <div class="rn-call-label">View</div>
+            <div class="rn-call-value">${escapeHtml(direction)}</div>
+            ${target ? `<div style="font-size:11px;margin-top:6px;color:#6b7280;">
+              Target band: ${fmtRupees(target * 0.95)} – ${fmtRupees(target * 1.05)}
+              (consensus ${fmtRupees(target)})
+            </div>` : ""}
+          </div>
+
+          <div class="rn-section-title">Key Metrics</div>
+          <div class="rn-metrics-grid">
+            <div class="rn-metric"><div class="lbl">RSI (14)</div><div class="val">${sf(tech.rsi, (v) => fmt(v, 1))}</div></div>
+            <div class="rn-metric"><div class="lbl">52W High</div><div class="val">${sf(tech.high_52w, fmtRupees)}</div></div>
+            <div class="rn-metric"><div class="lbl">52W Low</div><div class="val">${sf(tech.low_52w, fmtRupees)}</div></div>
+            <div class="rn-metric"><div class="lbl">ATR (14)</div><div class="val">${sf(tech.atr, fmtRupees)}</div></div>
+            <div class="rn-metric"><div class="lbl">SMA 50</div><div class="val">${sf(tech.sma_50, fmtRupees)}</div></div>
+            <div class="rn-metric"><div class="lbl">SMA 200</div><div class="val">${sf(tech.sma_200, fmtRupees)}</div></div>
+            <div class="rn-metric"><div class="lbl">PCR</div><div class="val">${sf(opts.pcr, (v) => fmt(v, 2))}</div></div>
+            <div class="rn-metric"><div class="lbl">Max Pain</div><div class="val">${sf(opts.max_pain, fmtRupees)}</div></div>
+            <div class="rn-metric"><div class="lbl">PE Ratio</div><div class="val">${sf(fund.pe_ratio, (v) => fmt(v, 1))}</div></div>
+            <div class="rn-metric"><div class="lbl">ROE</div><div class="val">${sf(fund.roe_pct, (v) => fmt(v, 1) + "%")}</div></div>
+            <div class="rn-metric"><div class="lbl">3Y Profit Growth</div><div class="val">${sf(fund.profit_growth_3y_pct, (v) => fmt(v, 1) + "%")}</div></div>
+            <div class="rn-metric"><div class="lbl">Promoter Holding</div><div class="val">${sf(fund.promoter_holding_pct, (v) => fmt(v, 1) + "%")}</div></div>
+          </div>
+
+          <div class="rn-section-title">Technical Posture</div>
+          <div class="rn-body">
+            <p>
+              Price is trading
+              ${tech.sma_50 ? (price > tech.sma_50 ? "above" : "below") : ""}
+              its 50-day moving average and
+              ${tech.sma_200 ? (price > tech.sma_200 ? "above" : "below") : ""}
+              its 200-day moving average. RSI of
+              ${sf(tech.rsi, (v) => fmt(v, 1))} indicates
+              ${tech.rsi >= 70 ? "overbought conditions; near-term mean-reversion risk"
+                : tech.rsi <= 30 ? "oversold conditions; possible bounce setup"
+                : "neutral momentum"}.
+              Volatility (ATR ${sf(tech.atr, fmtRupees)}) suggests
+              ${tech.atr && tech.atr / price > 0.025 ? "elevated" : "normal"}
+              daily range; size positions accordingly.
+            </p>
+            <p>
+              Options market signal: Put-Call Ratio of ${sf(opts.pcr, (v) => fmt(v, 2))}
+              ${opts.pcr >= 1.20 ? "is strongly bullish (puts being written aggressively)"
+                : opts.pcr >= 0.95 ? "leans bullish"
+                : opts.pcr >= 0.55 ? "is neutral"
+                : opts.pcr >= 0.40 ? "leans bearish"
+                : "is strongly bearish (calls being written aggressively)"}.
+              Max pain at ${sf(opts.max_pain, fmtRupees)} suggests
+              ${opts.max_pain && opts.max_pain > price ? "upward gravitational pull into expiry"
+                : opts.max_pain && opts.max_pain < price ? "downward gravitational pull into expiry"
+                : "neutral expiry positioning"}.
+            </p>
+          </div>
+
+          <div class="rn-footer">
+            <span>NSE Dashboard Research · ${escapeHtml(sym)}</span>
+            <span>Page 1 of 2</span>
+          </div>
+        </div>
+
+        <div class="rn-page">
+          <div class="rn-header">
+            <div>
+              <div class="rn-brand">NSE DASHBOARD RESEARCH</div>
+              <div class="rn-brand-sub">Continued — ${escapeHtml(sym)}</div>
+            </div>
+            <div class="rn-date">${date}</div>
+          </div>
+
+          <div class="rn-section-title">Analyst Commentary</div>
+          <div class="rn-body">
+            <p>${escapeHtml(aiTrimmed).replace(/\n+/g, "</p><p>")}</p>
+          </div>
+
+          ${ratings.recent_actions && ratings.recent_actions.length > 0 ? `
+          <div class="rn-section-title">Recent Broker Actions</div>
+          <div class="rn-body">
+            ${ratings.recent_actions.slice(0, 5).map(a => `
+              <p>
+                <strong>${escapeHtml(a.firm || "Analyst")}:</strong>
+                ${escapeHtml(a.action || "Updated")}
+                ${a.to_grade ? `to ${escapeHtml(a.to_grade)}` : ""}
+                ${a.date ? `<span style="color:#6b7280;">(${escapeHtml(a.date)})</span>` : ""}
+              </p>
+            `).join("")}
+          </div>
+          ` : ""}
+
+          <div class="rn-section-title">Risk Factors</div>
+          <div class="rn-body">
+            <p>
+              <strong>Volatility:</strong> Daily ATR of ${sf(tech.atr, fmtRupees)}
+              implies stops below ${tech.atr ? fmtRupees(price - 1.5 * tech.atr) : "—"}
+              risk false-triggers. Size positions to limit single-trade loss to
+              max 2% of capital.
+            </p>
+            <p>
+              <strong>Liquidity:</strong> Verify F&O lot size and option chain
+              depth before entering. Stocks with PCR outside [0.40, 1.50]
+              may have one-sided positioning that reverses sharply.
+            </p>
+            <p>
+              <strong>Concentration:</strong> Check existing portfolio exposure
+              to this name and sector before adding. Single-name positions
+              above 20% of capital warrant a hedge.
+            </p>
+          </div>
+
+          <div class="rn-disclaimer">
+            <strong>Disclaimer:</strong> This research note is generated by an automated
+            personal-use dashboard combining yfinance data, NSE option chain data
+            (via Upstox), and AI-generated commentary (Anthropic Claude).
+            It is NOT investment advice and is NOT produced by a SEBI-registered
+            research analyst. All numbers should be independently verified before
+            trading. The author and the system make no warranties about accuracy,
+            completeness, or fitness for any particular purpose. Past performance
+            does not indicate future results. Trade at your own risk.
+          </div>
+
+          <div class="rn-footer">
+            <span>NSE Dashboard Research · ${escapeHtml(sym)}</span>
+            <span>Page 2 of 2</span>
+          </div>
+        </div>
+      `;
+
+      const container = $("research-note-print");
+      container.innerHTML = html;
+
+      // Switch to print-research-note mode, print, then revert
+      document.body.classList.add("print-research-note");
+      // Use a tick to ensure the DOM update commits before window.print
+      setTimeout(() => {
+        window.print();
+        document.body.classList.remove("print-research-note");
+      }, 50);
+    }
+    // Stash the latest analyze response so the research-note CTA can use it
+    window._latestAnalyzeData = null;
+
 
     // Simple Markdown → HTML for AI analysis output
     function mdToHtml(md) {
@@ -2360,6 +3148,28 @@
       const p = data.price_data;
       const change1d = p.pct_change_1d;
 
+      // Stash for the Research Note generator (Tier-3 polish)
+      window._latestAnalyzeData = {
+        symbol:           data.symbol,
+        current_price:    p.current_price,
+        daily_change_pct: change1d,
+        technicals: {
+          rsi:        p.rsi_14,
+          high_52w:   p.high_52w,
+          low_52w:    p.low_52w,
+          atr:        p.atr_14,
+          sma_50:     p.sma_50,
+          sma_200:    p.sma_200,
+        },
+        options:          data.options || null,
+        analyst_ratings:  data.analyst_ratings || null,
+        fundamentals:     data.fundamentals || null,
+        ai_commentary:    data.analysis || data.ai_commentary || "",
+      };
+
+      // Update sticky market context bar with this symbol
+      setSymbolContext(data.symbol, p.current_price, change1d);
+
       const priceCard = `
         <div class="price-card">
           <div class="metric">
@@ -2450,6 +3260,12 @@
         ${analystCard}
         <div class="analysis-text">${mdToHtml(data.analysis)}</div>
         ${newsBlock}
+        <div style="margin: 16px 0; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button id="research-note-btn" class="research-note-cta" type="button"
+                  title="Generate a printable 2-page research note">
+            📄 Generate Research Note
+          </button>
+        </div>
         ${tradePlanCTA}
         ${chartLinks}
       `;
@@ -2458,6 +3274,11 @@
       const tpBtn = $("open-trade-plan-btn");
       if (tpBtn) {
         tpBtn.addEventListener("click", () => openTradePlanForm(data.symbol, data.options !== null));
+      }
+      // Wire up the Research Note button (Tier-3 polish)
+      const rnBtn = $("research-note-btn");
+      if (rnBtn) {
+        rnBtn.addEventListener("click", () => generateResearchNote(window._latestAnalyzeData));
       }
     }
 
@@ -2712,6 +3533,24 @@
 
       const isExisting = data.mode === "existing";
       const ep = data.existing_position;
+
+      // ---- Cache badge (only shown when response came from cache) ----
+      // The backend sets data.cached=true and data.cache_age_seconds when
+      // it serves a cached response (10-min TTL, 0.25% price bucket).
+      let cacheBadge = "";
+      if (data.cached === true) {
+        const age = data.cache_age_seconds || 0;
+        // Format age as "Xm Ys ago" or "Ys ago"
+        const ageLabel = age >= 60
+          ? `${Math.floor(age / 60)}m ${age % 60}s ago`
+          : `${age}s ago`;
+        cacheBadge = `
+          <div class="tp-cache-badge" title="Same inputs + price within 0.25% of original = served from 10-min cache instead of a fresh AI call. Saves API costs.">
+            <span class="tp-cache-dot"></span>
+            <span>SERVED FROM CACHE · ${ageLabel}</span>
+          </div>
+        `;
+      }
 
       // ---- Existing position banner (only in existing mode) ----
       let existingBanner = "";
@@ -3141,6 +3980,7 @@
 
       container.innerHTML = `
         <div class="trade-plan-result">
+          ${cacheBadge}
           ${existingBanner}
           ${entryCard}
           ${stopCard}
@@ -5686,5 +6526,49 @@ if barstate.islast
       });
     })();
   </script>
+
+  <!-- Keyboard shortcut help modal (toggled by ? key or ⌨ button) -->
+  <div id="kbd-modal-overlay" class="kbd-modal-overlay">
+    <div class="kbd-modal">
+      <h2>
+        ⌨ Keyboard Shortcuts
+        <span class="close" id="kbd-modal-close" role="button" aria-label="Close">×</span>
+      </h2>
+      <div class="kbd-section">Navigation</div>
+      <div class="kbd-row"><span>Quick symbol search</span>
+        <span><span class="kbd-key">Ctrl</span> + <span class="kbd-key">K</span></span></div>
+      <div class="kbd-row"><span>Go to Analyze</span>
+        <span><span class="kbd-key">g</span> <span class="kbd-key">a</span></span></div>
+      <div class="kbd-row"><span>Go to Journal</span>
+        <span><span class="kbd-key">g</span> <span class="kbd-key">j</span></span></div>
+      <div class="kbd-row"><span>Go to Strategy Advisor</span>
+        <span><span class="kbd-key">g</span> <span class="kbd-key">s</span></span></div>
+      <div class="kbd-row"><span>Go to Compare</span>
+        <span><span class="kbd-key">g</span> <span class="kbd-key">c</span></span></div>
+      <div class="kbd-row"><span>Go to Position Sizer</span>
+        <span><span class="kbd-key">g</span> <span class="kbd-key">p</span></span></div>
+      <div class="kbd-row"><span>Go to Intraday scan</span>
+        <span><span class="kbd-key">g</span> <span class="kbd-key">i</span></span></div>
+      <div class="kbd-row"><span>Go to Reversals scan</span>
+        <span><span class="kbd-key">g</span> <span class="kbd-key">r</span></span></div>
+      <div class="kbd-row"><span>Go to Momentum scan</span>
+        <span><span class="kbd-key">g</span> <span class="kbd-key">m</span></span></div>
+      <div class="kbd-section">UI</div>
+      <div class="kbd-row"><span>Toggle dark mode</span>
+        <span><span class="kbd-key">d</span></span></div>
+      <div class="kbd-row"><span>Save current tab as PDF</span>
+        <span><span class="kbd-key">Ctrl</span> + <span class="kbd-key">P</span></span></div>
+      <div class="kbd-row"><span>Show this help</span>
+        <span><span class="kbd-key">?</span></span></div>
+      <div class="kbd-row"><span>Close any modal</span>
+        <span><span class="kbd-key">Esc</span></span></div>
+    </div>
+  </div>
+
+  <!-- Research note print container: populated by generateResearchNote()
+       then window.print() is called with body.print-research-note set.
+       Hidden in normal view; revealed only when printing the research note. -->
+  <div id="research-note-print" class="research-note-print"></div>
+
 </body>
 </html>
