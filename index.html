@@ -638,6 +638,252 @@
     .hedge-general-advice strong { color: #065f46; }
     [data-theme="dark"] .hedge-general-advice strong { color: #6ee7b7; }
 
+    /* ============================================================
+       KANBAN TRADE IDEA PIPELINE
+       4-column board on desktop; stacked vertically on mobile.
+       Drag-and-drop between columns (desktop) + tap-to-move (mobile).
+       ============================================================ */
+    .kanban-wrapper {
+      padding: 16px;
+    }
+    .kanban-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+    }
+    .kanban-title { font-size: 18px; font-weight: 700; }
+    .kanban-subtitle { font-size: 12px; color: #6b7280; margin-top: 2px; }
+    [data-theme="dark"] .kanban-subtitle { color: var(--tp-fg-muted); }
+
+    .kanban-header-actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .kanban-btn-primary {
+      padding: 8px 16px; background: #1d4ed8; color: #fff; border: none;
+      border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;
+    }
+    .kanban-btn-primary:hover { background: #1e40af; }
+    .kanban-btn-secondary {
+      padding: 8px 14px; background: #fff; color: #1d4ed8;
+      border: 1px solid #1d4ed8; border-radius: 6px; cursor: pointer;
+      font-weight: 600; font-size: 13px;
+    }
+    [data-theme="dark"] .kanban-btn-secondary {
+      background: var(--tp-surface); border-color: var(--tp-accent); color: var(--tp-accent);
+    }
+
+    /* Board grid: 4 columns on desktop, stack on mobile */
+    .kanban-board {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    }
+    @media (max-width: 1100px) {
+      .kanban-board { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .kanban-board { grid-template-columns: 1fr; }
+    }
+
+    .kanban-column {
+      background: #f3f4f6; border-radius: 8px; padding: 10px;
+      min-height: 240px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    [data-theme="dark"] .kanban-column {
+      background: var(--tp-surface-alt); border: 1px solid var(--tp-border);
+    }
+    /* Highlight column on drag-over */
+    .kanban-column.drag-over {
+      background: #dbeafe;
+      outline: 2px dashed #1d4ed8;
+    }
+    [data-theme="dark"] .kanban-column.drag-over {
+      background: rgba(59,130,246,0.12);
+      outline-color: var(--tp-accent);
+    }
+
+    .kanban-column-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 6px; margin-bottom: 4px;
+    }
+    .kanban-column-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: #6b7280;
+    }
+    [data-theme="dark"] .kanban-column-title { color: var(--tp-fg-muted); }
+    .kanban-column-count {
+      background: #fff; border-radius: 999px; padding: 2px 8px;
+      font-size: 11px; font-weight: 600; color: #4b5563;
+      border: 1px solid #e5e7eb;
+    }
+    [data-theme="dark"] .kanban-column-count {
+      background: var(--tp-surface); color: var(--tp-fg); border-color: var(--tp-border);
+    }
+
+    /* Stage accent color on the column title */
+    .kanban-column[data-stage="watching"]        .kanban-column-title { color: #6366f1; }
+    .kanban-column[data-stage="researching"]     .kanban-column-title { color: #0891b2; }
+    .kanban-column[data-stage="setup_forming"]   .kanban-column-title { color: #ca8a04; }
+    .kanban-column[data-stage="setup_confirmed"] .kanban-column-title { color: #16a34a; }
+
+    .kanban-card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 6px;
+      padding: 10px 12px; cursor: grab;
+      transition: box-shadow 0.15s, transform 0.1s;
+      user-select: none;
+    }
+    [data-theme="dark"] .kanban-card {
+      background: var(--tp-surface); border-color: var(--tp-border);
+    }
+    .kanban-card:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+    .kanban-card:active { cursor: grabbing; }
+    .kanban-card.dragging { opacity: 0.4; }
+
+    /* Left accent bar based on stage */
+    .kanban-card[data-stage="watching"]        { border-left: 4px solid #6366f1; }
+    .kanban-card[data-stage="researching"]     { border-left: 4px solid #0891b2; }
+    .kanban-card[data-stage="setup_forming"]   { border-left: 4px solid #ca8a04; }
+    .kanban-card[data-stage="setup_confirmed"] { border-left: 4px solid #16a34a; }
+
+    .kanban-card-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 6px; gap: 8px;
+    }
+    .kanban-card-symbol {
+      font-weight: 700; font-size: 14px;
+    }
+    .kanban-card-direction {
+      font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .kanban-card-direction.long  { background: #dcfce7; color: #166534; }
+    .kanban-card-direction.short { background: #fee2e2; color: #991b1b; }
+    [data-theme="dark"] .kanban-card-direction.long  { background: rgba(22,163,74,0.2);  color: #4ade80; }
+    [data-theme="dark"] .kanban-card-direction.short { background: rgba(220,38,38,0.2);  color: #f87171; }
+
+    .kanban-card-thesis {
+      font-size: 12px; color: #4b5563; line-height: 1.4;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    [data-theme="dark"] .kanban-card-thesis { color: var(--tp-fg); }
+
+    .kanban-card-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: #9ca3af; margin-top: 6px;
+    }
+    [data-theme="dark"] .kanban-card-meta { color: var(--tp-fg-muted); }
+    .kanban-card-targets {
+      font-family: ui-monospace, monospace; font-size: 11px;
+    }
+
+    /* Empty column placeholder */
+    .kanban-empty {
+      color: #9ca3af; font-size: 12px; font-style: italic; text-align: center;
+      padding: 20px 8px;
+    }
+
+    /* Card actions row (shown in modal) */
+    .kanban-card-actions {
+      display: flex; gap: 6px; margin-top: 8px;
+    }
+    .kanban-card-action {
+      background: transparent; border: 1px solid #d1d5db;
+      padding: 4px 10px; border-radius: 4px; cursor: pointer;
+      font-size: 11px; color: #4b5563;
+    }
+    .kanban-card-action:hover { background: #f3f4f6; }
+    [data-theme="dark"] .kanban-card-action {
+      border-color: var(--tp-border); color: var(--tp-fg);
+    }
+    [data-theme="dark"] .kanban-card-action:hover { background: var(--tp-surface-alt); }
+    .kanban-card-action.promote { color: #16a34a; border-color: #16a34a; font-weight: 600; }
+    .kanban-card-action.promote:hover { background: #dcfce7; }
+    .kanban-card-action.delete  { color: #dc2626; border-color: #dc2626; }
+    .kanban-card-action.delete:hover { background: #fee2e2; }
+
+    /* Kanban modal (used for create + edit + tap-to-move) */
+    .kanban-modal-overlay {
+      display: none;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9000;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .kanban-modal-overlay.open { display: flex; }
+    .kanban-modal {
+      background: #fff; border-radius: 12px;
+      width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+      padding: 22px;
+    }
+    [data-theme="dark"] .kanban-modal {
+      background: var(--tp-surface); color: var(--tp-fg);
+    }
+    .kanban-modal h3 {
+      font-size: 17px; font-weight: 700; margin-bottom: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .kanban-modal h3 .close {
+      cursor: pointer; opacity: 0.5; font-size: 22px; padding: 4px 10px;
+    }
+    .kanban-modal h3 .close:hover { opacity: 1; }
+    .kanban-form-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;
+    }
+    .kanban-form-row.single { grid-template-columns: 1fr; }
+    @media (max-width: 500px) {
+      .kanban-form-row { grid-template-columns: 1fr; }
+    }
+    .kanban-form-field label {
+      display: block; font-size: 11px; font-weight: 600; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px;
+    }
+    [data-theme="dark"] .kanban-form-field label { color: var(--tp-fg-muted); }
+    .kanban-form-field input,
+    .kanban-form-field select,
+    .kanban-form-field textarea {
+      width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px;
+      font-size: 13px; font-family: inherit;
+    }
+    [data-theme="dark"] .kanban-form-field input,
+    [data-theme="dark"] .kanban-form-field select,
+    [data-theme="dark"] .kanban-form-field textarea {
+      background: var(--tp-surface-alt); border-color: var(--tp-border); color: var(--tp-fg);
+    }
+    .kanban-form-field textarea { min-height: 60px; resize: vertical; }
+    .kanban-form-buttons {
+      display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px;
+    }
+    .kanban-error {
+      color: #dc2626; font-size: 12px; margin-top: 8px;
+      display: none;
+    }
+    .kanban-error.visible { display: block; }
+    .kanban-modal-section-divider {
+      border-top: 1px solid #e5e7eb; margin: 16px 0;
+    }
+    [data-theme="dark"] .kanban-modal-section-divider { border-color: var(--tp-border); }
+
+    /* Mobile: show "move stage" buttons in modal (drag is hard on touch) */
+    .kanban-move-stage {
+      display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 4px;
+    }
+    .kanban-move-stage-btn {
+      padding: 6px 12px; border-radius: 4px; cursor: pointer;
+      font-size: 11px; font-weight: 600;
+      background: #f3f4f6; border: 1px solid #d1d5db; color: #4b5563;
+    }
+    [data-theme="dark"] .kanban-move-stage-btn {
+      background: var(--tp-surface-alt); border-color: var(--tp-border); color: var(--tp-fg);
+    }
+    .kanban-move-stage-btn:hover {
+      background: #1d4ed8; color: #fff; border-color: #1d4ed8;
+    }
+    .kanban-move-stage-btn.current {
+      background: #1d4ed8; color: #fff; border-color: #1d4ed8;
+      cursor: default;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -2263,6 +2509,9 @@
       <button class="tab" data-tab="risk">
         🛡️ Risk
       </button>
+      <button class="tab" data-tab="kanban">
+        📋 Pipeline
+      </button>
     </div>
 
     <div id="panel-intraday" class="panel"></div>
@@ -2274,6 +2523,7 @@
     <div id="panel-compare"  class="panel" style="display:none;"></div>
     <div id="panel-journal"  class="panel" style="display:none;"></div>
     <div id="panel-risk"     class="panel" style="display:none;"></div>
+    <div id="panel-kanban"   class="panel" style="display:none;"></div>
   </div>
 
   <script>
@@ -2531,6 +2781,9 @@
       // Always-on: Escape closes modals
       if (e.key === "Escape") {
         closeKbdHelp();
+        // Also close kanban modal if open
+        const km = document.getElementById("kanban-modal-overlay");
+        if (km) km.classList.remove("open");
         gPrefixActive = false;
         return;
       }
@@ -2581,6 +2834,7 @@
           a: "analyze",      j: "journal",     s: "strategy",
           c: "compare",      p: "sizer",       i: "intraday",
           r: "reversal",     m: "momentum",    k: "risk",
+          n: "kanban",
         };
         if (tabMap[k]) {
           e.preventDefault();
@@ -3420,6 +3674,432 @@
         </div>
       `;
     }
+
+
+    // =================================================================
+    // KANBAN TRADE IDEA PIPELINE
+    // =================================================================
+    // 4-stage idea tracker: Watching → Researching → Setup Forming →
+    // Setup Confirmed → (Live in Journal via Promote action).
+    //
+    // Supports:
+    //   - Drag-and-drop between columns on desktop
+    //   - Tap-to-edit modal with quick stage-move buttons on mobile
+    //   - Promote → creates journal entry, deletes kanban card
+    //   - Auto-archive stale ideas (handled by backend)
+    // =================================================================
+    const KANBAN_URL = "https://nse-dashboard-api.onrender.com/api/kanban";
+    const STAGE_LABELS = {
+      watching:         "Watching",
+      researching:      "Researching",
+      setup_forming:    "Setup Forming",
+      setup_confirmed:  "Setup Confirmed",
+    };
+    const STAGE_ORDER = ["watching", "researching", "setup_forming", "setup_confirmed"];
+
+    // Cached server state — used by drag handlers + promote action
+    let _kanbanData = null;
+    // Tracks which card is currently being dragged (HTML5 drag-and-drop)
+    let _kanbanDragId = null;
+
+    async function loadKanban() {
+      const panel = $("panel-kanban");
+      if (!panel) return;
+      renderKanbanSkeleton();
+      await fetchAndRenderKanban();
+    }
+
+    function renderKanbanSkeleton() {
+      const panel = $("panel-kanban");
+      panel.innerHTML = `
+        <div class="kanban-wrapper">
+          <div class="kanban-header">
+            <div>
+              <div class="kanban-title">📋 Trade Idea Pipeline</div>
+              <div class="kanban-subtitle">
+                Track pre-trade ideas through 4 stages. Promote a card to log it as a live trade in the Journal.
+                Stale cards auto-archive after 30 days.
+              </div>
+            </div>
+            <div class="kanban-header-actions">
+              <button id="kanban-add-btn" class="kanban-btn-primary" type="button">+ Add Idea</button>
+              <button id="kanban-refresh-btn" class="kanban-btn-secondary" type="button">↻ Refresh</button>
+            </div>
+          </div>
+          <div id="kanban-board-container">
+            <div style="padding: 40px 20px; text-align: center; color: #6b7280;">
+              Loading ideas…
+            </div>
+          </div>
+        </div>
+      `;
+      $("kanban-add-btn").addEventListener("click", () => openKanbanModal(null));
+      $("kanban-refresh-btn").addEventListener("click", () => fetchAndRenderKanban());
+    }
+
+    async function fetchAndRenderKanban() {
+      const container = $("kanban-board-container");
+      try {
+        const resp = await fetch(KANBAN_URL);
+        if (!resp.ok) {
+          const errText = await resp.text();
+          container.innerHTML = `
+            <div style="padding: 20px; background: #fee2e2; color: #991b1b; border-radius: 8px;">
+              <strong>Failed to load ideas:</strong> ${escapeHtml(errText.slice(0, 200))}
+            </div>
+          `;
+          return;
+        }
+        _kanbanData = await resp.json();
+        renderKanbanBoard(_kanbanData);
+      } catch (e) {
+        container.innerHTML = `
+          <div style="padding: 20px; background: #fee2e2; color: #991b1b; border-radius: 8px;">
+            <strong>Network error:</strong> ${escapeHtml(String(e))}
+          </div>
+        `;
+      }
+    }
+
+    function renderKanbanBoard(data) {
+      const container = $("kanban-board-container");
+      const totalIdeas = STAGE_ORDER.reduce((sum, s) => sum + (data.by_stage[s] || []).length, 0);
+
+      if (totalIdeas === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 60px 20px;">
+            <div style="font-size: 48px; margin-bottom: 12px;">💡</div>
+            <div style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">No ideas yet</div>
+            <div style="font-size: 13px; color: #6b7280; margin-bottom: 20px;">
+              Track stocks you're watching before they become trades.
+              The pipeline keeps you honest about what you saw vs what you acted on.
+            </div>
+            <button id="kanban-empty-add-btn" class="kanban-btn-primary" type="button">
+              + Add Your First Idea
+            </button>
+          </div>
+        `;
+        const emptyBtn = $("kanban-empty-add-btn");
+        if (emptyBtn) emptyBtn.addEventListener("click", () => openKanbanModal(null));
+        return;
+      }
+
+      const columns = STAGE_ORDER.map(stage => {
+        const ideas = data.by_stage[stage] || [];
+        const cards = ideas.length === 0
+          ? '<div class="kanban-empty">No ideas yet</div>'
+          : ideas.map(idea => renderKanbanCard(idea)).join("");
+        return `
+          <div class="kanban-column" data-stage="${stage}">
+            <div class="kanban-column-header">
+              <div class="kanban-column-title">${escapeHtml(STAGE_LABELS[stage])}</div>
+              <div class="kanban-column-count">${ideas.length}</div>
+            </div>
+            <div class="kanban-column-cards">${cards}</div>
+          </div>
+        `;
+      }).join("");
+
+      container.innerHTML = `<div class="kanban-board">${columns}</div>`;
+
+      // Wire up drag-and-drop on columns + cards
+      wireKanbanDragDrop();
+      // Wire up click handlers on cards (opens edit modal)
+      wireKanbanCardClicks();
+    }
+
+    function renderKanbanCard(idea) {
+      const direction = idea.direction
+        ? `<span class="kanban-card-direction ${idea.direction}">${idea.direction.toUpperCase()}</span>`
+        : "";
+      const targetLine = (idea.target_entry || idea.target_stop) ? `
+        <div class="kanban-card-targets">
+          ${idea.target_entry ? `E: ${fmtRupees(idea.target_entry)}` : ""}
+          ${idea.target_entry && idea.target_stop ? " · " : ""}
+          ${idea.target_stop ? `S: ${fmtRupees(idea.target_stop)}` : ""}
+          ${idea.target_size ? ` × ${idea.target_size}` : ""}
+        </div>
+      ` : "";
+      const days = idea.updated_at ? daysSinceIso(idea.updated_at) : 0;
+      const ageLabel = days === 0 ? "today" : days === 1 ? "1d ago" : `${days}d ago`;
+
+      return `
+        <div class="kanban-card" data-id="${idea.id}" data-stage="${idea.stage}" draggable="true">
+          <div class="kanban-card-header">
+            <div class="kanban-card-symbol">${escapeHtml(idea.symbol)}</div>
+            ${direction}
+          </div>
+          ${idea.thesis ? `<div class="kanban-card-thesis">${escapeHtml(idea.thesis)}</div>` : ""}
+          <div class="kanban-card-meta">
+            ${targetLine || '<span style="opacity:0.5;">No targets set</span>'}
+            <span>${ageLabel}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // Helper: days between an ISO date string and now
+    function daysSinceIso(iso) {
+      const then = new Date(iso).getTime();
+      if (isNaN(then)) return 0;
+      const diffMs = Date.now() - then;
+      return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+    }
+
+    // Drag-and-drop wiring (HTML5 native API)
+    function wireKanbanDragDrop() {
+      document.querySelectorAll(".kanban-card").forEach(card => {
+        card.addEventListener("dragstart", (e) => {
+          _kanbanDragId = card.dataset.id;
+          card.classList.add("dragging");
+          // Required for Firefox
+          if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", card.dataset.id);
+          }
+        });
+        card.addEventListener("dragend", () => {
+          card.classList.remove("dragging");
+          _kanbanDragId = null;
+          document.querySelectorAll(".kanban-column.drag-over")
+            .forEach(c => c.classList.remove("drag-over"));
+        });
+      });
+
+      document.querySelectorAll(".kanban-column").forEach(col => {
+        col.addEventListener("dragover", (e) => {
+          // Allow drop
+          e.preventDefault();
+          col.classList.add("drag-over");
+        });
+        col.addEventListener("dragleave", () => {
+          col.classList.remove("drag-over");
+        });
+        col.addEventListener("drop", async (e) => {
+          e.preventDefault();
+          col.classList.remove("drag-over");
+          const id = _kanbanDragId || (e.dataTransfer && e.dataTransfer.getData("text/plain"));
+          if (!id) return;
+          const newStage = col.dataset.stage;
+          // Find the dragged card's current stage from cached data
+          const allCards = Object.values(_kanbanData.by_stage).flat();
+          const card = allCards.find(c => String(c.id) === String(id));
+          if (!card || card.stage === newStage) return;  // no-op
+          await moveKanbanCard(id, newStage);
+        });
+      });
+    }
+
+    async function moveKanbanCard(id, newStage) {
+      try {
+        const resp = await fetch(`${KANBAN_URL}/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stage: newStage }),
+        });
+        if (!resp.ok) {
+          const err = await resp.text();
+          alert(`Failed to move card: ${err.slice(0, 200)}`);
+          return;
+        }
+        // Refresh the board to reflect the new state
+        await fetchAndRenderKanban();
+      } catch (e) {
+        alert(`Network error moving card: ${e}`);
+      }
+    }
+
+    // Click on a card → open edit modal
+    function wireKanbanCardClicks() {
+      document.querySelectorAll(".kanban-card").forEach(card => {
+        card.addEventListener("click", (e) => {
+          // Ignore if drag just happened (dragend fires before click in some browsers)
+          if (card.classList.contains("dragging")) return;
+          const id = card.dataset.id;
+          const allCards = Object.values(_kanbanData.by_stage).flat();
+          const idea = allCards.find(c => String(c.id) === String(id));
+          if (idea) openKanbanModal(idea);
+        });
+      });
+    }
+
+    // Modal: create new (idea = null) or edit existing (idea = obj)
+    function openKanbanModal(idea) {
+      const overlay = $("kanban-modal-overlay");
+      $("kanban-modal-title").textContent = idea ? `Edit Idea — ${idea.symbol}` : "Add New Idea";
+
+      // Populate form fields
+      $("kanban-input-symbol").value    = idea?.symbol || "";
+      $("kanban-input-stage").value     = idea?.stage || "watching";
+      $("kanban-input-direction").value = idea?.direction || "";
+      $("kanban-input-size").value      = idea?.target_size || "";
+      $("kanban-input-entry").value     = idea?.target_entry || "";
+      $("kanban-input-stop").value      = idea?.target_stop || "";
+      $("kanban-input-thesis").value    = idea?.thesis || "";
+      $("kanban-input-trigger").value   = idea?.trigger_text || "";
+      $("kanban-input-notes").value     = idea?.notes || "";
+
+      // Stash the editing idea ID on the modal for save handler to read
+      overlay.dataset.editingId = idea ? idea.id : "";
+
+      // Edit-only actions
+      $("kanban-modal-delete").style.display  = idea ? "inline-block" : "none";
+      $("kanban-modal-promote").style.display = idea ? "inline-block" : "none";
+
+      // Quick stage-move buttons (only shown when editing)
+      const moveRow = $("kanban-modal-move-row");
+      if (idea) {
+        moveRow.style.display = "block";
+        const buttons = STAGE_ORDER.map(s => `
+          <button class="kanban-move-stage-btn ${s === idea.stage ? "current" : ""}"
+                  data-stage="${s}" type="button"
+                  ${s === idea.stage ? "disabled" : ""}>
+            ${escapeHtml(STAGE_LABELS[s])}
+          </button>
+        `).join("");
+        $("kanban-modal-move-stages").innerHTML = buttons;
+        // Wire move buttons
+        $("kanban-modal-move-stages").querySelectorAll(".kanban-move-stage-btn").forEach(b => {
+          b.addEventListener("click", async () => {
+            await moveKanbanCard(idea.id, b.dataset.stage);
+            closeKanbanModal();
+          });
+        });
+      } else {
+        moveRow.style.display = "none";
+      }
+
+      // Clear any prior error
+      const errEl = $("kanban-modal-error");
+      errEl.textContent = "";
+      errEl.classList.remove("visible");
+
+      overlay.classList.add("open");
+      // Auto-focus symbol field for new ideas
+      if (!idea) setTimeout(() => $("kanban-input-symbol").focus(), 50);
+    }
+
+    function closeKanbanModal() {
+      $("kanban-modal-overlay").classList.remove("open");
+    }
+
+    function showKanbanError(msg) {
+      const errEl = $("kanban-modal-error");
+      errEl.textContent = msg;
+      errEl.classList.add("visible");
+    }
+
+    async function saveKanbanFromModal() {
+      const overlay = $("kanban-modal-overlay");
+      const editingId = overlay.dataset.editingId;
+
+      // Build payload from form
+      const payload = {
+        symbol:       $("kanban-input-symbol").value.trim().toUpperCase(),
+        stage:        $("kanban-input-stage").value,
+        direction:    $("kanban-input-direction").value || null,
+        target_size:  $("kanban-input-size").value || null,
+        target_entry: $("kanban-input-entry").value || null,
+        target_stop:  $("kanban-input-stop").value || null,
+        thesis:       $("kanban-input-thesis").value.trim(),
+        trigger_text: $("kanban-input-trigger").value.trim(),
+        notes:        $("kanban-input-notes").value.trim(),
+      };
+
+      if (!payload.symbol) {
+        showKanbanError("Symbol is required.");
+        return;
+      }
+
+      try {
+        const url    = editingId ? `${KANBAN_URL}/${editingId}` : KANBAN_URL;
+        const method = editingId ? "PATCH" : "POST";
+        const resp = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: "Unknown error" }));
+          showKanbanError(err.error || "Save failed.");
+          return;
+        }
+        closeKanbanModal();
+        await fetchAndRenderKanban();
+      } catch (e) {
+        showKanbanError(`Network error: ${e}`);
+      }
+    }
+
+    async function deleteKanbanFromModal() {
+      const overlay = $("kanban-modal-overlay");
+      const id = overlay.dataset.editingId;
+      if (!id) return;
+      if (!confirm("Delete this idea? This cannot be undone.")) return;
+      try {
+        const resp = await fetch(`${KANBAN_URL}/${id}`, { method: "DELETE" });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: "Unknown error" }));
+          showKanbanError(err.error || "Delete failed.");
+          return;
+        }
+        closeKanbanModal();
+        await fetchAndRenderKanban();
+      } catch (e) {
+        showKanbanError(`Network error: ${e}`);
+      }
+    }
+
+    async function promoteKanbanFromModal() {
+      const overlay = $("kanban-modal-overlay");
+      const id = overlay.dataset.editingId;
+      if (!id) return;
+
+      // Pre-check: promotion requires direction + entry + size
+      const direction = $("kanban-input-direction").value;
+      const entry     = $("kanban-input-entry").value;
+      const size      = $("kanban-input-size").value;
+      if (!direction || !entry || !size) {
+        showKanbanError("To promote, fill in: Direction, Target entry, and Target qty. Save first if you just edited.");
+        return;
+      }
+
+      if (!confirm(`Promote this idea to a LIVE journal trade?\n\nThis creates a journal entry and removes the kanban card.`)) return;
+
+      try {
+        const resp = await fetch(`${KANBAN_URL}/${id}/promote`, { method: "POST" });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: "Unknown error" }));
+          showKanbanError(err.error || "Promote failed.");
+          return;
+        }
+        const data = await resp.json();
+        closeKanbanModal();
+        await fetchAndRenderKanban();
+        alert(`✓ ${data.message || "Promoted to journal"}\n\nSwitch to the Journal tab to view the live trade.`);
+      } catch (e) {
+        showKanbanError(`Network error: ${e}`);
+      }
+    }
+
+    // Wire up modal buttons + close on overlay click
+    document.addEventListener("DOMContentLoaded", () => {
+      const overlay   = $("kanban-modal-overlay");
+      const closeBtn  = $("kanban-modal-close");
+      const cancelBtn = $("kanban-modal-cancel");
+      const saveBtn   = $("kanban-modal-save");
+      const deleteBtn = $("kanban-modal-delete");
+      const promoteBtn= $("kanban-modal-promote");
+
+      if (closeBtn)   closeBtn.addEventListener("click", closeKanbanModal);
+      if (cancelBtn)  cancelBtn.addEventListener("click", closeKanbanModal);
+      if (saveBtn)    saveBtn.addEventListener("click", saveKanbanFromModal);
+      if (deleteBtn)  deleteBtn.addEventListener("click", deleteKanbanFromModal);
+      if (promoteBtn) promoteBtn.addEventListener("click", promoteKanbanFromModal);
+      if (overlay) overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeKanbanModal();
+      });
+    });
 
 
     // Simple Markdown → HTML for AI analysis output
@@ -7264,6 +7944,9 @@ if barstate.islast
           // Load on first visit; on subsequent visits just refresh data
           loadRiskDashboard();
         }
+        if (tab === "kanban") {
+          loadKanban();
+        }
       });
     });
 
@@ -7542,6 +8225,8 @@ if barstate.islast
         <span><span class="kbd-key">g</span> <span class="kbd-key">m</span></span></div>
       <div class="kbd-row"><span>Go to Risk Dashboard</span>
         <span><span class="kbd-key">g</span> <span class="kbd-key">k</span></span></div>
+      <div class="kbd-row"><span>Go to Pipeline (Kanban)</span>
+        <span><span class="kbd-key">g</span> <span class="kbd-key">n</span></span></div>
       <div class="kbd-section">UI</div>
       <div class="kbd-row"><span>Toggle dark mode</span>
         <span><span class="kbd-key">d</span></span></div>
@@ -7551,6 +8236,97 @@ if barstate.islast
         <span><span class="kbd-key">?</span></span></div>
       <div class="kbd-row"><span>Close any modal</span>
         <span><span class="kbd-key">Esc</span></span></div>
+    </div>
+  </div>
+
+  <!-- Kanban modal (create / edit idea + mobile-friendly stage move) -->
+  <div id="kanban-modal-overlay" class="kanban-modal-overlay">
+    <div class="kanban-modal">
+      <h3>
+        <span id="kanban-modal-title">Add New Idea</span>
+        <span class="close" id="kanban-modal-close" role="button" aria-label="Close">×</span>
+      </h3>
+
+      <div class="kanban-form-row">
+        <div class="kanban-form-field">
+          <label for="kanban-input-symbol">Symbol *</label>
+          <input id="kanban-input-symbol" type="text" placeholder="e.g. RELIANCE" autocomplete="off">
+        </div>
+        <div class="kanban-form-field">
+          <label for="kanban-input-stage">Stage *</label>
+          <select id="kanban-input-stage">
+            <option value="watching">Watching</option>
+            <option value="researching">Researching</option>
+            <option value="setup_forming">Setup Forming</option>
+            <option value="setup_confirmed">Setup Confirmed</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="kanban-form-row">
+        <div class="kanban-form-field">
+          <label for="kanban-input-direction">Direction</label>
+          <select id="kanban-input-direction">
+            <option value="">— Not decided —</option>
+            <option value="long">Long</option>
+            <option value="short">Short</option>
+          </select>
+        </div>
+        <div class="kanban-form-field">
+          <label for="kanban-input-size">Target qty</label>
+          <input id="kanban-input-size" type="number" min="1" placeholder="e.g. 100" inputmode="numeric">
+        </div>
+      </div>
+
+      <div class="kanban-form-row">
+        <div class="kanban-form-field">
+          <label for="kanban-input-entry">Target entry ₹</label>
+          <input id="kanban-input-entry" type="number" step="0.01" placeholder="e.g. 1400.00" inputmode="decimal">
+        </div>
+        <div class="kanban-form-field">
+          <label for="kanban-input-stop">Target stop ₹</label>
+          <input id="kanban-input-stop" type="number" step="0.01" placeholder="e.g. 1350.00" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="kanban-form-row single">
+        <div class="kanban-form-field">
+          <label for="kanban-input-thesis">Thesis (why interested)</label>
+          <textarea id="kanban-input-thesis" placeholder="e.g. Breaking out of 6-month consolidation; results last week beat estimates"></textarea>
+        </div>
+      </div>
+
+      <div class="kanban-form-row single">
+        <div class="kanban-form-field">
+          <label for="kanban-input-trigger">Trigger (what advances it)</label>
+          <textarea id="kanban-input-trigger" placeholder="e.g. Wait for daily close above 1420 with volume"></textarea>
+        </div>
+      </div>
+
+      <div class="kanban-form-row single">
+        <div class="kanban-form-field">
+          <label for="kanban-input-notes">Notes</label>
+          <textarea id="kanban-input-notes" placeholder="Free-form scratchpad"></textarea>
+        </div>
+      </div>
+
+      <div id="kanban-modal-error" class="kanban-error"></div>
+
+      <!-- Mobile-friendly: quick stage move buttons appear when editing -->
+      <div id="kanban-modal-move-row" style="display:none;">
+        <div class="kanban-modal-section-divider"></div>
+        <div style="font-size:11px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px;">
+          Quick move to:
+        </div>
+        <div id="kanban-modal-move-stages" class="kanban-move-stage"></div>
+      </div>
+
+      <div class="kanban-form-buttons">
+        <button id="kanban-modal-delete" class="kanban-card-action delete" style="display:none;" type="button">🗑 Delete</button>
+        <button id="kanban-modal-promote" class="kanban-card-action promote" style="display:none;" type="button">🚀 Promote to Live</button>
+        <button id="kanban-modal-cancel" class="kanban-btn-secondary" type="button">Cancel</button>
+        <button id="kanban-modal-save" class="kanban-btn-primary" type="button">Save</button>
+      </div>
     </div>
   </div>
 
