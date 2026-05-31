@@ -884,6 +884,90 @@
       cursor: default;
     }
 
+    /* ============================================================
+       PRE-TRADE CHECKLIST — institutional discipline guardrail
+       Fires on Promote (kanban → live trade). All items must be
+       checked before the Confirm button enables.
+       ============================================================ */
+    .checklist-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 6px;
+      margin-bottom: 8px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    [data-theme="dark"] .checklist-item {
+      border-color: var(--tp-border); background: var(--tp-surface);
+    }
+    .checklist-item:hover {
+      border-color: #1d4ed8; background: #f9fafb;
+    }
+    [data-theme="dark"] .checklist-item:hover {
+      border-color: var(--tp-accent); background: var(--tp-surface-alt);
+    }
+    .checklist-item.checked {
+      background: #ecfdf5; border-color: #16a34a;
+    }
+    [data-theme="dark"] .checklist-item.checked {
+      background: rgba(22,163,74,0.12); border-color: #22c55e;
+    }
+    .checklist-item.auto {
+      background: #eff6ff; border-color: #3b82f6;
+      cursor: default;   /* auto-validated items aren't clickable */
+    }
+    [data-theme="dark"] .checklist-item.auto {
+      background: rgba(59,130,246,0.10); border-color: var(--tp-accent);
+    }
+    .checklist-item.auto.failed {
+      background: #fef3c7; border-color: #f59e0b;
+    }
+    [data-theme="dark"] .checklist-item.auto.failed {
+      background: rgba(245,158,11,0.10); border-color: #f59e0b;
+    }
+    .checklist-checkbox {
+      width: 20px; height: 20px; flex-shrink: 0;
+      border: 2px solid #d1d5db; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; margin-top: 2px;
+    }
+    .checklist-item.checked .checklist-checkbox {
+      background: #16a34a; border-color: #16a34a; color: #fff;
+    }
+    .checklist-item.auto .checklist-checkbox {
+      background: #3b82f6; border-color: #3b82f6; color: #fff;
+    }
+    .checklist-item.auto.failed .checklist-checkbox {
+      background: #f59e0b; border-color: #f59e0b; color: #fff;
+    }
+    .checklist-content {
+      flex: 1; min-width: 0;
+    }
+    .checklist-title {
+      font-size: 13px; font-weight: 600; line-height: 1.4;
+    }
+    .checklist-detail {
+      font-size: 11px; color: #6b7280; margin-top: 4px; line-height: 1.5;
+    }
+    [data-theme="dark"] .checklist-detail { color: var(--tp-fg-muted); }
+    .checklist-item.checked .checklist-detail { color: #166534; }
+    [data-theme="dark"] .checklist-item.checked .checklist-detail { color: #4ade80; }
+    .checklist-tag-auto {
+      font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px;
+      background: #3b82f6; color: #fff; letter-spacing: 0.5px;
+      margin-left: 6px; vertical-align: middle;
+    }
+    .checklist-item.auto.failed .checklist-tag-auto {
+      background: #f59e0b;
+    }
+    #checklist-progress.all-clear {
+      background: #dcfce7; color: #166534;
+    }
+    [data-theme="dark"] #checklist-progress {
+      background: rgba(245,158,11,0.15); color: #fde68a;
+    }
+    [data-theme="dark"] #checklist-progress.all-clear {
+      background: rgba(34,197,94,0.15); color: #6ee7b7;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -1071,6 +1155,54 @@
     .news-list a:hover { text-decoration: underline; }
     .news-list .news-meta { color: #9ca3af; font-size: 12px; margin-left: 6px; }
 
+    /* News relevance badges (Tier-2 polish) — inline before each headline */
+    .news-badge {
+      display: inline-block; font-size: 9px; font-weight: 700;
+      padding: 2px 6px; border-radius: 3px; letter-spacing: 0.5px;
+      margin-right: 8px; vertical-align: middle;
+      cursor: help;
+    }
+    .news-badge.material {
+      background: #dcfce7; color: #166534;
+      border: 1px solid #86efac;
+    }
+    .news-badge.noise {
+      background: #f3f4f6; color: #6b7280;
+      border: 1px solid #e5e7eb;
+    }
+    [data-theme="dark"] .news-badge.material {
+      background: rgba(22,163,74,0.18); color: #4ade80; border-color: rgba(22,163,74,0.4);
+    }
+    [data-theme="dark"] .news-badge.noise {
+      background: var(--tp-surface-alt); color: var(--tp-fg-muted); border-color: var(--tp-border);
+    }
+
+    /* Material-news list emphasis — slight green tint */
+    .news-list-material li {
+      background: #f0fdf4; padding-left: 10px; padding-right: 10px;
+      margin-bottom: 4px; border-bottom: 1px solid #dcfce7; border-radius: 4px;
+    }
+    [data-theme="dark"] .news-list-material li {
+      background: rgba(22,163,74,0.06); border-color: rgba(22,163,74,0.15);
+    }
+    .news-list-material li:last-child { border-bottom: 1px solid #dcfce7; }
+    [data-theme="dark"] .news-list-material li:last-child {
+      border-color: rgba(22,163,74,0.15);
+    }
+
+    /* "Show all" toggle button */
+    .news-toggle-btn {
+      background: transparent; color: #1d4ed8; border: 1px solid #1d4ed8;
+      padding: 3px 10px; border-radius: 4px; font-size: 11px; cursor: pointer;
+      font-weight: 600;
+    }
+    .news-toggle-btn:hover { background: #1d4ed8; color: #fff; }
+    [data-theme="dark"] .news-toggle-btn {
+      color: var(--tp-accent); border-color: var(--tp-accent);
+    }
+    [data-theme="dark"] .news-toggle-btn:hover {
+      background: var(--tp-accent); color: #fff;
+    }
     .loading-spinner { text-align: center; padding: 60px 20px; color: #6b7280; }
     .loading-spinner::after {
       content: "⏳"; font-size: 32px; display: block; margin-top: 10px;
@@ -2784,6 +2916,9 @@
         // Also close kanban modal if open
         const km = document.getElementById("kanban-modal-overlay");
         if (km) km.classList.remove("open");
+        // Also close checklist modal if open
+        const cm = document.getElementById("checklist-modal-overlay");
+        if (cm) cm.classList.remove("open");
         gPrefixActive = false;
         return;
       }
@@ -4064,8 +4199,19 @@
         return;
       }
 
-      if (!confirm(`Promote this idea to a LIVE journal trade?\n\nThis creates a journal entry and removes the kanban card.`)) return;
+      // Open the pre-trade checklist instead of going straight to promote.
+      // The checklist will call doKanbanPromote(id) once all items are confirmed.
+      openPreTradeChecklist(id, {
+        symbol:    $("kanban-input-symbol").value.trim().toUpperCase(),
+        direction: direction,
+        entry:     parseFloat(entry),
+        stop:      parseFloat($("kanban-input-stop").value) || null,
+        size:      parseInt(size, 10),
+      });
+    }
 
+    // The actual promote API call — invoked from the checklist after confirmation
+    async function doKanbanPromote(id) {
       try {
         const resp = await fetch(`${KANBAN_URL}/${id}/promote`, { method: "POST" });
         if (!resp.ok) {
@@ -4075,12 +4221,220 @@
         }
         const data = await resp.json();
         closeKanbanModal();
+        closePreTradeChecklist();
         await fetchAndRenderKanban();
         alert(`✓ ${data.message || "Promoted to journal"}\n\nSwitch to the Journal tab to view the live trade.`);
       } catch (e) {
         showKanbanError(`Network error: ${e}`);
       }
     }
+
+    // =================================================================
+    // PRE-TRADE CHECKLIST (institutional discipline guardrail)
+    // =================================================================
+    // Modal with 8 checks, gated behind a Confirm button that only
+    // enables once all items are checked. Some items auto-validate
+    // (entry/stop/qty defined, risk-per-trade computed if portfolio
+    // size is set). Manual items require explicit click.
+    // =================================================================
+
+    function openPreTradeChecklist(ideaId, ideaSummary) {
+      const overlay = $("checklist-modal-overlay");
+
+      // Header: show what's being promoted
+      const stopLine = ideaSummary.stop
+        ? `Stop ${fmtRupees(ideaSummary.stop)} · Risk ₹${fmt(Math.abs((ideaSummary.entry - ideaSummary.stop) * ideaSummary.size))}/trade`
+        : "(no stop set)";
+      $("checklist-symbol-header").innerHTML = `
+        <strong>${escapeHtml(ideaSummary.symbol)}</strong>
+        ${ideaSummary.direction.toUpperCase()} · ${ideaSummary.size} qty @ ${fmtRupees(ideaSummary.entry)}
+        <br><span style="color:#6b7280; font-size: 12px;">${stopLine}</span>
+      `;
+
+      // Build checklist items (mix of auto-validated + manual)
+      const items = buildChecklistItems(ideaSummary);
+      const itemsHtml = items.map((item, i) => `
+        <div class="checklist-item ${item.type}${item.autoChecked ? ' checked' : ''}"
+             data-index="${i}" data-type="${item.type}">
+          <div class="checklist-checkbox">${(item.autoChecked || item.type === 'auto') ? '✓' : ''}</div>
+          <div class="checklist-content">
+            <div class="checklist-title">
+              ${escapeHtml(item.title)}
+              ${item.type === 'auto' ? `<span class="checklist-tag-auto">AUTO ${item.failed ? '!' : '✓'}</span>` : ''}
+            </div>
+            <div class="checklist-detail">${escapeHtml(item.detail)}</div>
+          </div>
+        </div>
+      `).join("");
+      $("checklist-items").innerHTML = itemsHtml;
+
+      // Stash the idea ID + items state for the click handlers
+      overlay.dataset.ideaId = ideaId;
+      overlay.dataset.checked = JSON.stringify(items.map(it => it.autoChecked || it.type === 'auto'));
+      overlay.dataset.total = String(items.length);
+
+      // Wire up clicks (only on manual items)
+      $("checklist-items").querySelectorAll(".checklist-item:not(.auto)").forEach(el => {
+        el.addEventListener("click", () => toggleChecklistItem(el));
+      });
+
+      updateChecklistProgress();
+      overlay.classList.add("open");
+    }
+
+    function buildChecklistItems(ideaSummary) {
+      // Compute risk-per-trade if we have stop + portfolio size
+      const portfolioSize = getPortfolioSize();
+      const riskAmount = ideaSummary.stop
+        ? Math.abs((ideaSummary.entry - ideaSummary.stop) * ideaSummary.size)
+        : null;
+      const riskPct = (riskAmount !== null && portfolioSize)
+        ? (riskAmount / portfolioSize) * 100
+        : null;
+
+      const items = [];
+
+      // Auto-item 1: Entry/stop/qty defined
+      items.push({
+        type: 'auto',
+        autoChecked: true,
+        failed: false,
+        title: 'Entry, stop, and quantity are defined',
+        detail: ideaSummary.stop
+          ? `Entry ${fmtRupees(ideaSummary.entry)} · Stop ${fmtRupees(ideaSummary.stop)} · Qty ${ideaSummary.size}`
+          : `⚠️ No stop set — consider going back to set one`,
+      });
+
+      // Auto-item 2: Risk per trade ≤ 2% of portfolio (if portfolio size set)
+      if (portfolioSize && riskPct !== null) {
+        const failed = riskPct > 2;
+        items.push({
+          type: 'auto',
+          autoChecked: !failed,
+          failed: failed,
+          title: failed
+            ? `⚠️ Risk per trade is ${riskPct.toFixed(2)}% (>2% guideline)`
+            : `Risk per trade is ${riskPct.toFixed(2)}% (within 2% guideline)`,
+          detail: `Risking ${fmtRupeesCompact(riskAmount)} of ${fmtRupeesCompact(portfolioSize)} portfolio. Industry-standard rule is to risk ≤2% per trade.`,
+        });
+      } else if (riskAmount !== null) {
+        items.push({
+          type: 'manual',
+          autoChecked: false,
+          title: 'Risk is acceptable as % of portfolio',
+          detail: `This trade risks ${fmtRupeesCompact(riskAmount)} at stop. Set your portfolio size in Risk Dashboard for auto-validation.`,
+        });
+      } else {
+        items.push({
+          type: 'manual',
+          autoChecked: false,
+          title: 'Risk per trade is bounded and acceptable',
+          detail: 'No stop is set — set a stop or accept unlimited downside risk before proceeding.',
+        });
+      }
+
+      // Manual items (institutional discipline checks)
+      items.push({
+        type: 'manual',
+        autoChecked: false,
+        title: 'No earnings/results within next 7 days',
+        detail: 'Earnings inflate IV and create gap risk. If a result is imminent, accept it consciously or wait.',
+      });
+      items.push({
+        type: 'manual',
+        autoChecked: false,
+        title: 'Checked sector concentration',
+        detail: 'Reviewed Risk Dashboard — this trade does NOT over-concentrate in one sector (>35% threshold).',
+      });
+      items.push({
+        type: 'manual',
+        autoChecked: false,
+        title: 'Identified what would invalidate this thesis',
+        detail: 'Mental stop is clear (price level OR fundamental change). If thesis breaks, you exit — no rationalizing.',
+      });
+      items.push({
+        type: 'manual',
+        autoChecked: false,
+        title: 'Reviewed current market regime',
+        detail: 'Checked NIFTY trend + India VIX level (top bar). Trade is appropriate for this regime (don\'t fight strong trends, don\'t buy options in high IV).',
+      });
+      items.push({
+        type: 'manual',
+        autoChecked: false,
+        title: 'Have a max-loss number (₹) in mind',
+        detail: 'Concrete rupee amount, not just %. Repeat it aloud once before confirming.',
+      });
+      items.push({
+        type: 'manual',
+        autoChecked: false,
+        title: 'Not a FOMO entry, not chasing, no rules violated',
+        detail: 'Trade is taken on plan, not on a tip / urge / social media bump. No standing rule violated (no overnight on F&O if your rule says so, etc).',
+      });
+
+      return items;
+    }
+
+    function toggleChecklistItem(el) {
+      el.classList.toggle("checked");
+      const checkbox = el.querySelector(".checklist-checkbox");
+      checkbox.textContent = el.classList.contains("checked") ? "✓" : "";
+
+      // Update state
+      const overlay = $("checklist-modal-overlay");
+      const checked = JSON.parse(overlay.dataset.checked);
+      const idx = parseInt(el.dataset.index, 10);
+      checked[idx] = el.classList.contains("checked");
+      overlay.dataset.checked = JSON.stringify(checked);
+
+      updateChecklistProgress();
+    }
+
+    function updateChecklistProgress() {
+      const overlay = $("checklist-modal-overlay");
+      const checked = JSON.parse(overlay.dataset.checked);
+      const total = parseInt(overlay.dataset.total, 10);
+      const checkedCount = checked.filter(Boolean).length;
+
+      const progress = $("checklist-progress");
+      const confirmBtn = $("checklist-confirm");
+
+      progress.textContent = `${checkedCount} of ${total} items confirmed`;
+      if (checkedCount === total) {
+        progress.classList.add("all-clear");
+        progress.textContent = `✓ All ${total} items confirmed — ready to promote`;
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = "1";
+        confirmBtn.style.cursor = "pointer";
+      } else {
+        progress.classList.remove("all-clear");
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = "0.5";
+        confirmBtn.style.cursor = "not-allowed";
+      }
+    }
+
+    function closePreTradeChecklist() {
+      $("checklist-modal-overlay").classList.remove("open");
+    }
+
+    // Wire checklist modal buttons
+    document.addEventListener("DOMContentLoaded", () => {
+      const closeBtn   = $("checklist-modal-close");
+      const cancelBtn  = $("checklist-cancel");
+      const confirmBtn = $("checklist-confirm");
+      const overlay    = $("checklist-modal-overlay");
+
+      if (closeBtn)   closeBtn.addEventListener("click", closePreTradeChecklist);
+      if (cancelBtn)  cancelBtn.addEventListener("click", closePreTradeChecklist);
+      if (confirmBtn) confirmBtn.addEventListener("click", () => {
+        if (confirmBtn.disabled) return;
+        const ideaId = overlay.dataset.ideaId;
+        if (ideaId) doKanbanPromote(ideaId);
+      });
+      if (overlay) overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closePreTradeChecklist();
+      });
+    });
 
     // Wire up modal buttons + close on overlay click
     document.addEventListener("DOMContentLoaded", () => {
@@ -4872,21 +5226,66 @@
 
       let newsBlock = "";
       if (data.news && data.news.length > 0) {
-        const newsItems = data.news.map(n => {
+        // Tier-2 polish: classify-and-split into Material / All News
+        // Backend tags each item with relevance: "material" | "noise"
+        // Material items get a green badge, noise gets gray, default gets blue dot.
+        const material = data.news.filter(n => n.relevance === "material");
+        const noise    = data.news.filter(n => n.relevance === "noise");
+
+        // Helper to render a single news item with relevance badge
+        const renderNewsItem = (n) => {
           const age = n.age_days === 0 ? "today" : `${n.age_days}d ago`;
+          let badge = "";
+          if (n.relevance === "material") {
+            badge = `<span class="news-badge material" title="${escapeHtml(n.relevance_source === 'ai' ? 'AI-classified as material' : 'Rule-matched as material')}">MATERIAL</span>`;
+          } else if (n.relevance === "noise") {
+            badge = `<span class="news-badge noise" title="${escapeHtml(n.relevance_source === 'ai' ? 'AI-classified as noise' : 'Rule-matched as noise')}">NOISE</span>`;
+          }
           return `
             <li>
-              <a href="${n.link}" target="_blank">${escapeHtml(n.title)}</a>
+              ${badge}
+              <a href="${n.link}" target="_blank" rel="noopener">${escapeHtml(n.title)}</a>
               <span class="news-meta">${escapeHtml(n.source)} · ${age}</span>
             </li>
           `;
-        }).join("");
-        newsBlock = `
-          <h2 style="font-size:16px;margin-top:18px;padding-bottom:6px;border-bottom:1px solid #e5e7eb;">
-            📰 Latest News (last 7 days)
+        };
+
+        // Section 1: Material news (top, prominent)
+        const materialSection = material.length > 0 ? `
+          <h2 style="font-size:16px;margin-top:18px;padding-bottom:6px;border-bottom:2px solid #16a34a;">
+            ⭐ Material News
+            <span style="color:#16a34a; font-size:12px; font-weight:normal; margin-left:6px;">
+              (${material.length} item${material.length === 1 ? '' : 's'} likely to move price)
+            </span>
           </h2>
-          <ul class="news-list">${newsItems}</ul>
+          <ul class="news-list news-list-material">${material.map(renderNewsItem).join("")}</ul>
+        ` : "";
+
+        // Section 2: All news (collapsed by default if there's noise to hide)
+        const hasNoise = noise.length > 0;
+        const allNewsItems = data.news.map(renderNewsItem).join("");
+
+        const allNewsSection = `
+          <h2 style="font-size:14px;margin-top:18px;padding-bottom:6px;border-bottom:1px solid #e5e7eb;
+                     display:flex; justify-content:space-between; align-items:center;">
+            <span>📰 All News (last 7 days)</span>
+            ${hasNoise ? `
+              <button id="news-toggle-noise" class="news-toggle-btn" type="button">
+                Show all (${data.news.length})
+              </button>
+            ` : ''}
+          </h2>
+          <ul class="news-list" id="news-list-all" ${hasNoise ? 'style="display:none;"' : ''}>
+            ${allNewsItems}
+          </ul>
+          ${hasNoise && material.length === 0 ? `
+            <div style="font-size:12px; color:#6b7280; padding: 8px 0; font-style: italic;">
+              No material news in the last 7 days — only analyst chatter and market commentary.
+            </div>
+          ` : ''}
         `;
+
+        newsBlock = materialSection + allNewsSection;
       }
 
       const chartLinks = `
@@ -4942,6 +5341,17 @@
       const rnBtn = $("research-note-btn");
       if (rnBtn) {
         rnBtn.addEventListener("click", () => generateResearchNote(window._latestAnalyzeData));
+      }
+      // Wire up the "Show all" news toggle (relevance scoring polish)
+      const newsToggle = $("news-toggle-noise");
+      if (newsToggle) {
+        newsToggle.addEventListener("click", () => {
+          const list = $("news-list-all");
+          if (!list) return;
+          const isHidden = list.style.display === "none";
+          list.style.display = isHidden ? "block" : "none";
+          newsToggle.textContent = isHidden ? "Hide noise" : `Show all (${data.news.length})`;
+        });
       }
     }
 
@@ -8326,6 +8736,38 @@ if barstate.islast
         <button id="kanban-modal-promote" class="kanban-card-action promote" style="display:none;" type="button">🚀 Promote to Live</button>
         <button id="kanban-modal-cancel" class="kanban-btn-secondary" type="button">Cancel</button>
         <button id="kanban-modal-save" class="kanban-btn-primary" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-trade checklist modal — fires before promote, blocks until all items checked.
+       8 items: 2 auto-validated (entry/stop/qty defined, risk computed if portfolio set),
+       6 manual discipline items (earnings, sector, invalidation, regime, max-loss, no-FOMO). -->
+  <div id="checklist-modal-overlay" class="kanban-modal-overlay">
+    <div class="kanban-modal" style="max-width: 600px;">
+      <h3>
+        <span>🛡️ Pre-Trade Checklist</span>
+        <span class="close" id="checklist-modal-close" role="button" aria-label="Close">×</span>
+      </h3>
+      <div style="font-size: 13px; color: #6b7280; margin-bottom: 16px; line-height: 1.5;">
+        Confirm every item before going live. This is the difference between
+        disciplined and impulsive trading. Auto-validated items show ✓ on the right.
+      </div>
+      <div id="checklist-symbol-header" style="
+        background: #f3f4f6; padding: 10px 14px; border-radius: 6px;
+        margin-bottom: 14px; font-family: ui-monospace, monospace; font-size: 13px;
+      "></div>
+      <div id="checklist-items"></div>
+      <div id="checklist-progress" style="
+        text-align: center; padding: 10px; margin-top: 14px; font-size: 13px;
+        background: #fef3c7; color: #78350f; border-radius: 6px; font-weight: 600;
+      ">0 of 8 items confirmed</div>
+      <div class="kanban-form-buttons">
+        <button id="checklist-cancel" class="kanban-btn-secondary" type="button">Cancel</button>
+        <button id="checklist-confirm" class="kanban-btn-primary" type="button" disabled
+                style="opacity: 0.5; cursor: not-allowed;">
+          ✓ Confirm — Promote to Live
+        </button>
       </div>
     </div>
   </div>
