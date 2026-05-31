@@ -191,6 +191,130 @@
       background: var(--tp-surface-alt) !important;
       color: var(--tp-fg) !important;
     }
+
+    /* ============================================================
+       DARK MODE OVERRIDES — Analyze view cards & tables
+       ------------------------------------------------------------
+       Price card, F&O Options Sentiment card, Analyst Ratings
+       card, the metric tiles inside them, and the strikes table.
+       All originally use light backgrounds with hardcoded dark
+       text colors — invisible in dark mode without overrides.
+       ============================================================ */
+    [data-theme="dark"] .price-card {
+      background: var(--tp-surface-alt) !important;
+      color: var(--tp-fg) !important;
+    }
+    [data-theme="dark"] .price-card .metric-label {
+      color: var(--tp-fg-muted) !important;
+    }
+    [data-theme="dark"] .price-card .metric-value {
+      color: var(--tp-fg) !important;
+    }
+    [data-theme="dark"] .analyst-card,
+    [data-theme="dark"] .options-card {
+      background: var(--tp-surface) !important;
+      border-color: var(--tp-border) !important;
+      color: var(--tp-fg) !important;
+    }
+    [data-theme="dark"] .analyst-card-header,
+    [data-theme="dark"] .options-card-header {
+      color: var(--tp-fg) !important;
+    }
+    /* The 6 inner metric tiles (PCR, MAX PAIN, OI BUILDUP, etc.) */
+    [data-theme="dark"] .analyst-metric,
+    [data-theme="dark"] .options-metric {
+      background: var(--tp-surface-alt) !important;
+      color: var(--tp-fg) !important;
+    }
+    [data-theme="dark"] .analyst-metric-label,
+    [data-theme="dark"] .options-metric-label {
+      color: var(--tp-fg-muted) !important;
+    }
+    [data-theme="dark"] .analyst-metric-value,
+    [data-theme="dark"] .options-metric-value {
+      color: var(--tp-fg) !important;
+    }
+    /* The Top OI Strikes table */
+    [data-theme="dark"] .strikes-table th {
+      background: var(--tp-surface-alt) !important;
+      color: var(--tp-fg-muted) !important;
+    }
+    [data-theme="dark"] .strikes-table td {
+      color: var(--tp-fg) !important;
+      border-color: var(--tp-border-soft) !important;
+    }
+    [data-theme="dark"] .strikes-table .strike-row-atm {
+      background: rgba(245, 158, 11, 0.15) !important;
+    }
+    [data-theme="dark"] .strikes-table .strike-row-resistance { color: #fca5a5 !important; }
+    [data-theme="dark"] .strikes-table .strike-row-support    { color: #6ee7b7 !important; }
+    /* The AI analysis prose block (h2 headers + body) */
+    [data-theme="dark"] .analysis-text { color: var(--tp-fg) !important; }
+    [data-theme="dark"] .analysis-text h2 {
+      color: var(--tp-fg) !important;
+      border-color: var(--tp-border) !important;
+    }
+    [data-theme="dark"] .analysis-text h3 {
+      color: var(--tp-fg) !important;
+    }
+    /* Composite signal chip (Bearish/Bullish/Neutral pill) — the saturated
+       red/green variants are already fine (white text on bright bg). Only
+       the .signal-neutral variant needs help — already covered above. */
+
+    /* ============================================================
+       DARK MODE — Broader sweep for analysis prose, scoreboard,
+       trade plan cards, journal, compare, and other panels that
+       still use hardcoded dark text colors against light backgrounds.
+       ============================================================ */
+    /* Analysis text (AI commentary in Analyze tab) — bold/emphasized */
+    [data-theme="dark"] .analysis-text strong { color: var(--tp-fg) !important; }
+    [data-theme="dark"] .analysis-text em     { color: var(--tp-fg-muted) !important; }
+    [data-theme="dark"] .analysis-text ul li,
+    [data-theme="dark"] .analysis-text p,
+    [data-theme="dark"] .analysis-text { color: var(--tp-fg) !important; }
+
+    /* Analyst rating label */
+    [data-theme="dark"] .rating-label { color: var(--tp-fg) !important; }
+
+    /* Scoreboard (Factor Scoreboard inside Trade Plan) */
+    [data-theme="dark"] .sb-table thead { background: var(--tp-surface-alt) !important; }
+    [data-theme="dark"] .sb-table th    { color: var(--tp-fg-muted) !important; border-color: var(--tp-border) !important; }
+    [data-theme="dark"] .sb-table td    { color: var(--tp-fg) !important; border-color: var(--tp-border-soft) !important; }
+    [data-theme="dark"] .sb-bucket-title { color: var(--tp-fg-muted) !important; border-color: var(--tp-border) !important; }
+    [data-theme="dark"] .sb-factor      { color: var(--tp-fg) !important; }
+    [data-theme="dark"] .sb-value       { color: var(--tp-fg-muted) !important; }
+    [data-theme="dark"] .sb-reason      { color: var(--tp-fg-muted) !important; }
+    [data-theme="dark"] .sb-count.net strong { color: var(--tp-fg) !important; }
+    /* sb-count.fav/against/neutral keep their semantic colors — fine */
+    [data-theme="dark"] .sb-mobile-factor    { color: var(--tp-fg) !important; }
+
+    /* Trade plan cards (entry zone, stop, targets, etc. — see .tp-card) */
+    [data-theme="dark"] .tp-card {
+      background: var(--tp-surface) !important;
+      border-color: var(--tp-border) !important;
+      color: var(--tp-fg) !important;
+    }
+    [data-theme="dark"] .tp-card-title { color: var(--tp-fg-muted) !important; }
+
+    /* Compare table (Compare tab) */
+    [data-theme="dark"] .compare-table .metric-name { color: var(--tp-fg) !important; }
+    [data-theme="dark"] .compare-table th { color: var(--tp-fg-muted) !important; background: var(--tp-surface-alt) !important; }
+    [data-theme="dark"] .compare-table td { color: var(--tp-fg) !important; border-color: var(--tp-border-soft) !important; }
+
+    /* RSI Extremes filter pills */
+    [data-theme="dark"] .rsi-filter-btn:hover { background: var(--tp-surface-alt) !important; color: var(--tp-fg) !important; }
+
+    /* Generic white-bg + dark-text inline containers (forms, modal bodies, etc.) — they
+       should pick up theme colors, not their hardcoded values. Targeted at known classes
+       to avoid breaking semantic badges. */
+    [data-theme="dark"] .form-card,
+    [data-theme="dark"] .tp-form-card,
+    [data-theme="dark"] .journal-card,
+    [data-theme="dark"] .ep-card {
+      background: var(--tp-surface) !important;
+      color: var(--tp-fg) !important;
+      border-color: var(--tp-border) !important;
+    }
     /* Theme toggle button — sits in the header next to the brand */
     .theme-toggle {
       background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
