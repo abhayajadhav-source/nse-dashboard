@@ -315,6 +315,229 @@
       color: var(--tp-fg) !important;
       border-color: var(--tp-border) !important;
     }
+
+    /* ============================================================
+       COMPREHENSIVE DARK MODE OVERRIDES (audit pass 2)
+       ------------------------------------------------------------
+       This block fixes all remaining classes that had hardcoded
+       light backgrounds with no dark mode rule. Discovered via a
+       systematic CSS audit. Grouped by purpose:
+
+       1. Container surfaces (tables, cards, forms) →
+          var(--tp-surface) bg + var(--tp-fg) text
+       2. Track/progress backgrounds →
+          var(--tp-surface-alt)
+       3. Light gradient feature cards →
+          flat var(--tp-surface) bg
+       4. Semantic colored pills/badges →
+          rgba(color, 0.18) bg + brighter text shade
+       5. Active/selected states on toggles →
+          var(--tp-surface-alt) bg with accent border
+       ============================================================ */
+
+    /* ===== 1. CONTAINER SURFACES — tables, cards, forms ===== */
+    [data-theme="dark"] .trade-list-table,
+    [data-theme="dark"] .trade-card,
+    [data-theme="dark"] .trade-detail-content,
+    [data-theme="dark"] .trade-plan-form,
+    [data-theme="dark"] .analyze-form,
+    [data-theme="dark"] .compare-form,
+    [data-theme="dark"] .journal-form,
+    [data-theme="dark"] .verdict-card,
+    [data-theme="dark"] .ep-cell,
+    [data-theme="dark"] .ep-stop-compare,
+    [data-theme="dark"] .js-cell,
+    [data-theme="dark"] .pc-ai-verdict,
+    [data-theme="dark"] .risk-pct,
+    [data-theme="dark"] .td-btn,
+    [data-theme="dark"] .dir-btn-addon,
+    [data-theme="dark"] .jf-cancel-btn,
+    [data-theme="dark"] .jf-dir-btn,
+    [data-theme="dark"] .tp-mode-btn,
+    [data-theme="dark"] .tp-pos-mode-btn,
+    [data-theme="dark"] .sizer-mode-btn {
+      background: var(--tp-surface) !important;
+      color: var(--tp-fg) !important;
+      border-color: var(--tp-border) !important;
+    }
+
+    /* Light gray subtle surfaces → use surface-alt for visual layering */
+    [data-theme="dark"] .trade-list-table thead,
+    [data-theme="dark"] .trade-list-empty,
+    [data-theme="dark"] .rsi-filter-bar,
+    [data-theme="dark"] .td-cell,
+    [data-theme="dark"] .tp-econ-cell,
+    [data-theme="dark"] .tp-target,
+    [data-theme="dark"] .compare-news-col,
+    [data-theme="dark"] .journal-subview-toggle,
+    [data-theme="dark"] .jf-direction-toggle,
+    [data-theme="dark"] .direction-toggle,
+    [data-theme="dark"] .tp-position-mode-toggle,
+    [data-theme="dark"] .tp-input-toggle {
+      background: var(--tp-surface-alt) !important;
+      color: var(--tp-fg) !important;
+      border-color: var(--tp-border) !important;
+    }
+
+    /* Empty-state dashed borders */
+    [data-theme="dark"] .trade-list-empty {
+      border-style: dashed;
+      border-color: var(--tp-border) !important;
+      color: var(--tp-fg-muted) !important;
+    }
+
+    /* ===== 2. TRACK / PROGRESS-BAR BACKGROUNDS ===== */
+    [data-theme="dark"] .pc-score-track,
+    [data-theme="dark"] .rating-bar-track,
+    [data-theme="dark"] .rn-call-box {
+      background: var(--tp-surface-alt) !important;
+      border-color: var(--tp-border) !important;
+    }
+    [data-theme="dark"] .rn-call-box { color: var(--tp-fg) !important; }
+
+    /* ===== 3. LIGHT GRADIENT / FEATURE CARDS ===== */
+    /* Originally light blue/green gradients — flatten to surface in dark */
+    [data-theme="dark"] .journal-stats,
+    [data-theme="dark"] .compare-header-card,
+    [data-theme="dark"] .pc-stock-card,
+    [data-theme="dark"] .tp-existing-fields,
+    [data-theme="dark"] .ep-stop-box,
+    [data-theme="dark"] .pc-result,
+    [data-theme="dark"] .value-cell,
+    [data-theme="dark"] .sizer-scenario {
+      background: var(--tp-surface) !important;
+      color: var(--tp-fg) !important;
+      border-color: var(--tp-border) !important;
+    }
+    /* Their titles/labels usually had hardcoded dark colors */
+    [data-theme="dark"] .journal-stats-title { color: var(--tp-accent) !important; }
+
+    /* ===== 4. SEMANTIC COLORED PILLS / BADGES ===== */
+    /* Trade direction pills — translucent color bg + brighter text */
+    [data-theme="dark"] .trade-dir-pill.long {
+      background: rgba(22, 163, 74, 0.20) !important;
+      color: #6ee7b7 !important;
+    }
+    [data-theme="dark"] .trade-dir-pill.short {
+      background: rgba(220, 38, 38, 0.20) !important;
+      color: #fca5a5 !important;
+    }
+    [data-theme="dark"] .trade-dir-pill.hedged {
+      background: rgba(109, 40, 217, 0.25) !important;
+      color: #c4b5fd !important;
+    }
+
+    /* Generic badge variants */
+    [data-theme="dark"] .badge-blue {
+      background: rgba(59, 130, 246, 0.20) !important;
+      color: #93c5fd !important;
+    }
+    [data-theme="dark"] .badge-gray {
+      background: rgba(107, 114, 128, 0.25) !important;
+      color: var(--tp-fg) !important;
+    }
+    [data-theme="dark"] .composite-signal {
+      background: rgba(107, 114, 128, 0.25) !important;
+      color: var(--tp-fg) !important;
+    }
+
+    /* Strategy-builder badges (sb-badge variants) */
+    [data-theme="dark"] .sb-badge,
+    [data-theme="dark"] .sb-summary-ribbon {
+      background: rgba(22, 163, 74, 0.20) !important;
+      color: #6ee7b7 !important;
+    }
+    [data-theme="dark"] .pc-verdict-banner {
+      background: rgba(22, 163, 74, 0.20) !important;
+      color: #6ee7b7 !important;
+      border-color: rgba(22, 163, 74, 0.40) !important;
+    }
+
+    /* Yellow/amber feature backgrounds (warnings, cache indicators) */
+    [data-theme="dark"] .tp-cache-badge,
+    [data-theme="dark"] .sizer-settings-bar {
+      background: rgba(202, 138, 4, 0.18) !important;
+      color: #fde68a !important;
+      border-color: rgba(202, 138, 4, 0.40) !important;
+    }
+
+    /* Verdict-style colored card (ep-stop-verdict has blue bg) */
+    [data-theme="dark"] .ep-stop-verdict {
+      background: rgba(59, 130, 246, 0.18) !important;
+      color: #93c5fd !important;
+      border-color: rgba(59, 130, 246, 0.40) !important;
+    }
+
+    /* ===== 5. ACTIVE / SELECTED STATES on toggles & rows ===== */
+    /* Segment-control active pill */
+    [data-theme="dark"] .journal-subview-btn {
+      color: var(--tp-fg-muted) !important;
+      background: transparent !important;
+    }
+    [data-theme="dark"] .journal-subview-btn.active {
+      background: var(--tp-surface) !important;
+      color: var(--tp-fg) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.40) !important;
+    }
+    [data-theme="dark"] .journal-subview-btn .count-badge {
+      background: var(--tp-surface-alt) !important;
+      color: var(--tp-fg) !important;
+    }
+    [data-theme="dark"] .journal-subview-btn.active .count-badge {
+      background: var(--tp-accent) !important;
+      color: #fff !important;
+    }
+
+    /* Trade row expanded state — light blue tint */
+    [data-theme="dark"] .trade-row.expanded {
+      background: rgba(59, 130, 246, 0.10) !important;
+    }
+    [data-theme="dark"] .trade-row:hover {
+      background: var(--tp-surface-alt) !important;
+    }
+    [data-theme="dark"] .trade-row.expanded td {
+      background: rgba(59, 130, 246, 0.10) !important;
+    }
+    [data-theme="dark"] .trade-row td:first-child {
+      color: var(--tp-fg) !important;   /* symbol column */
+    }
+    /* Trade card mobile expanded state */
+    [data-theme="dark"] .trade-card.expanded {
+      background: rgba(59, 130, 246, 0.10) !important;
+      border-color: var(--tp-accent) !important;
+    }
+    [data-theme="dark"] .trade-detail-row {
+      background: rgba(59, 130, 246, 0.10) !important;
+    }
+
+    /* Mode buttons (toggles) when active */
+    [data-theme="dark"] .tp-mode-btn.active,
+    [data-theme="dark"] .tp-pos-mode-btn.active,
+    [data-theme="dark"] .sizer-mode-btn.active,
+    [data-theme="dark"] .jf-dir-btn.active,
+    [data-theme="dark"] .dir-btn-addon.active {
+      background: var(--tp-accent) !important;
+      color: #fff !important;
+      border-color: var(--tp-accent) !important;
+    }
+
+    /* Purple-themed light bg (rare) */
+    [data-theme="dark"] .ep-stop-box,
+    [data-theme="dark"] .tp-existing-fields,
+    [data-theme="dark"] .pc-result {
+      border-left-color: var(--tp-accent) !important;
+    }
+
+    /* Empty-icon text inside trade-list-empty */
+    [data-theme="dark"] .trade-list-empty .empty-icon { opacity: 0.6; }
+
+    /* Help text inside light containers */
+    [data-theme="dark"] .rsi-help {
+      background: var(--tp-surface-alt) !important;
+      color: var(--tp-fg) !important;
+      border-color: var(--tp-border) !important;
+    }
+
     /* Theme toggle button — sits in the header next to the brand */
     .theme-toggle {
       background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
