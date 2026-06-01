@@ -1374,6 +1374,79 @@
     .analysis-text p { margin: 8px 0; }
     .analysis-text em { color: #6b7280; font-size: 13px; }
 
+    /* ============================================================
+       IV BANNER — sits above the F&O metrics grid in Analyze tab.
+       Shows ATM IV + India VIX percentile + trader guidance.
+       Color-coded by VIX percentile: green (cheap), amber (normal),
+       red (expensive premiums).
+       ============================================================ */
+    .iv-banner {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 14px; border-radius: 8px; margin-bottom: 12px;
+      border: 1px solid #e5e7eb;
+    }
+    .iv-banner-icon {
+      font-size: 22px; font-weight: 700; flex-shrink: 0;
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .iv-banner-text { flex: 1; min-width: 0; }
+    .iv-banner-label { font-size: 13px; font-weight: 700; }
+    .iv-banner-guidance { font-size: 11px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
+    [data-theme="dark"] .iv-banner-guidance { color: var(--tp-fg-muted); }
+    .iv-banner-numbers { display: flex; gap: 12px; flex-shrink: 0; }
+    .iv-banner-num { text-align: center; }
+    .iv-banner-num-label {
+      font-size: 9px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    [data-theme="dark"] .iv-banner-num-label { color: var(--tp-fg-muted); }
+    .iv-banner-num-value {
+      font-family: ui-monospace, monospace; font-size: 14px; font-weight: 700;
+      margin-top: 2px;
+    }
+    /* Three color variants (high / normal / low) */
+    .iv-banner.iv-banner-high {
+      background: #fef2f2; border-color: #fecaca;
+    }
+    .iv-banner.iv-banner-high .iv-banner-icon { background: #dc2626; color: #fff; }
+    .iv-banner.iv-banner-high .iv-banner-label { color: #991b1b; }
+
+    .iv-banner.iv-banner-normal {
+      background: #fffbeb; border-color: #fde68a;
+    }
+    .iv-banner.iv-banner-normal .iv-banner-icon { background: #ca8a04; color: #fff; }
+    .iv-banner.iv-banner-normal .iv-banner-label { color: #78350f; }
+
+    .iv-banner.iv-banner-low {
+      background: #ecfdf5; border-color: #6ee7b7;
+    }
+    .iv-banner.iv-banner-low .iv-banner-icon { background: #16a34a; color: #fff; }
+    .iv-banner.iv-banner-low .iv-banner-label { color: #065f46; }
+
+    /* Dark mode overrides for IV banner */
+    [data-theme="dark"] .iv-banner.iv-banner-high {
+      background: rgba(220, 38, 38, 0.10);
+      border-color: rgba(220, 38, 38, 0.40);
+    }
+    [data-theme="dark"] .iv-banner.iv-banner-high .iv-banner-label { color: #fca5a5; }
+    [data-theme="dark"] .iv-banner.iv-banner-normal {
+      background: rgba(202, 138, 4, 0.10);
+      border-color: rgba(202, 138, 4, 0.40);
+    }
+    [data-theme="dark"] .iv-banner.iv-banner-normal .iv-banner-label { color: #fde68a; }
+    [data-theme="dark"] .iv-banner.iv-banner-low {
+      background: rgba(22, 163, 74, 0.10);
+      border-color: rgba(22, 163, 74, 0.40);
+    }
+    [data-theme="dark"] .iv-banner.iv-banner-low .iv-banner-label { color: #6ee7b7; }
+
+    /* Mobile: stack vertically when narrow */
+    @media (max-width: 700px) {
+      .iv-banner { flex-wrap: wrap; }
+      .iv-banner-text { flex-basis: 100%; }
+    }
+
     .news-list { list-style: none; padding: 0; margin-top: 12px; }
     .news-list li { padding: 10px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
     .news-list li:last-child { border-bottom: none; }
@@ -5248,6 +5321,50 @@
       const pctFromPain   = options.pct_from_max_pain || 0;
       const painArrow     = pctFromPain > 0 ? "↑" : (pctFromPain < 0 ? "↓" : "≈");
 
+      // ===== IV CONTEXT BANNER (2026: ATM IV + India VIX percentile) =====
+      // Tells the trader at a glance whether options are expensive or cheap
+      // relative to recent history. Color-coded: green=cheap, amber=normal,
+      // red=expensive. Hidden if no IV data is available.
+      let ivBanner = "";
+      const ivCtx = options.iv_context;
+      if (ivCtx) {
+        // Color by VIX percentile (the most reliable regime signal)
+        let bannerClass = "iv-banner-normal";
+        let regimeIcon = "≈";
+        const pct = ivCtx.vix_percentile;
+        if (pct !== null && pct !== undefined) {
+          if (pct >= 70) { bannerClass = "iv-banner-high"; regimeIcon = "↑"; }
+          else if (pct <= 30) { bannerClass = "iv-banner-low"; regimeIcon = "↓"; }
+        }
+        ivBanner = `
+          <div class="iv-banner ${bannerClass}" title="Implied Volatility context — informs strategy selection">
+            <div class="iv-banner-icon">${regimeIcon}</div>
+            <div class="iv-banner-text">
+              <div class="iv-banner-label">${escapeHtml(ivCtx.iv_label || "IV context")}</div>
+              ${ivCtx.trader_guidance ? `
+                <div class="iv-banner-guidance">${escapeHtml(ivCtx.trader_guidance)}</div>
+              ` : ""}
+            </div>
+            ${ivCtx.atm_iv_pct !== null && ivCtx.atm_iv_pct !== undefined ? `
+              <div class="iv-banner-numbers">
+                <div class="iv-banner-num">
+                  <div class="iv-banner-num-label">ATM IV</div>
+                  <div class="iv-banner-num-value">${fmt(ivCtx.atm_iv_pct)}%</div>
+                </div>
+              </div>
+            ` : ""}
+            ${ivCtx.vix_level !== null && ivCtx.vix_level !== undefined ? `
+              <div class="iv-banner-numbers">
+                <div class="iv-banner-num">
+                  <div class="iv-banner-num-label">VIX (P${pct !== null ? fmt(pct) : "?"})</div>
+                  <div class="iv-banner-num-value">${fmt(ivCtx.vix_level)}</div>
+                </div>
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }
+
       const pcrClass = /bull/i.test(options.pcr_signal) ? "gain" :
                        /bear/i.test(options.pcr_signal) ? "loss" : "";
 
@@ -5325,6 +5442,10 @@
           const callOiChangeCls = s.call_oi_change >= 0 ? "oi-change-pos" : "oi-change-neg";
           const putOiChangeCls  = s.put_oi_change  >= 0 ? "oi-change-pos" : "oi-change-neg";
 
+          // Greeks display helpers — handle missing data gracefully
+          const fmtIV    = (v) => (v !== null && v !== undefined) ? `${(v*100).toFixed(0)}%` : "—";
+          const fmtGreek = (v, d = 2) => (v !== null && v !== undefined) ? v.toFixed(d) : "—";
+
           return `
             <tr class="${rowClass}">
               <td style="white-space:nowrap;">₹${fmt(s.strike)}</td>
@@ -5333,10 +5454,14 @@
               <td style="text-align:right;" class="${callOiChangeCls}">
                 ${s.call_oi_change >= 0 ? "+" : ""}${(s.call_oi_change / 1000).toFixed(0)}K
               </td>
+              <td style="text-align:right; font-size:11px; color:#6b7280;">${fmtIV(s.call_iv)}</td>
+              <td style="text-align:right; font-size:11px; color:#6b7280;">${fmtGreek(s.call_delta)}</td>
               <td style="text-align:right;">${(s.put_oi / 100000).toFixed(1)}L</td>
               <td style="text-align:right;" class="${putOiChangeCls}">
                 ${s.put_oi_change >= 0 ? "+" : ""}${(s.put_oi_change / 1000).toFixed(0)}K
               </td>
+              <td style="text-align:right; font-size:11px; color:#6b7280;">${fmtIV(s.put_iv)}</td>
+              <td style="text-align:right; font-size:11px; color:#6b7280;">${fmtGreek(s.put_delta)}</td>
             </tr>
           `;
         }).join("");
@@ -5346,6 +5471,7 @@
             <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">
               Top OI Strikes (sorted by strike price)
             </div>
+            <div style="overflow-x:auto;">
             <table class="strikes-table">
               <thead>
                 <tr>
@@ -5353,14 +5479,19 @@
                   <th>Type</th>
                   <th style="text-align:right;">Call OI</th>
                   <th style="text-align:right;">Call ΔOI</th>
+                  <th style="text-align:right;">Call IV</th>
+                  <th style="text-align:right;">Call Δ</th>
                   <th style="text-align:right;">Put OI</th>
                   <th style="text-align:right;">Put ΔOI</th>
+                  <th style="text-align:right;">Put IV</th>
+                  <th style="text-align:right;">Put Δ</th>
                 </tr>
               </thead>
               <tbody>${rows}</tbody>
             </table>
+            </div>
             <div style="font-size:11px;color:#9ca3af;margin-top:8px;">
-              💡 OI in lakhs (L) · ΔOI in thousands (K) · Yellow row = ATM strike (within 1% of spot)
+              💡 OI in lakhs (L) · ΔOI in thousands (K) · IV = annualized implied volatility · Δ = delta (probability-weighted directional exposure) · Yellow row = ATM strike
             </div>
           </div>
         `;
@@ -5378,6 +5509,7 @@
               ${escapeHtml(options.composite_signal)}
             </span>
           </div>
+          ${ivBanner}
           <div class="options-summary">${metrics}</div>
           ${confirmationsHtml}
           ${strikesTable}
