@@ -296,6 +296,89 @@
       border-radius: 0 6px 6px 0;
     }
 
+    /* IV banner — top of strategy result */
+    .iv-banner {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+      border: 1px solid #e5e7eb;
+    }
+    .iv-banner-icon {
+      font-size: 22px; font-weight: 700; flex-shrink: 0;
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .iv-banner-text { flex: 1; min-width: 0; }
+    .iv-banner-label { font-size: 14px; font-weight: 700; }
+    .iv-banner-guidance { font-size: 12px; color: #6b7280; margin-top: 3px; line-height: 1.4; }
+    .iv-banner-numbers { display: flex; gap: 12px; flex-shrink: 0; }
+    .iv-banner-num { text-align: center; }
+    .iv-banner-num-label {
+      font-size: 10px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .iv-banner-num-value {
+      font-family: ui-monospace, monospace; font-size: 15px; font-weight: 700;
+      margin-top: 2px;
+    }
+    .iv-banner.iv-banner-high {
+      background: #fef2f2; border-color: #fecaca;
+    }
+    .iv-banner.iv-banner-high .iv-banner-icon { background: #dc2626; color: #fff; }
+    .iv-banner.iv-banner-high .iv-banner-label { color: #991b1b; }
+
+    .iv-banner.iv-banner-normal {
+      background: #fffbeb; border-color: #fde68a;
+    }
+    .iv-banner.iv-banner-normal .iv-banner-icon { background: #ca8a04; color: #fff; }
+    .iv-banner.iv-banner-normal .iv-banner-label { color: #78350f; }
+
+    .iv-banner.iv-banner-low {
+      background: #ecfdf5; border-color: #6ee7b7;
+    }
+    .iv-banner.iv-banner-low .iv-banner-icon { background: #16a34a; color: #fff; }
+    .iv-banner.iv-banner-low .iv-banner-label { color: #065f46; }
+
+    @media (max-width: 700px) {
+      .iv-banner { flex-wrap: wrap; }
+      .iv-banner-text { flex-basis: 100%; }
+    }
+
+    /* Strategy-level Greeks totals card */
+    .greeks-totals-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+      border: 1px solid #c7d2fe; border-radius: 8px;
+      padding: 14px 16px; margin: 12px 0;
+    }
+    .greeks-totals-header {
+      font-size: 12px; font-weight: 700; color: #4338ca;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;
+    }
+    .greeks-totals-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    }
+    @media (max-width: 700px) {
+      .greeks-totals-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .greek-tile {
+      background: #fff; padding: 10px 12px; border-radius: 6px;
+      border: 1px solid #e5e7eb;
+    }
+    .greek-tile-label {
+      font-size: 10px; font-weight: 700; color: #6b7280;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .greek-tile-value {
+      font-family: ui-monospace, monospace; font-size: 18px; font-weight: 700;
+      margin-top: 4px;
+    }
+    .greek-tile-detail {
+      font-size: 10px; color: #9ca3af; margin-top: 3px;
+    }
+    .greeks-totals-note {
+      font-size: 12px; color: #4338ca; margin-top: 10px;
+      padding-top: 10px; border-top: 1px solid #c7d2fe;
+    }
+
     /* AI analysis */
     .ai-card {
       background: #fff;
@@ -544,6 +627,48 @@
       const outlook = data.outlook;
       const top = data.top_pick;
 
+      // ===== IV CONTEXT BANNER (new) =====
+      // Tells the trader at a glance whether premium-buy or premium-sell
+      // strategies are favored by the current IV regime. Color-coded.
+      let ivBannerHTML = "";
+      const ivCtx = data.iv_context;
+      if (ivCtx) {
+        let bannerClass = "iv-banner-normal";
+        let icon = "≈";
+        const pct = ivCtx.vix_percentile;
+        if (pct !== null && pct !== undefined) {
+          if (pct >= 70) { bannerClass = "iv-banner-high"; icon = "↑"; }
+          else if (pct <= 30) { bannerClass = "iv-banner-low"; icon = "↓"; }
+        }
+        ivBannerHTML = `
+          <div class="iv-banner ${bannerClass}">
+            <div class="iv-banner-icon">${icon}</div>
+            <div class="iv-banner-text">
+              <div class="iv-banner-label">${escapeHtml(ivCtx.iv_label || "IV context")}</div>
+              ${ivCtx.trader_guidance ? `
+                <div class="iv-banner-guidance">${escapeHtml(ivCtx.trader_guidance)}</div>
+              ` : ""}
+            </div>
+            ${ivCtx.atm_iv_pct !== null && ivCtx.atm_iv_pct !== undefined ? `
+              <div class="iv-banner-numbers">
+                <div class="iv-banner-num">
+                  <div class="iv-banner-num-label">ATM IV</div>
+                  <div class="iv-banner-num-value">${fmt(ivCtx.atm_iv_pct)}%</div>
+                </div>
+              </div>
+            ` : ""}
+            ${ivCtx.vix_level !== null && ivCtx.vix_level !== undefined ? `
+              <div class="iv-banner-numbers">
+                <div class="iv-banner-num">
+                  <div class="iv-banner-num-label">VIX (P${pct !== null ? fmt(pct) : "?"})</div>
+                  <div class="iv-banner-num-value">${fmt(ivCtx.vix_level)}</div>
+                </div>
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }
+
       // ===== Outlook summary =====
       const outlookHTML = `
         <div class="outlook-card">
@@ -648,7 +773,7 @@
         </div>
       `;
 
-      result.innerHTML = outlookHTML + topPickHTML + aiHTML + altsHTML + allStratsHTML + disclaimerHTML;
+      result.innerHTML = ivBannerHTML + outlookHTML + topPickHTML + aiHTML + altsHTML + allStratsHTML + disclaimerHTML;
 
       // Attach alt-card toggle handlers
       document.querySelectorAll(".alt-card").forEach(card => {
@@ -676,18 +801,36 @@
     }
 
     function renderStrategyBody(strat) {
+      // Helper to format a Greek with sign for table cells
+      const fmtGreek = (v, decimals = 2) =>
+        (v === null || v === undefined) ? "—" : v.toFixed(decimals);
+      const fmtIV = (v) =>
+        (v === null || v === undefined) ? "—" : `${(v * 100).toFixed(0)}%`;
+
+      // Check if any leg has Greeks data (decides whether to render the Greeks columns)
+      const hasGreeks = strat.legs.some(l =>
+        l.delta !== null && l.delta !== undefined);
+
       const legsRows = strat.legs.map(leg => {
         const actionClass = leg.action === 'BUY' ? 'leg-action-buy' : 'leg-action-sell';
         const strikeDisplay = leg.strike !== null ? `₹${fmt(leg.strike, 2)}` : '—';
         const premiumDisplay = leg.instrument === 'STOCK'
           ? `₹${fmt(leg.premium)} (spot)`
           : `₹${fmt(leg.premium)}`;
+        // Greeks cells (only included when hasGreeks)
+        const greekCells = hasGreeks ? `
+          <td style="text-align:right; font-size:11px; color:#6b7280;">${fmtIV(leg.iv)}</td>
+          <td style="text-align:right; font-size:12px;">${fmtGreek(leg.delta)}</td>
+          <td style="text-align:right; font-size:11px; color:#6b7280;">${fmtGreek(leg.theta)}</td>
+          <td style="text-align:right; font-size:11px; color:#6b7280;">${fmtGreek(leg.vega)}</td>
+        ` : '';
         return `
           <tr>
             <td class="${actionClass}">${leg.action}</td>
             <td>${leg.quantity}× ${leg.instrument}</td>
             <td>${strikeDisplay}</td>
             <td>${premiumDisplay}</td>
+            ${greekCells}
           </tr>
         `;
       }).join("");
@@ -707,9 +850,61 @@
         ? strat.breakevens.map(b => `₹${fmt(b)}`).join(" or ")
         : '—';
 
+      // Strategy-level Greeks totals card (only when Greeks available)
+      let greeksTotalsHtml = '';
+      if (strat.greeks_totals) {
+        const t = strat.greeks_totals;
+        // Interpret delta: how many "shares of underlying" the position is equivalent to
+        const deltaClass = t.delta > 0 ? "profit" : (t.delta < 0 ? "loss" : "");
+        const thetaClass = t.theta < 0 ? "loss" : "profit";
+        greeksTotalsHtml = `
+          <div class="greeks-totals-card">
+            <div class="greeks-totals-header">
+              ⚡ Position Greeks (total exposure across all legs × lots)
+            </div>
+            <div class="greeks-totals-grid">
+              <div class="greek-tile">
+                <div class="greek-tile-label">Net Delta</div>
+                <div class="greek-tile-value ${deltaClass}">${fmtGreek(t.delta, 1)}</div>
+                <div class="greek-tile-detail">Shares-equiv directional bias</div>
+              </div>
+              <div class="greek-tile">
+                <div class="greek-tile-label">Net Theta</div>
+                <div class="greek-tile-value ${thetaClass}">₹${fmtGreek(t.theta, 0)}</div>
+                <div class="greek-tile-detail">Per-day decay (₹)</div>
+              </div>
+              <div class="greek-tile">
+                <div class="greek-tile-label">Net Vega</div>
+                <div class="greek-tile-value">₹${fmtGreek(t.vega, 0)}</div>
+                <div class="greek-tile-detail">Per 1% IV change (₹)</div>
+              </div>
+              <div class="greek-tile">
+                <div class="greek-tile-label">Net Gamma</div>
+                <div class="greek-tile-value">${fmtGreek(t.gamma, 4)}</div>
+                <div class="greek-tile-detail">Delta sensitivity</div>
+              </div>
+            </div>
+            <div class="greeks-totals-note">
+              ${t.delta > 0 ? '<strong>Bullish bias</strong> — gains if spot rises' :
+                t.delta < 0 ? '<strong>Bearish bias</strong> — gains if spot falls' :
+                '<strong>Delta-neutral</strong> — direction-agnostic'}
+              · ${t.theta < 0 ? 'Time decay works against you' : 'Time decay works for you'}
+            </div>
+          </div>
+        `;
+      }
+
+      const greeksTableHeader = hasGreeks ? `
+        <th style="text-align:right;">IV</th>
+        <th style="text-align:right;">Δ</th>
+        <th style="text-align:right;">Θ/day</th>
+        <th style="text-align:right;">Vega</th>
+      ` : '';
+
       return `
         <div class="legs-section">
           <div class="section-header-small">Strategy Legs</div>
+          <div style="overflow-x:auto;">
           <table class="legs-table">
             <thead>
               <tr>
@@ -717,14 +912,19 @@
                 <th>Quantity</th>
                 <th>Strike</th>
                 <th>Premium</th>
+                ${greeksTableHeader}
               </tr>
             </thead>
             <tbody>${legsRows}</tbody>
           </table>
+          </div>
           <div style="font-size:11px; color:#9ca3af; margin-top:6px;">
             Quantities × lot size (${fmtInt(strat.lot_size)}) for total exposure
+            ${hasGreeks ? ' · Greeks sign-flipped for SELL legs' : ''}
           </div>
         </div>
+
+        ${greeksTotalsHtml}
 
         <div class="pl-grid">
           <div class="pl-metric">
