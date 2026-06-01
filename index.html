@@ -1405,6 +1405,185 @@
       font-family: ui-monospace, monospace; font-size: 14px; font-weight: 700;
       margin-top: 2px;
     }
+
+    /* ============================================================
+       CHART PATTERN CARD
+       Daily / 15m / 5m tabs, formed/forming sections
+       ============================================================ */
+    .pattern-card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+      padding: 16px; margin-bottom: 16px;
+    }
+    [data-theme="dark"] .pattern-card {
+      background: var(--tp-surface); border-color: var(--tp-border); color: var(--tp-fg);
+    }
+    .pattern-card-header {
+      font-size: 16px; font-weight: 700; margin-bottom: 12px;
+      display: flex; align-items: center;
+    }
+    .pattern-tabs {
+      display: flex; gap: 4px; border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 12px;
+    }
+    [data-theme="dark"] .pattern-tabs { border-color: var(--tp-border); }
+    .pattern-tab {
+      padding: 6px 12px; background: transparent; border: none;
+      font-size: 13px; cursor: pointer; color: #6b7280;
+      border-bottom: 2px solid transparent;
+    }
+    [data-theme="dark"] .pattern-tab { color: var(--tp-fg-muted); }
+    .pattern-tab:hover { color: #1d4ed8; }
+    .pattern-tab.active {
+      color: #1d4ed8; font-weight: 600; border-bottom-color: #1d4ed8;
+    }
+    [data-theme="dark"] .pattern-tab.active {
+      color: var(--tp-accent); border-bottom-color: var(--tp-accent);
+    }
+    .pattern-empty {
+      padding: 16px; text-align: center; color: #9ca3af; font-size: 13px;
+      font-style: italic;
+    }
+    [data-theme="dark"] .pattern-empty { color: var(--tp-fg-muted); }
+
+    .pattern-section { margin-bottom: 14px; }
+    .pattern-section:last-child { margin-bottom: 0; }
+    .pattern-section-title {
+      font-size: 12px; font-weight: 700; color: #374151;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 6px; display: flex; align-items: center;
+    }
+    [data-theme="dark"] .pattern-section-title { color: var(--tp-fg); }
+    .pattern-section-count {
+      background: #e5e7eb; color: #374151; padding: 1px 7px; border-radius: 999px;
+      font-size: 10px; font-weight: 600; margin-left: 6px;
+    }
+    [data-theme="dark"] .pattern-section-count {
+      background: var(--tp-surface-alt); color: var(--tp-fg);
+    }
+
+    /* Forming section visually distinct (lower contrast, dashed border) */
+    .pattern-section-forming .pattern-row {
+      border-style: dashed;
+      opacity: 0.92;
+    }
+
+    .pattern-list { display: flex; flex-direction: column; gap: 8px; }
+    .pattern-row {
+      background: #f9fafb; border: 1px solid #e5e7eb; border-left-width: 4px;
+      border-radius: 6px; padding: 10px 12px;
+    }
+    [data-theme="dark"] .pattern-row {
+      background: var(--tp-surface-alt); border-color: var(--tp-border); color: var(--tp-fg);
+    }
+    /* Color-code left border by direction */
+    .pattern-row.pattern-type-bullish { border-left-color: #16a34a; }
+    .pattern-row.pattern-type-bearish { border-left-color: #dc2626; }
+    .pattern-row.pattern-type-neutral { border-left-color: #6b7280; }
+
+    .pattern-row-header {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 8px; margin-bottom: 4px;
+    }
+    .pattern-name {
+      font-weight: 600; font-size: 14px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .pattern-arrow {
+      font-size: 16px; font-weight: 700;
+    }
+    .pattern-type-bullish .pattern-arrow { color: #16a34a; }
+    .pattern-type-bearish .pattern-arrow { color: #dc2626; }
+    .pattern-type-neutral .pattern-arrow { color: #6b7280; }
+    [data-theme="dark"] .pattern-type-bullish .pattern-arrow { color: #4ade80; }
+    [data-theme="dark"] .pattern-type-bearish .pattern-arrow { color: #f87171; }
+    [data-theme="dark"] .pattern-type-neutral .pattern-arrow { color: var(--tp-fg-muted); }
+
+    .pattern-badges { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+    .pattern-badge {
+      font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 3px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .pattern-reliability-high   { background: #dcfce7; color: #166534; }
+    .pattern-reliability-medium { background: #fef3c7; color: #78350f; }
+    .pattern-reliability-low    { background: #f3f4f6; color: #6b7280; }
+    [data-theme="dark"] .pattern-reliability-high   { background: rgba(22,163,74,0.20); color: #4ade80; }
+    [data-theme="dark"] .pattern-reliability-medium { background: rgba(202,138,4,0.20); color: #fde68a; }
+    [data-theme="dark"] .pattern-reliability-low    { background: var(--tp-surface); color: var(--tp-fg-muted); }
+    .pattern-age {
+      font-size: 11px; color: #9ca3af; white-space: nowrap;
+    }
+    [data-theme="dark"] .pattern-age { color: var(--tp-fg-muted); }
+    .pattern-description {
+      font-size: 12px; color: #4b5563; line-height: 1.4; margin-top: 4px;
+    }
+    [data-theme="dark"] .pattern-description { color: var(--tp-fg); }
+    .pattern-targets {
+      display: flex; gap: 12px; margin-top: 6px; font-size: 11px;
+      color: #4b5563; font-family: ui-monospace, monospace;
+    }
+    [data-theme="dark"] .pattern-targets { color: var(--tp-fg-muted); }
+    .pattern-targets strong { color: #374151; }
+    [data-theme="dark"] .pattern-targets strong { color: var(--tp-fg); }
+
+    /* ============================================================
+       PATTERN SCANNER TAB
+       ============================================================ */
+    .patterns-scanner-wrapper {
+      padding: 16px;
+    }
+    .patterns-scanner-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 12px;
+    }
+    .patterns-scanner-title { font-size: 18px; font-weight: 700; }
+    .patterns-scanner-subtitle {
+      font-size: 12px; color: #6b7280; margin-top: 4px; max-width: 600px;
+      line-height: 1.5;
+    }
+    [data-theme="dark"] .patterns-scanner-subtitle { color: var(--tp-fg-muted); }
+
+    .patterns-scanner-filters {
+      display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .patterns-filter {
+      padding: 5px 12px; font-size: 12px; border: 1px solid #d1d5db;
+      background: #fff; color: #4b5563; border-radius: 4px; cursor: pointer;
+    }
+    [data-theme="dark"] .patterns-filter {
+      background: var(--tp-surface); border-color: var(--tp-border); color: var(--tp-fg);
+    }
+    .patterns-filter:hover { background: #f3f4f6; }
+    [data-theme="dark"] .patterns-filter:hover { background: var(--tp-surface-alt); }
+    .patterns-filter.active {
+      background: #1d4ed8; color: #fff; border-color: #1d4ed8;
+    }
+
+    .scanner-table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+      background: #fff;
+    }
+    [data-theme="dark"] .scanner-table { background: var(--tp-surface); }
+    .scanner-table th {
+      padding: 10px 12px; text-align: left; background: #f9fafb;
+      font-size: 11px; text-transform: uppercase; color: #6b7280;
+      letter-spacing: 0.5px; border-bottom: 1px solid #e5e7eb;
+    }
+    [data-theme="dark"] .scanner-table th {
+      background: var(--tp-surface-alt); color: var(--tp-fg-muted); border-color: var(--tp-border);
+    }
+    .scanner-table td {
+      padding: 10px 12px; border-bottom: 1px solid #f3f4f6;
+    }
+    [data-theme="dark"] .scanner-table td {
+      border-color: var(--tp-border-soft); color: var(--tp-fg);
+    }
+    .scanner-row:hover { background: #f9fafb; }
+    [data-theme="dark"] .scanner-row:hover { background: var(--tp-surface-alt); }
+
+    .scanner-pattern-tag {
+      display: inline-block; margin-right: 6px; font-size: 12px; font-weight: 500;
+    }
+
     /* Three color variants (high / normal / low) */
     .iv-banner.iv-banner-high {
       background: #fef2f2; border-color: #fecaca;
@@ -2943,6 +3122,9 @@
       <button class="tab" data-tab="kanban">
         📋 Pipeline
       </button>
+      <button class="tab" data-tab="patterns">
+        📐 Patterns
+      </button>
     </div>
 
     <div id="panel-intraday" class="panel"></div>
@@ -2955,6 +3137,7 @@
     <div id="panel-journal"  class="panel" style="display:none;"></div>
     <div id="panel-risk"     class="panel" style="display:none;"></div>
     <div id="panel-kanban"   class="panel" style="display:none;"></div>
+    <div id="panel-patterns" class="panel" style="display:none;"></div>
   </div>
 
   <script>
@@ -3268,7 +3451,7 @@
           a: "analyze",      j: "journal",     s: "strategy",
           c: "compare",      p: "sizer",       i: "intraday",
           r: "reversal",     m: "momentum",    k: "risk",
-          n: "kanban",
+          n: "kanban",       x: "patterns",
         };
         if (tabMap[k]) {
           e.preventDefault();
@@ -4756,6 +4939,381 @@
 
 
     // Simple Markdown → HTML for AI analysis output
+    // =================================================================
+    // CHART PATTERN DETECTION (display)
+    // =================================================================
+    // Renders a pattern card showing candlestick + chart patterns across
+    // daily / 15m / 5m timeframes. The Analyze response embeds daily
+    // patterns; 15m and 5m are loaded on-demand to keep Analyze fast.
+    // Formed patterns shown with solid badges; forming ones with dashed.
+    // =================================================================
+
+    function renderPatternCard(patternsData, symbol) {
+      if (!patternsData) return "";
+      // Compute summary counts
+      const daily = patternsData || {};
+      const dailyCount = (daily.candlesticks || []).length + (daily.chart_patterns || []).length;
+
+      return `
+        <div class="pattern-card">
+          <div class="pattern-card-header">
+            📐 Chart Patterns
+            <span style="font-size:12px; color:#6b7280; font-weight:normal; margin-left:8px;">
+              Daily${dailyCount > 0 ? ` · ${dailyCount} detected` : " · none"}
+            </span>
+          </div>
+
+          <!-- Timeframe tabs -->
+          <div class="pattern-tabs">
+            <button class="pattern-tab active" data-tf="daily" type="button">📅 Daily</button>
+            <button class="pattern-tab" data-tf="15m" id="pattern-load-15m" type="button">⏱ 15-min</button>
+            <button class="pattern-tab" data-tf="5m"  id="pattern-load-5m"  type="button">⚡ 5-min</button>
+          </div>
+
+          <!-- Daily timeframe (always rendered) -->
+          <div class="pattern-pane active" data-pane="daily">
+            ${renderPatternPane(daily, "daily")}
+          </div>
+          <!-- Intraday panes are lazy-loaded -->
+          <div class="pattern-pane" data-pane="15m" style="display:none;">
+            <div class="pattern-empty">Click <strong>⏱ 15-min</strong> to load intraday patterns</div>
+          </div>
+          <div class="pattern-pane" data-pane="5m" style="display:none;">
+            <div class="pattern-empty">Click <strong>⚡ 5-min</strong> to load intraday patterns</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render the content of one timeframe pane (formed + forming sections)
+    function renderPatternPane(data, timeframe) {
+      if (!data) return '<div class="pattern-empty">No data</div>';
+
+      const allPatterns = [
+        ...(data.candlesticks || []),
+        ...(data.chart_patterns || []),
+      ];
+      if (allPatterns.length === 0) {
+        return '<div class="pattern-empty">No active patterns on this timeframe.</div>';
+      }
+
+      const formed = allPatterns.filter(p => p.status === "formed");
+      const forming = allPatterns.filter(p => p.status === "forming");
+
+      let html = "";
+      // Formed section
+      if (formed.length > 0) {
+        html += `
+          <div class="pattern-section">
+            <div class="pattern-section-title">
+              ✓ Formed <span class="pattern-section-count">${formed.length}</span>
+            </div>
+            <div class="pattern-list">
+              ${formed.map(renderPatternRow).join("")}
+            </div>
+          </div>
+        `;
+      }
+      // Forming section (visually distinct — dashed border, less prominent)
+      if (forming.length > 0) {
+        html += `
+          <div class="pattern-section pattern-section-forming">
+            <div class="pattern-section-title">
+              ⏳ Forming <span class="pattern-section-count">${forming.length}</span>
+              <span style="font-size:11px; font-weight:normal; color:#9ca3af; margin-left:6px;">
+                (not yet confirmed)
+              </span>
+            </div>
+            <div class="pattern-list">
+              ${forming.map(renderPatternRow).join("")}
+            </div>
+          </div>
+        `;
+      }
+      return html;
+    }
+
+    function renderPatternRow(p) {
+      const typeClass = `pattern-type-${p.type}`;       // bullish/bearish/neutral
+      const statusClass = `pattern-status-${p.status}`; // formed/forming
+      const reliabilityClass = `pattern-reliability-${p.reliability}`;
+      const ageText = p.bars_ago === 0 ? "today" :
+                       p.bars_ago === 1 ? "1 bar ago" : `${p.bars_ago} bars ago`;
+      // Direction arrow + color
+      const arrow = p.type === "bullish" ? "↑" : (p.type === "bearish" ? "↓" : "↔");
+      // Optional: target/neckline if present (chart patterns only)
+      const targetLine = (p.neckline || p.target) ? `
+        <div class="pattern-targets">
+          ${p.neckline ? `<span><strong>Neckline:</strong> ₹${p.neckline}</span>` : ""}
+          ${p.target   ? `<span><strong>Target:</strong> ₹${p.target}</span>`   : ""}
+        </div>
+      ` : "";
+
+      return `
+        <div class="pattern-row ${typeClass} ${statusClass}">
+          <div class="pattern-row-header">
+            <div class="pattern-name">
+              <span class="pattern-arrow">${arrow}</span>
+              ${escapeHtml(p.name)}
+            </div>
+            <div class="pattern-badges">
+              <span class="pattern-badge ${reliabilityClass}">${p.reliability}</span>
+              <span class="pattern-age">${ageText}</span>
+            </div>
+          </div>
+          <div class="pattern-description">${escapeHtml(p.description)}</div>
+          ${targetLine}
+        </div>
+      `;
+    }
+
+    // Lazy-load patterns for an intraday timeframe (15m or 5m)
+    async function loadIntradayPatterns(symbol, timeframe) {
+      const btn = $(timeframe === "15m" ? "pattern-load-15m" : "pattern-load-5m");
+      const pane = document.querySelector(`.pattern-pane[data-pane="${timeframe}"]`);
+      if (!btn || !pane) return;
+
+      // Switch to this tab + show loading
+      document.querySelectorAll(".pattern-tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelectorAll(".pattern-pane").forEach(p => p.style.display = "none");
+      pane.style.display = "block";
+      pane.innerHTML = `<div class="pattern-empty">⏳ Loading ${timeframe} patterns…</div>`;
+
+      try {
+        const resp = await fetch(`https://nse-dashboard-api.onrender.com/api/patterns/${encodeURIComponent(symbol)}`);
+        if (!resp.ok) {
+          pane.innerHTML = `<div class="pattern-empty">⚠️ Failed to fetch: ${resp.status}</div>`;
+          return;
+        }
+        const data = await resp.json();
+        const tfData = timeframe === "15m" ? data.intraday_15m : data.intraday_5m;
+        pane.innerHTML = renderPatternPane(tfData, timeframe);
+      } catch (e) {
+        pane.innerHTML = `<div class="pattern-empty">⚠️ Network error: ${escapeHtml(String(e))}</div>`;
+      }
+    }
+
+    // Wire daily tab switching (the active state) — separate from load handlers
+    document.addEventListener("click", (e) => {
+      const tab = e.target.closest(".pattern-tab");
+      if (!tab || tab.dataset.tf !== "daily") return;
+      document.querySelectorAll(".pattern-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      document.querySelectorAll(".pattern-pane").forEach(p => p.style.display = "none");
+      const pane = document.querySelector('.pattern-pane[data-pane="daily"]');
+      if (pane) pane.style.display = "block";
+    });
+
+
+    // =================================================================
+    // PATTERNS SCANNER TAB
+    // =================================================================
+    // Lists F&O symbols with active chart/candlestick patterns on the
+    // DAILY timeframe. Backend uses /api/patterns/scan which is
+    // cache-backed (6h TTL), so subsequent loads in a session are fast.
+    // First load may take 30-60s for a fresh universe.
+    // =================================================================
+    const PATTERNS_SCAN_URL = "https://nse-dashboard-api.onrender.com/api/patterns/scan";
+
+    function loadPatternsScanner() {
+      const panel = $("panel-patterns");
+      if (!panel) return;
+      panel.innerHTML = `
+        <div class="patterns-scanner-wrapper">
+          <div class="patterns-scanner-header">
+            <div>
+              <div class="patterns-scanner-title">📐 Pattern Scanner</div>
+              <div class="patterns-scanner-subtitle">
+                Active chart and candlestick patterns across F&O stocks (daily timeframe).
+                Results cached for 6 hours — first scan may take 30-60s.
+              </div>
+            </div>
+            <div>
+              <button id="patterns-scan-btn" class="kanban-btn-primary" type="button">
+                🔍 Scan F&O Universe
+              </button>
+            </div>
+          </div>
+
+          <div class="patterns-scanner-filters" id="patterns-filters" style="display:none;">
+            <button class="patterns-filter active" data-filter="all" type="button">All</button>
+            <button class="patterns-filter" data-filter="bullish" type="button">Bullish only</button>
+            <button class="patterns-filter" data-filter="bearish" type="button">Bearish only</button>
+            <button class="patterns-filter" data-filter="formed" type="button">Formed only</button>
+            <button class="patterns-filter" data-filter="forming" type="button">Forming only</button>
+          </div>
+
+          <div id="patterns-scanner-results">
+            <div style="padding: 40px 20px; text-align: center; color: #6b7280;">
+              Click <strong>🔍 Scan F&O Universe</strong> to find active patterns.
+            </div>
+          </div>
+        </div>
+      `;
+      $("patterns-scan-btn").addEventListener("click", runPatternsScan);
+    }
+
+    let _patternsScanData = null;
+    let _patternsFilter = "all";
+
+    async function runPatternsScan() {
+      const btn = $("patterns-scan-btn");
+      const results = $("patterns-scanner-results");
+      if (!btn || !results) return;
+      btn.disabled = true;
+      btn.textContent = "⏳ Scanning…";
+      results.innerHTML = `
+        <div style="padding: 40px 20px; text-align: center; color: #6b7280;">
+          <div style="font-size: 14px; margin-bottom: 8px;">
+            Running pattern detection on F&O universe…
+          </div>
+          <div style="font-size: 12px; color: #9ca3af;">
+            First scan may take 30-60s (subsequent scans are fast thanks to caching)
+          </div>
+        </div>
+      `;
+      try {
+        const resp = await fetch(PATTERNS_SCAN_URL);
+        if (!resp.ok) {
+          results.innerHTML = `
+            <div class="risk-warning danger">
+              <span>⚠️</span>
+              <div>Scan failed: ${resp.status}</div>
+            </div>
+          `;
+          return;
+        }
+        _patternsScanData = await resp.json();
+        $("patterns-filters").style.display = "flex";
+        // Wire filter buttons
+        $("patterns-filters").querySelectorAll(".patterns-filter").forEach(b => {
+          b.addEventListener("click", () => {
+            $("patterns-filters").querySelectorAll(".patterns-filter")
+              .forEach(x => x.classList.remove("active"));
+            b.classList.add("active");
+            _patternsFilter = b.dataset.filter;
+            renderPatternsScannerResults();
+          });
+        });
+        renderPatternsScannerResults();
+      } catch (e) {
+        results.innerHTML = `
+          <div class="risk-warning danger">
+            <span>⚠️</span>
+            <div>Network error: ${escapeHtml(String(e))}</div>
+          </div>
+        `;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "↻ Re-scan";
+      }
+    }
+
+    function renderPatternsScannerResults() {
+      const results = $("patterns-scanner-results");
+      const data = _patternsScanData;
+      if (!data) return;
+
+      // Apply filter
+      let rows = data.results || [];
+      if (_patternsFilter === "bullish") {
+        rows = rows.filter(r => r.bullish_count > r.bearish_count);
+      } else if (_patternsFilter === "bearish") {
+        rows = rows.filter(r => r.bearish_count > r.bullish_count);
+      } else if (_patternsFilter === "formed") {
+        rows = rows.filter(r => r.formed_count > 0);
+      } else if (_patternsFilter === "forming") {
+        rows = rows.filter(r => r.forming_count > 0);
+      }
+
+      const summary = `
+        <div style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">
+          Scanned <strong>${data.scanned}</strong> symbols ·
+          Found patterns in <strong>${data.with_patterns}</strong> ·
+          Showing <strong>${rows.length}</strong> after filter
+        </div>
+      `;
+
+      if (rows.length === 0) {
+        results.innerHTML = summary + `
+          <div style="padding: 40px 20px; text-align: center; color: #9ca3af; font-style: italic;">
+            No symbols match the current filter.
+          </div>
+        `;
+        return;
+      }
+
+      // Render table
+      const tableRows = rows.map(r => {
+        const dirBadge = r.bullish_count > r.bearish_count
+          ? `<span class="pattern-badge pattern-reliability-high">${r.bullish_count} bull</span>`
+          : r.bearish_count > r.bullish_count
+            ? `<span class="pattern-badge" style="background:#fee2e2;color:#991b1b;">${r.bearish_count} bear</span>`
+            : `<span class="pattern-badge pattern-reliability-low">mixed</span>`;
+
+        const topPatterns = (r.patterns || []).slice(0, 3).map(p => {
+          const arrow = p.type === "bullish" ? "↑" : (p.type === "bearish" ? "↓" : "↔");
+          const cls = p.type === "bullish" ? "loss" : (p.type === "bearish" ? "loss" : "");
+          // Note: deliberately use color from .pattern-type-* via inline style fallback
+          const color = p.type === "bullish" ? "#16a34a" : (p.type === "bearish" ? "#dc2626" : "#6b7280");
+          const statusBadge = p.status === "forming"
+            ? '<span style="font-size:9px;color:#9ca3af;">(forming)</span>'
+            : '';
+          return `
+            <span class="scanner-pattern-tag" style="color:${color};">
+              ${arrow} ${escapeHtml(p.name)} ${statusBadge}
+            </span>
+          `;
+        }).join(" ");
+
+        return `
+          <tr class="scanner-row" onclick="analyzeSymbol('${escapeHtml(r.symbol)}')" style="cursor:pointer;">
+            <td><strong>${escapeHtml(r.symbol)}</strong></td>
+            <td>${dirBadge}</td>
+            <td style="text-align:center;">${r.formed_count}</td>
+            <td style="text-align:center;">${r.forming_count}</td>
+            <td>${topPatterns || "—"}</td>
+          </tr>
+        `;
+      }).join("");
+
+      results.innerHTML = summary + `
+        <div style="overflow-x:auto;">
+        <table class="scanner-table">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Direction</th>
+              <th style="text-align:center;">Formed</th>
+              <th style="text-align:center;">Forming</th>
+              <th>Top Patterns</th>
+            </tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+        </div>
+        <div style="font-size:11px; color:#9ca3af; margin-top:8px;">
+          💡 Tap a row to open Analyze for that symbol
+        </div>
+      `;
+    }
+
+    // Helper: switch to Analyze tab and load this symbol
+    function analyzeSymbol(symbol) {
+      // Find Analyze tab and click it
+      const analyzeTab = document.querySelector('.tab[data-tab="analyze"]');
+      if (analyzeTab) analyzeTab.click();
+      // Set the input and trigger analyze
+      const input = $("analyze-symbol-input");
+      if (input) {
+        input.value = symbol;
+        const btn = $("analyze-btn");
+        if (btn) btn.click();
+      }
+    }
+
+
     function mdToHtml(md) {
       const lines = md.split("\n");
       let html = "";
@@ -5673,11 +6231,16 @@
         <div id="trade-plan-panel"></div>
       `;
 
+      // Chart pattern card (daily comes embedded in analyze response; 15m/5m
+      // are loaded on-demand via the intraday-loader buttons below)
+      const patternCard = renderPatternCard(data.patterns, data.symbol);
+
       result.innerHTML = `
         <h1 style="font-size:20px; margin-bottom:6px;">${data.symbol}</h1>
         ${priceCard}
         ${optionsCard}
         ${analystCard}
+        ${patternCard}
         <div class="analysis-text">${mdToHtml(data.analysis)}</div>
         ${newsBlock}
         <div style="margin: 16px 0; display: flex; gap: 10px; flex-wrap: wrap;">
@@ -5690,6 +6253,15 @@
         ${chartLinks}
       `;
 
+      // Wire up intraday timeframe loaders (15m, 5m) — lazy-load on click
+      const load15m = $("pattern-load-15m");
+      if (load15m) {
+        load15m.addEventListener("click", () => loadIntradayPatterns(data.symbol, "15m"));
+      }
+      const load5m = $("pattern-load-5m");
+      if (load5m) {
+        load5m.addEventListener("click", () => loadIntradayPatterns(data.symbol, "5m"));
+      }
       // Wire up the "Generate Trade Plan" button — opens the inline form
       const tpBtn = $("open-trade-plan-btn");
       if (tpBtn) {
@@ -8714,6 +9286,9 @@ if barstate.islast
         }
         if (tab === "kanban") {
           loadKanban();
+        }
+        if (tab === "patterns") {
+          loadPatternsScanner();
         }
       });
     });
