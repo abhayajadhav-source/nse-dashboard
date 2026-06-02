@@ -538,6 +538,112 @@
       border-color: var(--tp-border) !important;
     }
 
+    /* ============================================================
+       DARK MODE TEXT/BORDER OVERRIDES (audit pass 3)
+       ------------------------------------------------------------
+       Fixes hardcoded dark text colors that became invisible in dark
+       mode. Audit found 40 rules across 33 classes — focuses on the
+       Analyze tab's AI commentary section + supporting forms/labels.
+       Color mapping:
+         #111827 / #1f2937 (near-black) → var(--tp-fg)         (light)
+         #374151 (medium dark gray)      → var(--tp-fg)         (light)
+         #1e40af / #1d4ed8 (dark blue)   → #93c5fd              (light blue)
+       ============================================================ */
+
+    /* ===== AI Commentary block in trade plan + Analyze ===== */
+    [data-theme="dark"] .tp-commentary {
+      color: var(--tp-fg) !important;
+    }
+    [data-theme="dark"] .tp-commentary h3 {
+      color: #93c5fd !important;
+      border-bottom-color: var(--tp-border) !important;
+    }
+    [data-theme="dark"] .tp-commentary strong {
+      color: #93c5fd !important;
+    }
+    [data-theme="dark"] .tp-commentary p,
+    [data-theme="dark"] .tp-commentary li,
+    [data-theme="dark"] .tp-commentary ul {
+      color: var(--tp-fg) !important;
+    }
+
+    /* ===== Trade plan rows (label/value/rationale) ===== */
+    [data-theme="dark"] .tp-row {
+      border-bottom-color: var(--tp-border-soft, var(--tp-border)) !important;
+    }
+    [data-theme="dark"] .tp-row .tp-label,
+    [data-theme="dark"] .tp-row .tp-rationale,
+    [data-theme="dark"] .tp-target-rationale {
+      color: var(--tp-fg-muted) !important;
+    }
+    [data-theme="dark"] .tp-row .tp-value,
+    [data-theme="dark"] .tp-target-econ {
+      color: var(--tp-fg) !important;
+    }
+    /* Long/short colored values keep their accent colors */
+    [data-theme="dark"] .tp-row .tp-value.long  { color: #4ade80 !important; }
+    [data-theme="dark"] .tp-row .tp-value.short { color: #f87171 !important; }
+    [data-theme="dark"] .tp-mode-hint {
+      color: #93c5fd !important;
+    }
+
+    /* ===== Generic .val class (used inside econ cells everywhere) ===== */
+    [data-theme="dark"] .val {
+      color: var(--tp-fg) !important;
+    }
+    [data-theme="dark"] .tp-econ-cell .val.good { color: #4ade80 !important; }
+    [data-theme="dark"] .tp-econ-cell .val.bad  { color: #f87171 !important; }
+
+    /* ===== Verdict cards, form titles, labels ===== */
+    [data-theme="dark"] .verdict-card-header,
+    [data-theme="dark"] .form-title,
+    [data-theme="dark"] .journal-form-title {
+      color: #93c5fd !important;
+    }
+    [data-theme="dark"] .form-field label,
+    [data-theme="dark"] .jf-field label,
+    [data-theme="dark"] .sizer-field label,
+    [data-theme="dark"] .filter-label,
+    [data-theme="dark"] .metric-name,
+    [data-theme="dark"] .pc-rank-badge,
+    [data-theme="dark"] .td-section-content,
+    [data-theme="dark"] .compare-news-col-header,
+    [data-theme="dark"] .count-badge,
+    [data-theme="dark"] .confirmations-list,
+    [data-theme="dark"] .rsi-tier-standard {
+      color: var(--tp-fg) !important;
+    }
+
+    /* ===== Links — across all surfaces ===== */
+    [data-theme="dark"] .action-init,
+    [data-theme="dark"] .ext-link,
+    [data-theme="dark"] .news-list a,
+    [data-theme="dark"] .ep-stop-tag {
+      color: #93c5fd !important;
+    }
+    [data-theme="dark"] .action-init:hover,
+    [data-theme="dark"] .ext-link:hover,
+    [data-theme="dark"] .news-list a:hover {
+      color: #bfdbfe !important;
+    }
+
+    /* ===== Research note classes (used in printable PDF + dashboard) ===== */
+    [data-theme="dark"] .rn-brand,
+    [data-theme="dark"] .rn-call-value,
+    [data-theme="dark"] .rn-section-title {
+      color: #93c5fd !important;
+    }
+    [data-theme="dark"] .rn-page {
+      color: var(--tp-fg) !important;
+    }
+
+    /* ===== Strike-row colored variants (in options table) ===== */
+    [data-theme="dark"] .strike-row-resistance { color: #f87171 !important; }
+    [data-theme="dark"] .strike-row-support    { color: #4ade80 !important; }
+
+    /* ===== Score values with amber tier ===== */
+    [data-theme="dark"] .pc-score-value.ok { color: #fde68a !important; }
+
     /* Theme toggle button — sits in the header next to the brand */
     .theme-toggle {
       background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
