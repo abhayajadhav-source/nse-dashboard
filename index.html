@@ -1749,6 +1749,128 @@
     [data-theme="dark"] .pattern-targets strong { color: var(--tp-fg); }
 
     /* ============================================================
+       AI ALIGNMENT BANNER (top of pattern card)
+       Shows whether the AI's overall thesis confirms or contradicts
+       the mechanical patterns. Three states with distinct colors.
+       ============================================================ */
+    .align-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;
+      border: 1px solid #e5e7eb;
+    }
+    .align-banner-icon {
+      font-size: 18px; font-weight: 700; flex-shrink: 0;
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .align-banner-text { flex: 1; min-width: 0; }
+    .align-banner-headline { font-size: 13px; font-weight: 600; }
+    .align-banner-sub {
+      font-size: 11px; color: #6b7280; margin-top: 2px; line-height: 1.4;
+    }
+    [data-theme="dark"] .align-banner-sub { color: var(--tp-fg-muted); }
+
+    /* Confirm (green) — mechanical + AI agree */
+    .align-banner.align-banner-confirm {
+      background: #ecfdf5; border-color: #6ee7b7;
+    }
+    .align-banner.align-banner-confirm .align-banner-icon {
+      background: #16a34a; color: #fff;
+    }
+    .align-banner.align-banner-confirm .align-banner-headline { color: #065f46; }
+    [data-theme="dark"] .align-banner.align-banner-confirm {
+      background: rgba(22, 163, 74, 0.12); border-color: rgba(22, 163, 74, 0.40);
+    }
+    [data-theme="dark"] .align-banner.align-banner-confirm .align-banner-headline {
+      color: #6ee7b7;
+    }
+
+    /* Divergent (red) — patterns contradict AI */
+    .align-banner.align-banner-divergent {
+      background: #fef2f2; border-color: #fecaca;
+    }
+    .align-banner.align-banner-divergent .align-banner-icon {
+      background: #dc2626; color: #fff;
+    }
+    .align-banner.align-banner-divergent .align-banner-headline { color: #991b1b; }
+    [data-theme="dark"] .align-banner.align-banner-divergent {
+      background: rgba(220, 38, 38, 0.12); border-color: rgba(220, 38, 38, 0.40);
+    }
+    [data-theme="dark"] .align-banner.align-banner-divergent .align-banner-headline {
+      color: #fca5a5;
+    }
+
+    /* Mixed (amber) — some patterns agree, some don't */
+    .align-banner.align-banner-mixed {
+      background: #fffbeb; border-color: #fde68a;
+    }
+    .align-banner.align-banner-mixed .align-banner-icon {
+      background: #ca8a04; color: #fff;
+    }
+    .align-banner.align-banner-mixed .align-banner-headline { color: #78350f; }
+    [data-theme="dark"] .align-banner.align-banner-mixed {
+      background: rgba(202, 138, 4, 0.12); border-color: rgba(202, 138, 4, 0.40);
+    }
+    [data-theme="dark"] .align-banner.align-banner-mixed .align-banner-headline {
+      color: #fde68a;
+    }
+
+    /* Neutral (gray) — AI itself is undecided */
+    .align-banner.align-banner-neutral {
+      background: #f9fafb; border-color: #e5e7eb;
+    }
+    .align-banner.align-banner-neutral .align-banner-icon {
+      background: #6b7280; color: #fff;
+    }
+    .align-banner.align-banner-neutral .align-banner-headline { color: #374151; }
+    [data-theme="dark"] .align-banner.align-banner-neutral {
+      background: var(--tp-surface-alt); border-color: var(--tp-border);
+    }
+    [data-theme="dark"] .align-banner.align-banner-neutral .align-banner-headline {
+      color: var(--tp-fg);
+    }
+
+    /* ============================================================
+       PER-PATTERN ALIGNMENT PILLS
+       Small badges that appear below a pattern's description showing
+       its specific alignment (direction match + price-level matches)
+       ============================================================ */
+    .pattern-alignment-row {
+      margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .align-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 500; padding: 3px 8px;
+      border-radius: 999px; line-height: 1.3;
+    }
+    .align-pill-confirm {
+      background: #dcfce7; color: #166534;
+    }
+    [data-theme="dark"] .align-pill-confirm {
+      background: rgba(22, 163, 74, 0.20); color: #6ee7b7;
+    }
+    .align-pill-divergent {
+      background: #fef3c7; color: #92400e;
+    }
+    [data-theme="dark"] .align-pill-divergent {
+      background: rgba(202, 138, 4, 0.20); color: #fde68a;
+    }
+    .align-pill-pricematch {
+      background: #dbeafe; color: #1e3a8a;
+      cursor: help;
+    }
+    [data-theme="dark"] .align-pill-pricematch {
+      background: rgba(59, 130, 246, 0.20); color: #93c5fd;
+    }
+
+    /* Mobile: stack alignment pills */
+    @media (max-width: 700px) {
+      .align-banner { flex-wrap: wrap; }
+      .pattern-alignment-row { gap: 4px; }
+      .align-pill { font-size: 10px; padding: 2px 7px; }
+    }
+
+    /* ============================================================
        PATTERN SCANNER TAB
        ============================================================ */
     .patterns-scanner-wrapper {
@@ -5177,6 +5299,53 @@
       const daily = patternsData || {};
       const dailyCount = (daily.candlesticks || []).length + (daily.chart_patterns || []).length;
 
+      // ===== AI Alignment summary banner =====
+      // Shows whether mechanical patterns agree with the AI thesis. Three
+      // states: aligned (green), divergent (amber/red), neutral (gray).
+      // Only shows on daily timeframe — that's where the AI thesis lives.
+      let alignmentBanner = "";
+      const align = daily.ai_alignment_summary;
+      if (align && align.total_patterns > 0) {
+        const aiDir = align.ai_direction || "neutral";
+        const aligned = align.aligned_count || 0;
+        const divergent = align.divergent_count || 0;
+        const priceMatches = align.price_match_count || 0;
+
+        // Pick banner tone based on the alignment story
+        let bannerClass, icon, headline;
+        if (aiDir === "neutral") {
+          bannerClass = "align-banner-neutral";
+          icon = "—";
+          headline = "AI thesis is neutral";
+        } else if (aligned > divergent) {
+          bannerClass = "align-banner-confirm";
+          icon = "✓";
+          headline = `${aligned} pattern${aligned !== 1 ? "s" : ""} confirm AI's ${aiDir} thesis`;
+        } else if (divergent > aligned) {
+          bannerClass = "align-banner-divergent";
+          icon = "⚠";
+          headline = `${divergent} pattern${divergent !== 1 ? "s" : ""} contradict AI's ${aiDir} thesis`;
+        } else {
+          bannerClass = "align-banner-mixed";
+          icon = "≈";
+          headline = `Mixed signals vs AI's ${aiDir} thesis (${aligned} aligned, ${divergent} divergent)`;
+        }
+
+        alignmentBanner = `
+          <div class="align-banner ${bannerClass}">
+            <div class="align-banner-icon">${icon}</div>
+            <div class="align-banner-text">
+              <div class="align-banner-headline">${headline}</div>
+              ${priceMatches > 0 ? `
+                <div class="align-banner-sub">
+                  🎯 ${priceMatches} pattern price level${priceMatches !== 1 ? "s match" : " matches"} AI's mentioned levels (within 2.5%)
+                </div>
+              ` : ""}
+            </div>
+          </div>
+        `;
+      }
+
       return `
         <div class="pattern-card">
           <div class="pattern-card-header">
@@ -5185,6 +5354,8 @@
               Daily${dailyCount > 0 ? ` · ${dailyCount} detected` : " · none"}
             </span>
           </div>
+
+          ${alignmentBanner}
 
           <!-- Timeframe tabs -->
           <div class="pattern-tabs">
@@ -5272,6 +5443,37 @@
         </div>
       ` : "";
 
+      // ===== AI alignment badge (direction + price level matches) =====
+      // Only shown when alignment info is present (daily timeframe only —
+      // intraday patterns don't get cross-referenced with AI thesis since
+      // AI analysis is daily-scoped).
+      let alignmentRow = "";
+      const ai = p.ai_alignment;
+      if (ai) {
+        const dirBadges = [];
+        // Direction badge
+        if (ai.direction === "aligned") {
+          dirBadges.push(`<span class="align-pill align-pill-confirm">
+            ✓ Confirms AI ${ai.ai_direction} thesis
+          </span>`);
+        } else if (ai.direction === "divergent") {
+          dirBadges.push(`<span class="align-pill align-pill-divergent">
+            ⚠ Diverges from AI ${ai.ai_direction} thesis
+          </span>`);
+        }
+        // Price match badges (one per match, max 2)
+        for (const pm of (ai.price_matches || [])) {
+          dirBadges.push(`<span class="align-pill align-pill-pricematch" title="${
+            `Pattern's ${pm.pattern_field} ₹${pm.pattern_price} is within ${pm.pct_diff}% of AI's ${pm.ai_type} ₹${pm.ai_price}`
+          }">
+            🎯 ${pm.pattern_field} ₹${pm.pattern_price} ≈ AI ${pm.ai_type} ₹${pm.ai_price}
+          </span>`);
+        }
+        if (dirBadges.length > 0) {
+          alignmentRow = `<div class="pattern-alignment-row">${dirBadges.join("")}</div>`;
+        }
+      }
+
       return `
         <div class="pattern-row ${typeClass} ${statusClass}">
           <div class="pattern-row-header">
@@ -5286,6 +5488,7 @@
           </div>
           <div class="pattern-description">${escapeHtml(p.description)}</div>
           ${targetLine}
+          ${alignmentRow}
         </div>
       `;
     }
@@ -5438,6 +5641,37 @@
       const data = _patternsScanData;
       if (!data) return;
 
+      // Special case: backend returned a diagnostic response because the
+      // universe couldn't be sourced. Show the actual cause, not "undefined".
+      if (data.diag === true || data.error) {
+        const detector = data.pattern_detector_importable || {};
+        results.innerHTML = `
+          <div class="risk-warning danger">
+            <span>⚠️</span>
+            <div style="flex:1;">
+              <div style="font-weight:600; margin-bottom:8px;">
+                Scanner couldn't load any symbols
+              </div>
+              <div style="font-size: 12px; line-height: 1.6;">
+                <div><strong>Universe source:</strong> ${escapeHtml(String(data.universe_source || "none"))}</div>
+                <div><strong>Universe size:</strong> ${data.universe_size ?? 0}</div>
+                <div><strong>DATABASE_URL set:</strong> ${data.database_url_set ? "yes" : "no"}</div>
+                ${data.momentum_error ? `<div><strong>momentum_snapshot error:</strong> <code>${escapeHtml(data.momentum_error)}</code></div>` : ""}
+                ${data.stock_list_error ? `<div><strong>stock_list error:</strong> <code>${escapeHtml(data.stock_list_error)}</code></div>` : ""}
+                ${detector.importable === false ? `<div><strong>pattern_detector missing:</strong> <code>${escapeHtml(detector.error || "")}</code></div>` : ""}
+                ${data.error ? `<div><strong>Top-level error:</strong> <code>${escapeHtml(data.error)}</code></div>` : ""}
+                ${data.error_detail ? `<div><strong>Detail:</strong> <code>${escapeHtml(data.error_detail)}</code></div>` : ""}
+              </div>
+              <div style="font-size: 11px; color: #9ca3af; margin-top: 8px;">
+                Share the above with the developer to debug. You can also hit the diagnostic endpoint directly:
+                <code>/api/patterns/scan?diag=1</code>
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
       // Apply filter
       let rows = data.results || [];
       if (_patternsFilter === "bullish") {
@@ -5450,11 +5684,15 @@
         rows = rows.filter(r => r.forming_count > 0);
       }
 
+      // Defensive: with_patterns may be missing on older response shapes
+      const withPatterns = data.with_patterns !== undefined ? data.with_patterns : (data.results || []).length;
+
       const summary = `
         <div style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">
           Scanned <strong>${data.scanned}</strong> symbols ·
-          Found patterns in <strong>${data.with_patterns}</strong> ·
+          Found patterns in <strong>${withPatterns}</strong> ·
           Showing <strong>${rows.length}</strong> after filter
+          ${data.failure_count > 0 ? `· <span style="color:#dc2626;">${data.failure_count} fetch failures</span>` : ""}
         </div>
       `;
 
