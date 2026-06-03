@@ -1977,6 +1977,196 @@
     }
 
     /* ============================================================
+       CAPITAL ALLOCATION TAB
+       Target vs actual breakdown across 4 dimensions with regime-aware
+       AI suggestions. Built mobile-first; dark mode coverage included.
+       ============================================================ */
+    .alloc-wrapper { padding: 14px 16px 60px; }
+    .alloc-header-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .alloc-title { font-size: 18px; font-weight: 700; }
+    .alloc-subtitle {
+      font-size: 12px; color: #6b7280; margin-top: 4px; max-width: 600px;
+      line-height: 1.5;
+    }
+    [data-theme="dark"] .alloc-subtitle { color: var(--tp-fg-muted); }
+
+    .alloc-card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+      padding: 14px 16px; margin-bottom: 12px;
+    }
+    [data-theme="dark"] .alloc-card {
+      background: var(--tp-surface); border-color: var(--tp-border); color: var(--tp-fg);
+    }
+    .alloc-card-title {
+      font-size: 14px; font-weight: 700; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .alloc-card-subtitle {
+      font-size: 11px; font-weight: 400; color: #6b7280;
+    }
+    [data-theme="dark"] .alloc-card-subtitle { color: var(--tp-fg-muted); }
+
+    /* Portfolio overview stats grid */
+    .alloc-overview-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .alloc-stat {
+      background: #f9fafb; border-radius: 6px; padding: 10px 12px;
+    }
+    [data-theme="dark"] .alloc-stat {
+      background: var(--tp-surface-alt);
+    }
+    .alloc-stat-label {
+      font-size: 10px; color: #6b7280; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700; margin-bottom: 3px;
+    }
+    [data-theme="dark"] .alloc-stat-label { color: var(--tp-fg-muted); }
+    .alloc-stat-value {
+      font-size: 17px; font-weight: 700; font-family: ui-monospace, monospace;
+    }
+
+    /* Comparison rows (one per bucket) */
+    .alloc-rows { display: flex; flex-direction: column; gap: 10px; }
+    .alloc-row {
+      display: grid; grid-template-columns: 120px 1fr 70px; gap: 10px;
+      align-items: center;
+      padding: 8px 0; border-top: 1px solid #f3f4f6;
+    }
+    [data-theme="dark"] .alloc-row { border-color: var(--tp-border-soft, var(--tp-border)); }
+    .alloc-row:first-child { border-top: none; padding-top: 0; }
+    .alloc-row-label {
+      font-size: 13px;
+    }
+    .alloc-bucket-name {
+      font-weight: 600; text-transform: capitalize;
+    }
+    .alloc-pos-count {
+      font-size: 10px; color: #9ca3af; margin-left: 6px;
+      background: #f3f4f6; padding: 1px 6px; border-radius: 999px;
+    }
+    [data-theme="dark"] .alloc-pos-count {
+      background: var(--tp-surface-alt); color: var(--tp-fg-muted);
+    }
+
+    /* Bar pairs (actual + target) */
+    .alloc-bars { display: flex; flex-direction: column; gap: 3px; }
+    .alloc-bar-row {
+      display: grid; grid-template-columns: 50px 1fr 45px; gap: 6px;
+      align-items: center;
+    }
+    .alloc-bar-label {
+      font-size: 10px; color: #6b7280; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    [data-theme="dark"] .alloc-bar-label { color: var(--tp-fg-muted); }
+    .alloc-bar-track {
+      background: #f3f4f6; height: 10px; border-radius: 999px; overflow: hidden;
+      position: relative;
+    }
+    [data-theme="dark"] .alloc-bar-track {
+      background: var(--tp-surface-alt);
+    }
+    .alloc-bar-fill {
+      height: 100%; border-radius: 999px; transition: width 0.3s ease;
+    }
+    .alloc-bar-actual.alloc-status-ok   { background: #16a34a; }
+    .alloc-bar-actual.alloc-status-warn { background: #f59e0b; }
+    .alloc-bar-actual.alloc-status-off  { background: #dc2626; }
+    .alloc-bar-target {
+      background: #cbd5e1; border: 1px dashed #94a3b8;
+    }
+    [data-theme="dark"] .alloc-bar-target {
+      background: rgba(148,163,184,0.30); border-color: rgba(148,163,184,0.50);
+    }
+    .alloc-bar-pct {
+      font-size: 11px; font-family: ui-monospace, monospace;
+      font-weight: 600; text-align: right;
+    }
+
+    /* Delta indicator */
+    .alloc-delta {
+      font-size: 12px; font-weight: 700; text-align: right;
+      font-family: ui-monospace, monospace;
+    }
+    .alloc-delta.alloc-status-ok   { color: #16a34a; }
+    .alloc-delta.alloc-status-warn { color: #d97706; }
+    .alloc-delta.alloc-status-off  { color: #dc2626; }
+    [data-theme="dark"] .alloc-delta.alloc-status-ok   { color: #4ade80; }
+    [data-theme="dark"] .alloc-delta.alloc-status-warn { color: #fde68a; }
+    [data-theme="dark"] .alloc-delta.alloc-status-off  { color: #f87171; }
+
+    /* Rules / violations card */
+    .alloc-rules-card-ok { border-left: 4px solid #16a34a; }
+    .alloc-rules-card-warn { border-left: 4px solid #f59e0b; }
+    [data-theme="dark"] .alloc-rules-card-ok   { border-left-color: #4ade80; }
+    [data-theme="dark"] .alloc-rules-card-warn { border-left-color: #fde68a; }
+
+    .alloc-violation {
+      display: flex; gap: 8px; align-items: flex-start;
+      padding: 8px 10px; border-radius: 6px; font-size: 13px;
+      line-height: 1.4;
+    }
+    .alloc-violation-warn {
+      background: #fffbeb; color: #78350f;
+    }
+    .alloc-violation-off {
+      background: #fef2f2; color: #991b1b;
+    }
+    [data-theme="dark"] .alloc-violation-warn {
+      background: rgba(202,138,4,0.12); color: #fde68a;
+    }
+    [data-theme="dark"] .alloc-violation-off {
+      background: rgba(220,38,38,0.12); color: #fca5a5;
+    }
+
+    /* Target setup form */
+    .alloc-targets-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+    }
+    .alloc-target-field {
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .alloc-target-field label {
+      font-size: 11px; color: #6b7280; font-weight: 600;
+    }
+    [data-theme="dark"] .alloc-target-field label { color: var(--tp-fg-muted); }
+    .alloc-target-field input {
+      padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px;
+      font-size: 14px; font-family: ui-monospace, monospace;
+      background: #fff;
+    }
+    [data-theme="dark"] .alloc-target-field input {
+      background: var(--tp-surface-alt); border-color: var(--tp-border);
+      color: var(--tp-fg);
+    }
+
+    /* AI regime suggestion card */
+    .alloc-regime-card {
+      background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+      border-left: 4px solid #6366f1;
+    }
+    [data-theme="dark"] .alloc-regime-card {
+      background: rgba(99,102,241,0.10);
+      border-left-color: #818cf8;
+    }
+    .alloc-regime-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 0; font-size: 13px;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 700px) {
+      .alloc-row { grid-template-columns: 1fr; gap: 6px; }
+      .alloc-delta { text-align: left; }
+      .alloc-overview-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ============================================================
        PATTERN SCANNER TAB
        ============================================================ */
     .patterns-scanner-wrapper {
@@ -3576,6 +3766,9 @@
       <button class="tab" data-tab="patterns">
         📐 Patterns
       </button>
+      <button class="tab" data-tab="allocation">
+        💰 Allocation
+      </button>
     </div>
 
     <div id="panel-intraday" class="panel"></div>
@@ -3589,6 +3782,7 @@
     <div id="panel-risk"     class="panel" style="display:none;"></div>
     <div id="panel-kanban"   class="panel" style="display:none;"></div>
     <div id="panel-patterns" class="panel" style="display:none;"></div>
+    <div id="panel-allocation" class="panel" style="display:none;"></div>
   </div>
 
   <script>
@@ -3902,7 +4096,7 @@
           a: "analyze",      j: "journal",     s: "strategy",
           c: "compare",      p: "sizer",       i: "intraday",
           r: "reversal",     m: "momentum",    k: "risk",
-          n: "kanban",       x: "patterns",
+          n: "kanban",       x: "patterns",    b: "allocation",
         };
         if (tabMap[k]) {
           e.preventDefault();
@@ -5877,6 +6071,635 @@
         input.value = symbol;
         const btn = $("analyze-btn");
         if (btn) btn.click();
+      }
+    }
+
+
+    // ===================================================================
+    // CAPITAL ALLOCATION TAB
+    // ===================================================================
+    // Compares user-defined TARGET allocation against the ACTUAL allocation
+    // computed from open journal positions, across 4 dimensions:
+    //   1. Direction (long bias / short bias / hedged / cash)
+    //   2. Time Horizon (today / swing / positional / cash)
+    //   3. Sector (Banking / IT / Pharma / ... / cash)
+    //   4. Strategy Type (momentum / mean_reversion / event_driven / swing / cash)
+    //
+    // User targets are persisted in localStorage. AI regime-suggestions
+    // adjust the targets based on India VIX percentile.
+    // ===================================================================
+
+    const ALLOC_URL        = "https://nse-dashboard-api.onrender.com/api/capital-allocation";
+    const ALLOC_AI_URL     = "https://nse-dashboard-api.onrender.com/api/capital-allocation/recommend";
+    const ALLOC_LS_KEY     = "nseDashboardAllocationTargets";
+
+    // Sensible defaults — a balanced base portfolio for an Indian F&O trader
+    const DEFAULT_TARGETS = {
+      cash_reserve_pct:    20,
+      max_single_position: 10,
+      max_sector_pct:      30,
+      by_direction: {
+        long:   45,
+        short:  20,
+        hedged: 15,
+        // cash = 100 - (long + short + hedged) = 20
+      },
+      by_time_horizon: {
+        today:      5,
+        swing:      35,
+        positional: 40,
+        // cash = 20
+      },
+      by_strategy_type: {
+        momentum:       25,
+        mean_reversion: 20,
+        event_driven:   15,
+        swing:          15,
+        other:          5,
+        // cash = 20
+      },
+    };
+
+    function getAllocTargets() {
+      try {
+        const raw = localStorage.getItem(ALLOC_LS_KEY);
+        if (!raw) return {...DEFAULT_TARGETS};
+        const parsed = JSON.parse(raw);
+        // Merge with defaults so missing keys get defaults
+        return {
+          ...DEFAULT_TARGETS,
+          ...parsed,
+          by_direction:      {...DEFAULT_TARGETS.by_direction, ...(parsed.by_direction || {})},
+          by_time_horizon:   {...DEFAULT_TARGETS.by_time_horizon, ...(parsed.by_time_horizon || {})},
+          by_strategy_type:  {...DEFAULT_TARGETS.by_strategy_type, ...(parsed.by_strategy_type || {})},
+        };
+      } catch {
+        return {...DEFAULT_TARGETS};
+      }
+    }
+
+    function saveAllocTargets(targets) {
+      try { localStorage.setItem(ALLOC_LS_KEY, JSON.stringify(targets)); } catch {}
+    }
+
+    function getPortfolioSize() {
+      const raw = localStorage.getItem("nseDashboardPortfolioSize");
+      const n = parseFloat(raw);
+      return isFinite(n) && n > 0 ? n : 1000000;
+    }
+
+    let _allocData = null;     // last fetched actual allocation
+    let _allocRegime = null;   // last AI regime suggestion
+
+    async function loadAllocation() {
+      const panel = $("panel-allocation");
+      if (!panel) return;
+      // Initial render — skeleton
+      panel.innerHTML = `
+        <div class="alloc-wrapper">
+          <div class="alloc-header-row">
+            <div>
+              <div class="alloc-title">💰 Capital Allocation</div>
+              <div class="alloc-subtitle">
+                Target vs actual allocation across direction, time horizon, sector, and strategy.
+                Targets persist locally · AI-suggested regime adjustments available.
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button id="alloc-edit-targets" class="kanban-btn-secondary" type="button">
+                ⚙️ Edit Targets
+              </button>
+              <button id="alloc-regime-btn" class="kanban-btn-primary" type="button">
+                🤖 AI Regime Adjust
+              </button>
+            </div>
+          </div>
+          <div id="alloc-portfolio-card"></div>
+          <div id="alloc-targets-card" style="display:none;"></div>
+          <div id="alloc-regime-result"></div>
+          <div id="alloc-rules-card"></div>
+          <div id="alloc-comparisons"></div>
+        </div>
+      `;
+      $("alloc-edit-targets").addEventListener("click", showTargetEditor);
+      $("alloc-regime-btn").addEventListener("click", fetchRegimeSuggestion);
+      fetchAllocation();
+    }
+
+    async function fetchAllocation() {
+      const portfolio = getPortfolioSize();
+      const url = `${ALLOC_URL}?portfolio=${portfolio}`;
+      const card = $("alloc-portfolio-card");
+      card.innerHTML = `<div style="padding:20px;text-align:center;color:#6b7280;">⏳ Loading allocation…</div>`;
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        _allocData = await resp.json();
+        renderAllocation();
+      } catch (e) {
+        card.innerHTML = `<div class="risk-warning danger">⚠️ Failed to load: ${escapeHtml(String(e))}</div>`;
+      }
+    }
+
+    function renderAllocation() {
+      const d = _allocData;
+      if (!d) return;
+      const targets = getAllocTargets();
+      const portfolio = d.portfolio_size;
+
+      // Portfolio overview card
+      $("alloc-portfolio-card").innerHTML = `
+        <div class="alloc-card">
+          <div class="alloc-card-title">Portfolio Overview</div>
+          <div class="alloc-overview-grid">
+            <div class="alloc-stat">
+              <div class="alloc-stat-label">Portfolio Size</div>
+              <div class="alloc-stat-value">${fmtRupeesCompact(portfolio)}</div>
+            </div>
+            <div class="alloc-stat">
+              <div class="alloc-stat-label">Total Deployed</div>
+              <div class="alloc-stat-value">${fmtRupeesCompact(d.total_deployed)}</div>
+            </div>
+            <div class="alloc-stat">
+              <div class="alloc-stat-label">Cash Available</div>
+              <div class="alloc-stat-value gain">${fmtRupeesCompact(d.cash_available)}</div>
+            </div>
+            <div class="alloc-stat">
+              <div class="alloc-stat-label">Deployment %</div>
+              <div class="alloc-stat-value">${d.deployment_pct.toFixed(1)}%</div>
+            </div>
+            <div class="alloc-stat">
+              <div class="alloc-stat-label">Open Positions</div>
+              <div class="alloc-stat-value">${d.open_positions}</div>
+            </div>
+            <div class="alloc-stat">
+              <div class="alloc-stat-label">Cash Reserve Target</div>
+              <div class="alloc-stat-value">${targets.cash_reserve_pct}%</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Rules / violations card
+      $("alloc-rules-card").innerHTML = renderAllocRules(d, targets);
+
+      // Four comparison views
+      $("alloc-comparisons").innerHTML = `
+        ${renderAllocDimension("Direction",     d.by_direction,    targets.by_direction,    targets.cash_reserve_pct, "directional bias")}
+        ${renderAllocDimension("Time Horizon",  d.by_time_horizon, targets.by_time_horizon, targets.cash_reserve_pct, "holding period")}
+        ${renderAllocSector(d.by_sector, targets.max_sector_pct)}
+        ${renderAllocDimension("Strategy Type", d.by_strategy_type, targets.by_strategy_type, targets.cash_reserve_pct, "setup type")}
+      `;
+    }
+
+    // Render a generic dimension comparison (direction, time-horizon, strategy)
+    function renderAllocDimension(title, actual, target, cashReservePct, hintLabel) {
+      // Build the bucket list from target keys, plus cash always last
+      const buckets = Object.keys(target || {});
+      const rows = buckets.map(bucket => {
+        const actualPct = (actual?.[bucket]?.pct) ?? 0;
+        const targetPct = target[bucket] ?? 0;
+        const positions = (actual?.[bucket]?.positions) ?? 0;
+        const delta = actualPct - targetPct;
+        const status = Math.abs(delta) <= 5 ? "ok" : (Math.abs(delta) <= 10 ? "warn" : "off");
+        return {bucket, actualPct, targetPct, positions, delta, status};
+      });
+      // Add cash as the last bucket
+      const actualCashPct = (actual?.cash?.pct) ?? 0;
+      const cashDelta = actualCashPct - cashReservePct;
+      const cashStatus = Math.abs(cashDelta) <= 5 ? "ok" : (Math.abs(cashDelta) <= 10 ? "warn" : "off");
+      rows.push({bucket: "cash", actualPct: actualCashPct, targetPct: cashReservePct,
+                  positions: 0, delta: cashDelta, status: cashStatus});
+
+      const rowsHtml = rows.map(r => {
+        const labelText = r.bucket.replace(/_/g, " ");
+        const maxPct = Math.max(r.actualPct, r.targetPct, 100) || 100;
+        // Two stacked mini-bars: target (gray, dashed-ish) and actual (colored)
+        const targetWidth = (r.targetPct / 100) * 100;
+        const actualWidth = (r.actualPct / 100) * 100;
+        const deltaSign = r.delta > 0 ? "+" : "";
+        const statusClass = `alloc-status-${r.status}`;
+        return `
+          <div class="alloc-row">
+            <div class="alloc-row-label">
+              <span class="alloc-bucket-name">${escapeHtml(labelText)}</span>
+              ${r.positions > 0 ? `<span class="alloc-pos-count">${r.positions} pos</span>` : ""}
+            </div>
+            <div class="alloc-bars">
+              <div class="alloc-bar-row">
+                <span class="alloc-bar-label">Actual</span>
+                <div class="alloc-bar-track">
+                  <div class="alloc-bar-fill alloc-bar-actual ${statusClass}"
+                       style="width: ${actualWidth}%;"></div>
+                </div>
+                <span class="alloc-bar-pct">${r.actualPct.toFixed(1)}%</span>
+              </div>
+              <div class="alloc-bar-row">
+                <span class="alloc-bar-label">Target</span>
+                <div class="alloc-bar-track">
+                  <div class="alloc-bar-fill alloc-bar-target"
+                       style="width: ${targetWidth}%;"></div>
+                </div>
+                <span class="alloc-bar-pct">${r.targetPct.toFixed(1)}%</span>
+              </div>
+            </div>
+            <div class="alloc-delta ${statusClass}">
+              ${deltaSign}${r.delta.toFixed(1)}%
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="alloc-card">
+          <div class="alloc-card-title">
+            By ${escapeHtml(title)}
+            <span class="alloc-card-subtitle">(${hintLabel})</span>
+          </div>
+          <div class="alloc-rows">${rowsHtml}</div>
+        </div>
+      `;
+    }
+
+    // Sector view is special — buckets are dynamic; just show actual sectors
+    // and check each against the user's max_sector_pct rule
+    function renderAllocSector(actualBySector, maxSectorPct) {
+      const entries = Object.entries(actualBySector || {})
+        .filter(([k, _]) => k !== "cash")
+        .sort((a, b) => (b[1]?.pct || 0) - (a[1]?.pct || 0));
+      if (entries.length === 0) {
+        return `
+          <div class="alloc-card">
+            <div class="alloc-card-title">By Sector <span class="alloc-card-subtitle">(max ${maxSectorPct}% per sector)</span></div>
+            <div style="padding:14px; color:#6b7280; font-style:italic;">No deployed positions yet.</div>
+          </div>
+        `;
+      }
+      const rowsHtml = entries.map(([sector, info]) => {
+        const pct = info?.pct ?? 0;
+        const positions = info?.positions ?? 0;
+        const over = pct > maxSectorPct;
+        const statusClass = over ? "alloc-status-off" : (pct > maxSectorPct * 0.85 ? "alloc-status-warn" : "alloc-status-ok");
+        return `
+          <div class="alloc-row">
+            <div class="alloc-row-label">
+              <span class="alloc-bucket-name">${escapeHtml(sector)}</span>
+              ${positions > 0 ? `<span class="alloc-pos-count">${positions} pos</span>` : ""}
+            </div>
+            <div class="alloc-bars">
+              <div class="alloc-bar-row">
+                <span class="alloc-bar-label">Actual</span>
+                <div class="alloc-bar-track">
+                  <div class="alloc-bar-fill alloc-bar-actual ${statusClass}"
+                       style="width: ${Math.min(pct, 100)}%;"></div>
+                </div>
+                <span class="alloc-bar-pct">${pct.toFixed(1)}%</span>
+              </div>
+              <div class="alloc-bar-row">
+                <span class="alloc-bar-label">Max</span>
+                <div class="alloc-bar-track">
+                  <div class="alloc-bar-fill alloc-bar-target"
+                       style="width: ${maxSectorPct}%;"></div>
+                </div>
+                <span class="alloc-bar-pct">${maxSectorPct}%</span>
+              </div>
+            </div>
+            <div class="alloc-delta ${statusClass}">
+              ${over ? `+${(pct - maxSectorPct).toFixed(1)}% over` : "OK"}
+            </div>
+          </div>
+        `;
+      }).join("");
+      return `
+        <div class="alloc-card">
+          <div class="alloc-card-title">
+            By Sector
+            <span class="alloc-card-subtitle">(max ${maxSectorPct}% per sector)</span>
+          </div>
+          <div class="alloc-rows">${rowsHtml}</div>
+        </div>
+      `;
+    }
+
+    // Rule violations panel
+    function renderAllocRules(actual, targets) {
+      const violations = [];
+      // Cash reserve check
+      if (actual.cash_pct < targets.cash_reserve_pct - 5) {
+        violations.push({
+          severity: "warn",
+          msg: `Cash reserve is ${actual.cash_pct.toFixed(1)}%, below target of ${targets.cash_reserve_pct}%. ` +
+               `Consider trimming positions to rebuild cash buffer.`,
+        });
+      }
+      // Sector concentration check (any sector > max?)
+      const sectors = Object.entries(actual.by_sector || {}).filter(([k, _]) => k !== "cash");
+      for (const [sector, info] of sectors) {
+        if ((info?.pct ?? 0) > targets.max_sector_pct) {
+          violations.push({
+            severity: "off",
+            msg: `Sector concentration: ${escapeHtml(sector)} at ${info.pct.toFixed(1)}% exceeds ${targets.max_sector_pct}% limit.`,
+          });
+        }
+      }
+      // Direction skew check (long+short >> hedged means undirectional)
+      const dir = actual.by_direction || {};
+      const longShort = (dir.long?.pct ?? 0) + (dir.short?.pct ?? 0);
+      if (longShort > 80 && (dir.hedged?.pct ?? 0) < 10) {
+        violations.push({
+          severity: "warn",
+          msg: `${longShort.toFixed(1)}% of capital is in unhedged directional bets. Consider some hedged positions.`,
+        });
+      }
+      // Over-deployed
+      if (actual.deployment_pct > 90) {
+        violations.push({
+          severity: "off",
+          msg: `${actual.deployment_pct.toFixed(1)}% deployed leaves no buffer. New opportunities will require closing existing trades.`,
+        });
+      }
+
+      if (violations.length === 0) {
+        return `
+          <div class="alloc-card alloc-rules-card-ok">
+            <div class="alloc-card-title">📋 Allocation Rules</div>
+            <div style="padding:10px; color:#16a34a; font-weight:500;">
+              ✓ All rule checks passing
+            </div>
+          </div>
+        `;
+      }
+
+      const rows = violations.map(v => `
+        <div class="alloc-violation alloc-violation-${v.severity}">
+          <span>${v.severity === "off" ? "🔴" : "⚠️"}</span>
+          <span>${v.msg}</span>
+        </div>
+      `).join("");
+      return `
+        <div class="alloc-card alloc-rules-card-warn">
+          <div class="alloc-card-title">📋 Allocation Rules (${violations.length} flag${violations.length !== 1 ? "s" : ""})</div>
+          <div style="display:flex; flex-direction:column; gap:6px; padding:10px 0;">${rows}</div>
+        </div>
+      `;
+    }
+
+    // Target editor — collapsible form with all settings
+    function showTargetEditor() {
+      const card = $("alloc-targets-card");
+      if (!card) return;
+      const t = getAllocTargets();
+      const isHidden = card.style.display === "none" || !card.style.display;
+      if (!isHidden) {
+        // Toggle close
+        card.style.display = "none";
+        return;
+      }
+      card.style.display = "block";
+      card.innerHTML = `
+        <div class="alloc-card">
+          <div class="alloc-card-title">⚙️ Target Setup</div>
+          <div style="font-size:12px; color:#6b7280; margin-bottom:12px;">
+            Your base targets (saved locally in this browser). All percentages should sum near 100% within each dimension.
+          </div>
+
+          <div class="alloc-targets-grid">
+            <div class="alloc-target-field">
+              <label>Cash Reserve %</label>
+              <input id="t-cash-reserve" type="number" min="0" max="100" value="${t.cash_reserve_pct}">
+            </div>
+            <div class="alloc-target-field">
+              <label>Max Single Position %</label>
+              <input id="t-max-pos" type="number" min="0" max="100" value="${t.max_single_position}">
+            </div>
+            <div class="alloc-target-field">
+              <label>Max Sector %</label>
+              <input id="t-max-sector" type="number" min="0" max="100" value="${t.max_sector_pct}">
+            </div>
+          </div>
+
+          <div class="alloc-card-title" style="margin-top:14px;font-size:13px;">By Direction (%)</div>
+          <div class="alloc-targets-grid">
+            <div class="alloc-target-field">
+              <label>Long Bias</label>
+              <input id="t-dir-long" type="number" min="0" max="100" value="${t.by_direction.long}">
+            </div>
+            <div class="alloc-target-field">
+              <label>Short Bias</label>
+              <input id="t-dir-short" type="number" min="0" max="100" value="${t.by_direction.short}">
+            </div>
+            <div class="alloc-target-field">
+              <label>Hedged</label>
+              <input id="t-dir-hedged" type="number" min="0" max="100" value="${t.by_direction.hedged}">
+            </div>
+          </div>
+
+          <div class="alloc-card-title" style="margin-top:14px;font-size:13px;">By Time Horizon (%)</div>
+          <div class="alloc-targets-grid">
+            <div class="alloc-target-field">
+              <label>Today (intraday)</label>
+              <input id="t-th-today" type="number" min="0" max="100" value="${t.by_time_horizon.today}">
+            </div>
+            <div class="alloc-target-field">
+              <label>Swing (2-5d)</label>
+              <input id="t-th-swing" type="number" min="0" max="100" value="${t.by_time_horizon.swing}">
+            </div>
+            <div class="alloc-target-field">
+              <label>Positional (>5d)</label>
+              <input id="t-th-positional" type="number" min="0" max="100" value="${t.by_time_horizon.positional}">
+            </div>
+          </div>
+
+          <div class="alloc-card-title" style="margin-top:14px;font-size:13px;">By Strategy Type (%)</div>
+          <div class="alloc-targets-grid">
+            <div class="alloc-target-field">
+              <label>Momentum</label>
+              <input id="t-st-momentum" type="number" min="0" max="100" value="${t.by_strategy_type.momentum}">
+            </div>
+            <div class="alloc-target-field">
+              <label>Mean Reversion</label>
+              <input id="t-st-mean-reversion" type="number" min="0" max="100" value="${t.by_strategy_type.mean_reversion}">
+            </div>
+            <div class="alloc-target-field">
+              <label>Event-Driven</label>
+              <input id="t-st-event-driven" type="number" min="0" max="100" value="${t.by_strategy_type.event_driven}">
+            </div>
+            <div class="alloc-target-field">
+              <label>Swing</label>
+              <input id="t-st-swing" type="number" min="0" max="100" value="${t.by_strategy_type.swing}">
+            </div>
+            <div class="alloc-target-field">
+              <label>Other</label>
+              <input id="t-st-other" type="number" min="0" max="100" value="${t.by_strategy_type.other}">
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button id="t-save" class="kanban-btn-primary" type="button">💾 Save Targets</button>
+            <button id="t-reset" class="kanban-btn-secondary" type="button">↻ Reset to Defaults</button>
+            <button id="t-close" class="kanban-btn-secondary" type="button">Cancel</button>
+          </div>
+        </div>
+      `;
+      $("t-save").addEventListener("click", () => {
+        const num = (id) => parseFloat($(id).value) || 0;
+        const updated = {
+          cash_reserve_pct:    num("t-cash-reserve"),
+          max_single_position: num("t-max-pos"),
+          max_sector_pct:      num("t-max-sector"),
+          by_direction: {
+            long:   num("t-dir-long"),
+            short:  num("t-dir-short"),
+            hedged: num("t-dir-hedged"),
+          },
+          by_time_horizon: {
+            today:      num("t-th-today"),
+            swing:      num("t-th-swing"),
+            positional: num("t-th-positional"),
+          },
+          by_strategy_type: {
+            momentum:       num("t-st-momentum"),
+            mean_reversion: num("t-st-mean-reversion"),
+            event_driven:   num("t-st-event-driven"),
+            swing:          num("t-st-swing"),
+            other:          num("t-st-other"),
+          },
+        };
+        saveAllocTargets(updated);
+        card.style.display = "none";
+        renderAllocation();
+      });
+      $("t-reset").addEventListener("click", () => {
+        if (confirm("Reset all targets to default values?")) {
+          saveAllocTargets(DEFAULT_TARGETS);
+          showTargetEditor();   // re-render with defaults
+          showTargetEditor();   // toggle back open
+        }
+      });
+      $("t-close").addEventListener("click", () => { card.style.display = "none"; });
+    }
+
+    // AI regime suggestion — single Claude call
+    async function fetchRegimeSuggestion() {
+      const btn = $("alloc-regime-btn");
+      const result = $("alloc-regime-result");
+      btn.disabled = true; btn.textContent = "⏳ Analyzing…";
+      result.innerHTML = `
+        <div class="alloc-card" style="background: rgba(99,102,241,0.05);">
+          <div style="padding:14px; color:#6b7280;">Asking Claude to suggest regime-adjusted targets based on current India VIX…</div>
+        </div>
+      `;
+      try {
+        const targets = getAllocTargets();
+        const portfolio = getPortfolioSize();
+        const resp = await fetch(ALLOC_AI_URL, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({portfolio_size: portfolio, user_targets: targets}),
+        });
+        if (!resp.ok) {
+          const body = await resp.text();
+          throw new Error(`HTTP ${resp.status}: ${body.slice(0, 200)}`);
+        }
+        _allocRegime = await resp.json();
+        renderRegimeSuggestion();
+      } catch (e) {
+        result.innerHTML = `
+          <div class="risk-warning danger">
+            <span>⚠️</span>
+            <div>AI suggestion failed: ${escapeHtml(String(e))}</div>
+          </div>
+        `;
+      } finally {
+        btn.disabled = false; btn.textContent = "🤖 AI Regime Adjust";
+      }
+    }
+
+    function renderRegimeSuggestion() {
+      const r = _allocRegime;
+      const result = $("alloc-regime-result");
+      if (!r) return;
+      const regime = r.regime || {};
+      const adj = r.adjusted_targets || {};
+      const actions = r.actions || [];
+
+      // Build before/after rows for direction (most visible)
+      const targets = getAllocTargets();
+      const adjDir = adj.by_direction || {};
+      const dirRows = Object.keys(targets.by_direction || {}).map(k => {
+        const before = targets.by_direction[k];
+        const after = adjDir[k];
+        if (after === undefined) return "";
+        const delta = after - before;
+        const sign = delta > 0 ? "+" : "";
+        const color = delta > 0 ? "gain" : (delta < 0 ? "loss" : "");
+        return `
+          <div class="alloc-regime-row">
+            <span class="alloc-bucket-name">${escapeHtml(k)}</span>
+            <span style="font-family: ui-monospace, monospace;">
+              ${before}% → ${after}%
+              <span class="${color}" style="margin-left:6px;">(${sign}${delta.toFixed(1)})</span>
+            </span>
+          </div>
+        `;
+      }).join("");
+
+      const actionsHtml = actions.length > 0 ? `
+        <div style="margin-top:14px;">
+          <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">Concrete actions:</div>
+          <ul style="margin:0; padding-left:20px;">
+            ${actions.map(a => `<li style="margin-bottom:4px;">${escapeHtml(a)}</li>`).join("")}
+          </ul>
+        </div>
+      ` : "";
+
+      result.innerHTML = `
+        <div class="alloc-card alloc-regime-card">
+          <div class="alloc-card-title">
+            🤖 AI Regime Adjustment
+            <span class="alloc-card-subtitle">
+              India VIX ${regime.vix_level ? regime.vix_level.toFixed(1) : "?"}
+              ${regime.vix_percentile !== null ? `(P${regime.vix_percentile.toFixed(0)})` : ""}
+              · ${escapeHtml(regime.label || "normal")} regime
+            </span>
+          </div>
+          <div style="font-size:13px; line-height:1.55; margin-bottom:10px;">
+            ${escapeHtml(r.rationale || "")}
+          </div>
+          ${dirRows ? `
+            <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">
+              Direction adjustments:
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;">
+              ${dirRows}
+            </div>
+          ` : ""}
+          ${actionsHtml}
+          <div style="margin-top:14px;padding-top:10px;border-top:1px solid #e5e7eb;">
+            <button class="kanban-btn-secondary" id="alloc-apply-regime" type="button">
+              ✓ Apply Suggested Targets
+            </button>
+            <span style="font-size:11px;color:#9ca3af;margin-left:10px;">
+              This replaces your saved targets with the AI-adjusted values.
+            </span>
+          </div>
+        </div>
+      `;
+      const applyBtn = $("alloc-apply-regime");
+      if (applyBtn) {
+        applyBtn.addEventListener("click", () => {
+          if (!confirm("Replace your saved targets with the AI's regime-adjusted targets?")) return;
+          const current = getAllocTargets();
+          const merged = {
+            ...current,
+            ...adj,
+            by_direction:     {...current.by_direction,    ...(adj.by_direction || {})},
+            by_strategy_type: {...current.by_strategy_type, ...(adj.by_strategy_type || {})},
+          };
+          if (adj.cash_reserve_pct !== undefined) merged.cash_reserve_pct = adj.cash_reserve_pct;
+          saveAllocTargets(merged);
+          renderAllocation();
+        });
       }
     }
 
@@ -9856,6 +10679,9 @@ if barstate.islast
         }
         if (tab === "patterns") {
           loadPatternsScanner();
+        }
+        if (tab === "allocation") {
+          loadAllocation();
         }
       });
     });
